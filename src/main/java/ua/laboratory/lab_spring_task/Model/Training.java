@@ -3,23 +3,34 @@ package ua.laboratory.lab_spring_task.Model;
 import java.time.LocalDate;
 
 public class Training {
-    private long traineeId;
-    private long trainerId;
+    private Long trainingId;
+    private Long traineeId;
+    private Long trainerId;
     private String trainingName;
     private TrainingType trainingType;
     private LocalDate trainingDate;
-    private long trainingDuration;
+    private Long trainingDuration;
 
     public Training() {
     }
 
-    public Training(long traineeId, long trainerId, String trainingName, TrainingType trainingType, LocalDate trainingDate, long trainingDuration) {
+    public Training(Long trainingId, Long traineeId, Long trainerId, String trainingName,
+                    TrainingType trainingType, LocalDate trainingDate, Long trainingDuration) {
+        this.trainingId = trainingId;
         this.traineeId = traineeId;
         this.trainerId = trainerId;
         this.trainingName = trainingName;
         this.trainingType = trainingType;
         this.trainingDate = trainingDate;
         this.trainingDuration = trainingDuration;
+    }
+
+    public Long getTrainingId() {
+        return trainingId;
+    }
+
+    public void setTrainingId(Long trainingId) {
+        this.trainingId = trainingId;
     }
 
     public long getTraineeId() {
