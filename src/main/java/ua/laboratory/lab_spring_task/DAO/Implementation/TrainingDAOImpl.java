@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ua.laboratory.lab_spring_task.DAO.TrainingDAO;
 import ua.laboratory.lab_spring_task.Model.Training;
-import ua.laboratory.lab_spring_task.Util.Storage.InMemoryStorage;
+import ua.laboratory.lab_spring_task.Util.InMemoryStorage;
 
 import java.util.ArrayList;
 import java.util.List;

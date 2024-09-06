@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface TrainingService {
     public Training createTraining(Training training);
-    public Training getTraining(int id);
+    public Training getTraining(Long id);
     public List<Training> getAllTrainings();
 }

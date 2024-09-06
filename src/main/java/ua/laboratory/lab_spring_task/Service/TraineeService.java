@@ -5,9 +5,8 @@ import java.util.List;
 
 public interface TraineeService {
     public Trainee createTrainee(Trainee trainee);
-    public Trainee getTraineeById(int id);
-    public Trainee getTraineeByUsername(String username);
+    public Trainee getTraineeById(Long id);
     public List<Trainee> getAllTrainees();
     public Trainee updateTrainee(Trainee trainee);
-    public void deleteTrainee(int id);
+    public void deleteTrainee(Long id);
 }

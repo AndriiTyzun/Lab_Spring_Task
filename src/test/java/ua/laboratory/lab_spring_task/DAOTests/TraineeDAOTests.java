@@ -6,12 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
-import ua.laboratory.lab_spring_task.Util.Storage.InMemoryStorage;
+import ua.laboratory.lab_spring_task.Util.InMemoryStorage;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,19 +27,19 @@ public class TraineeDAOTests {
     public void setUp() {
         storage.getTraineeStorage().clear();
         traineeStorage = storage.getTraineeStorage();
-        traineeStorage.put(1L, new Trainee("Tom", "Thompson", "tom.tompson@gmail.com", "12344321",
+        traineeStorage.put(1L, new Trainee("Tom", "Thompson", "tom.tompson", "abctgFdJQ5",
                 true, 1L, LocalDate.now(), "City, Street, House 1"));
-        traineeStorage.put(2L, new Trainee("John", "Thompson", "john.tompson@gmail.com", "12344321",
+        traineeStorage.put(2L, new Trainee("John", "Thompson", "john.tompson", "abctgFdJQ5",
                 true, 2L, LocalDate.now(), "City, Street, House 2"));
     }
 
     @Test
     public void testCreateTrainee() {
-        Trainee trainee = new Trainee("Tom", "Thompson", "tom.tompson@gmail.com", "12344321",
-                true, 1L, LocalDate.now(), "City, Street, House 1");
+        Trainee trainee = new Trainee("Tom", "Thompson", "tom.tompson", "abctgFdJQ5",
+                true, 3L, LocalDate.now(), "City, Street, House 1");
         traineeDAO.createTrainee(trainee);
 
-        assertEquals(2, storage.getTraineeStorage().size());
+        assertEquals(3, storage.getTraineeStorage().size());
         assertTrue(storage.getTraineeStorage().containsKey(trainee.getUserId()));
     }
 
@@ -63,7 +62,7 @@ public class TraineeDAOTests {
 
     @Test
     public void testUpdateTrainee() {
-        Trainee updatedTrainee = new Trainee("Jon", "Thompson", "john.tompson@gmail.com", "12344321",
+        Trainee updatedTrainee = new Trainee("Jon", "Thompson", "john.tompson", "abctgFdJQ5",
                 true, 2L, LocalDate.now(), "City, Street, House 2");
         traineeDAO.updateTrainee(updatedTrainee);
 

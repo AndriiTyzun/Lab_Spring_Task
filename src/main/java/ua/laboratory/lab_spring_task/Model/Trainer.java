@@ -14,6 +14,13 @@ public class Trainer extends User{
         this.specialization = specialization;
     }
 
+    public Trainer(String firstName, String lastName,
+                   boolean isActive, long userId, String specialization) {
+        super(firstName, lastName, isActive);
+        this.userId = userId;
+        this.specialization = specialization;
+    }
+
     public Long getUserId() {
         return userId;
     }

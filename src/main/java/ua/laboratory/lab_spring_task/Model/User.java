@@ -18,6 +18,14 @@ public abstract class User {
         this.isActive = isActive;
     }
 
+    public User(String firstName, String lastName, boolean isActive) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = null;
+        this.password = null;
+        this.isActive = isActive;
+    }
+
     public String getFirstName() {
         return firstName;
     }
