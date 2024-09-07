@@ -1,13 +1,15 @@
 package ua.laboratory.lab_spring_task.Util;
 
-import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 import ua.laboratory.lab_spring_task.Model.Trainer;
 import ua.laboratory.lab_spring_task.Model.Training;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -16,7 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Configuration
+@PropertySource("classpath:application.properties")
 public class InMemoryStorage {
     @Value("${default.data.file.path}")
     private String dataFilePath;
@@ -32,17 +35,17 @@ public class InMemoryStorage {
     }
 
     @Bean
-    public Map<Long, Trainer> getTrainerStorage() {
+    public Map<Long, Trainer> trainerStorage() {
         return trainerStorage;
     }
 
     @Bean
-    public Map<Long, Trainee> getTraineeStorage() {
+    public Map<Long, Trainee> traineeStorage() {
         return traineeStorage;
     }
 
     @Bean
-    public Map<Long, Training> getTrainingStorage() {
+    public Map<Long, Training> trainingStorage() {
         return trainingStorage;
     }
 
@@ -61,7 +64,6 @@ public class InMemoryStorage {
                                 parts[2],parts[3],parts[4],parts[5],
                                 Boolean.parseBoolean(parts[6]), Long.parseLong(parts[7]),
                                 LocalDate.parse(parts[8]),parts[9]
-
                         );
                         traineeStorage.put(Long.parseLong(parts[7]), trainee);
                         break;

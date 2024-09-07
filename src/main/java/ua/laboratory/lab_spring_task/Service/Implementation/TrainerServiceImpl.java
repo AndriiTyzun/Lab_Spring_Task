@@ -20,17 +20,15 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Trainer createTrainer(Trainer trainer) {
-        if(trainer.getUsername().isEmpty())
-            trainer.setUsername(trainer.getFirstName() + "." + trainer.getLastName());
-
+        trainer.setUsername(trainer.getFirstName() + "." + trainer.getLastName());
 
         if(trainerDAO.getAllTrainers().stream().anyMatch(x -> x.getUsername()
                 .equals(trainer.getUsername())))
             trainer.setUsername(trainer.getFirstName() + "." + trainer.getLastName() +
                     trainer.getUserId());
 
-        if (trainer.getPassword().isEmpty())
-            trainer.setPassword(Utilities.generatePassword(10));
+        trainer.setPassword(Utilities.generatePassword(10));
+
 
         return trainerDAO.createTrainer(trainer);
     }

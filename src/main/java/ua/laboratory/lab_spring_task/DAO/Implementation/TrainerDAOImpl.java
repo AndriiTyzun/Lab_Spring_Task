@@ -12,11 +12,11 @@ import java.util.Map;
 
 @Repository
 public class TrainerDAOImpl implements TrainerDAO {
-    private final Map<Long, Trainer> trainerStorage;
-
     @Autowired
-    public TrainerDAOImpl(InMemoryStorage storage) {
-        trainerStorage = storage.getTrainerStorage();
+    private Map<Long, Trainer> trainerStorage;
+
+    public TrainerDAOImpl(Map<Long, Trainer> trainerStorage) {
+        this.trainerStorage = trainerStorage;
     }
 
     @Override

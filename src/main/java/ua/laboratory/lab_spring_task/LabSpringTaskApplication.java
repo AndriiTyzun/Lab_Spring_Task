@@ -1,15 +1,22 @@
 package ua.laboratory.lab_spring_task;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import ua.laboratory.lab_spring_task.DAO.Implementation.TraineeDAOImpl;
-import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 
-@SpringBootApplication
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import ua.laboratory.lab_spring_task.Config.AppConfig;
+import ua.laboratory.lab_spring_task.Model.Trainee;
+import ua.laboratory.lab_spring_task.Service.TraineeService;
+
+import java.time.LocalDate;
+
 public class LabSpringTaskApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(LabSpringTaskApplication.class, args);
-    }
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        TraineeService traineeService = context.getBean(TraineeService.class);
 
+
+
+    }
 }

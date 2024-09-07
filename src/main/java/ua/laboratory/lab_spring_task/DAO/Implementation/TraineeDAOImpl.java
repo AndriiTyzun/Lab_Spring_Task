@@ -3,10 +3,11 @@ package ua.laboratory.lab_spring_task.DAO.Implementation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
-import ua.laboratory.lab_spring_task.Util.InMemoryStorage;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +16,12 @@ import java.util.Map;
 @Repository
 public class TraineeDAOImpl implements TraineeDAO {
     private static final Logger logger = LoggerFactory.getLogger(TraineeDAOImpl.class);
-    private final Map<Long, Trainee> traineeStorage;
 
     @Autowired
-    public TraineeDAOImpl(InMemoryStorage storage) {
-        traineeStorage = storage.getTraineeStorage();
+    private Map<Long, Trainee> traineeStorage;
+
+    public TraineeDAOImpl(Map<Long, Trainee> traineeStorage) {
+        this.traineeStorage = traineeStorage;
     }
 
     @Override

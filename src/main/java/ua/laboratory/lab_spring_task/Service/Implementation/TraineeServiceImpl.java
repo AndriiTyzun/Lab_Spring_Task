@@ -23,17 +23,15 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee createTrainee(Trainee trainee) {
-        if(trainee.getUsername().isEmpty()){
-            trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName());
-        }
+        trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName());
 
-        if(traineeDAO.getAllTrainees().stream().anyMatch(x -> x.getUsername()
-                .equals(trainee.getUsername()))) {
+        if(traineeDAO.getAllTrainees().stream()
+                .anyMatch(x -> x.getUsername().equals(trainee.getUsername())))
             trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName() +
                     trainee.getUserId());
-        }
-        if (trainee.getPassword().isEmpty())
-            trainee.setPassword(Utilities.generatePassword(10));
+
+        trainee.setPassword(Utilities.generatePassword(10));
+
 
         return traineeDAO.createTrainee(trainee);
     }
