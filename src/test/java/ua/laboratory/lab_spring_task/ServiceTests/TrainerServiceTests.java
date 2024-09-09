@@ -1,30 +1,28 @@
-package ua.laboratory.lab_spring_task.DAOTests;
+package ua.laboratory.lab_spring_task.ServiceTests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import ua.laboratory.lab_spring_task.DAO.Implementation.TrainerDAOImpl;
 import ua.laboratory.lab_spring_task.DAO.Implementation.TrainerDAOImpl;
 import ua.laboratory.lab_spring_task.DAO.TrainerDAO;
-import ua.laboratory.lab_spring_task.DAO.TrainerDAO;
 import ua.laboratory.lab_spring_task.Model.Trainer;
-import ua.laboratory.lab_spring_task.Model.Trainer;
-import ua.laboratory.lab_spring_task.Util.InMemoryStorage;
+import ua.laboratory.lab_spring_task.Service.Implementation.TrainerServiceImpl;
+import ua.laboratory.lab_spring_task.Service.TrainerService;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class TrainerDAOTests {
+public class TrainerServiceTests {
     private final Map<Long, Trainer> storage;
     private final TrainerDAO trainerDAO;
+    private final TrainerService trainerService;
 
-    public TrainerDAOTests() {
+    public TrainerServiceTests() {
         storage = new HashMap<>();
         trainerDAO = new TrainerDAOImpl(storage);
+        trainerService = new TrainerServiceImpl(trainerDAO);
     }
 
     @BeforeEach
@@ -38,17 +36,19 @@ public class TrainerDAOTests {
 
     @Test
     public void testCreateTrainer() {
-        Trainer trainer = new Trainer("Tom", "Thompson",
+        Trainer trainer = new Trainer("Tom", "Thompson","tom.tompson","abctgFdJQ5",
                 true, 3L, "Athletics");
-        trainerDAO.createTrainer(trainer);
+        trainerService.createTrainer(trainer);
 
         assertEquals(3, storage.size());
+        assertEquals("Tom.Thompson", trainerService.getTrainer(3L).getUsername());
+        assertFalse(trainerService.getTrainer(3L).getPassword().isEmpty());
         assertTrue(storage.containsKey(trainer.getUserId()));
     }
 
     @Test
     public void testGetTrainer() {
-        Trainer found = trainerDAO.getTrainer(1L);
+        Trainer found = trainerService.getTrainer(1L);
 
         assertEquals(2, storage.size());
         assertTrue(storage.containsKey(found.getUserId()));
@@ -56,7 +56,7 @@ public class TrainerDAOTests {
 
     @Test
     public void testGetAllTrainers() {
-        List<Trainer> found = trainerDAO.getAllTrainers();
+        List<Trainer> found = trainerService.getAllTrainers();
 
         assertEquals(2, found.size());
         assertTrue(storage.containsKey(found.get(0).getUserId()));
@@ -65,7 +65,7 @@ public class TrainerDAOTests {
 
     @Test
     public void testUpdateTrainer() {
-        Trainer updatedTrainer = new Trainer("Jon", "Thompson",
+        Trainer updatedTrainer = new Trainer("Jon", "Thompson","tom.tompson","abctgFdJQ5",
                 true, 2L, "Athletics");
         trainerDAO.updateTrainer(updatedTrainer);
 

@@ -8,6 +8,7 @@ import org.springframework.context.annotation.PropertySource;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 import ua.laboratory.lab_spring_task.Model.Trainer;
 import ua.laboratory.lab_spring_task.Model.Training;
+import ua.laboratory.lab_spring_task.Model.TrainingType;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -65,16 +66,25 @@ public class InMemoryStorage {
                                 Boolean.parseBoolean(parts[6]), Long.parseLong(parts[7]),
                                 LocalDate.parse(parts[8]),parts[9]
                         );
-                        traineeStorage.put(Long.parseLong(parts[7]), trainee);
+                        traineeStorage.put(trainee.getUserId(), trainee);
                         break;
-//                    case "trainer":
-//                        Trainer trainer = new Trainer(id);
-//                        trainerStorage.put(id, trainer);
-//                        break;
-//                    case "training":
-//                        Training training = new Training(id);
-//                        trainingStorage.put(id, training);
-//                        break;
+                    case "trainer":
+                        Trainer trainer = new Trainer(
+                                parts[2],parts[3],parts[4],parts[5],
+                                Boolean.parseBoolean(parts[6]), Long.parseLong(parts[7]),
+                                parts[8]
+                        );
+                        trainerStorage.put(trainer.getUserId(), trainer);
+                        break;
+                    case "training":
+                        Training training = new Training(
+                                Long.parseLong(parts[1]),Long.parseLong(parts[2]),
+                                Long.parseLong(parts[3]),parts[4],
+                                TrainingType.valueOf(parts[5]), LocalDate.parse(parts[6]),
+                                Long.parseLong(parts[7])
+                        );
+                        trainingStorage.put(training.getTrainingId(), training);
+                        break;
                     default:
                         throw new IllegalArgumentException("Unknown entity type: " + entityType);
                 }
