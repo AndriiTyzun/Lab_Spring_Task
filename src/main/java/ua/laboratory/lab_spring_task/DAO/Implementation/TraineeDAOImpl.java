@@ -26,34 +26,59 @@ public class TraineeDAOImpl implements TraineeDAO {
 
     @Override
     public Trainee createTrainee(Trainee trainee) {
-        logger.info("Creating trainee with ID: {}", trainee.getUserId());
+        try {
+            logger.info("Creating trainee with ID: {}", trainee.getUserId());
 
-        traineeStorage.put(trainee.getUserId(), trainee);
-        return traineeStorage.get(trainee.getUserId());
+            traineeStorage.put(trainee.getUserId(), trainee);
+            return traineeStorage.get(trainee.getUserId());
+        }catch (Exception e) {
+            logger.error("Failed to create trainee with ID: {}", trainee.getUserId());
+            throw new RuntimeException("Failed to create trainee with ID: " + trainee.getUserId(), e);
+        }
     }
 
     @Override
     public Trainee getTraineeById(Long id) {
-        logger.debug("Fetching trainee with ID: {}", id);
-        return traineeStorage.get(id);
+        try {
+            logger.info("Fetching trainee with ID: {}", id);
+            return traineeStorage.get(id);
+        }catch (Exception e) {
+            logger.error("Failed to fetch trainee with ID: {}", id);
+            throw new RuntimeException("Failed to fetch trainee with ID: " + id, e);
+        }
     }
 
     @Override
     public List<Trainee> getAllTrainees() {
-        logger.debug("Fetching all trainees");
-        return new ArrayList<>(traineeStorage.values());
+        try {
+            logger.info("Fetching all trainees");
+            return new ArrayList<>(traineeStorage.values());
+        } catch (Exception e){
+            logger.error("Failed to fetch all trainees", e);
+            throw new RuntimeException("Failed to fetch all trainees", e);
+        }
     }
 
     @Override
     public Trainee updateTrainee(Trainee trainee) {
-        logger.info("Updating trainee with ID: {}", trainee.getUserId());
-        traineeStorage.put(trainee.getUserId(), trainee);
-        return traineeStorage.get(trainee.getUserId());
+        try {
+            logger.info("Updating trainee with ID: {}", trainee.getUserId());
+            traineeStorage.put(trainee.getUserId(), trainee);
+            return traineeStorage.get(trainee.getUserId());
+        } catch (Exception e){
+            logger.error("Failed to update trainee with ID: {}", trainee.getUserId());
+            throw new RuntimeException("Failed to update trainee with ID: " + trainee.getUserId(), e);
+        }
     }
 
     @Override
     public Trainee deleteTrainee(Long id) {
-        logger.info("Deleting trainee with ID: {}", id);
-        return traineeStorage.remove(id);
+        try {
+            logger.info("Deleting trainee with ID: {}", id);
+            return traineeStorage.remove(id);
+        } catch (Exception e){
+            logger.error("Failed to delete trainee with ID: {}", id);
+            throw new RuntimeException("Failed to delete trainee with ID: " + id, e);
+        }
     }
 }

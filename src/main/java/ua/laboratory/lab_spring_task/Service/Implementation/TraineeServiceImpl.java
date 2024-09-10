@@ -4,16 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.laboratory.lab_spring_task.DAO.Implementation.TrainerDAOImpl;
 import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 import ua.laboratory.lab_spring_task.Service.TraineeService;
 import ua.laboratory.lab_spring_task.Util.Utilities;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Random;
 
 @Service
 public class TraineeServiceImpl implements TraineeService {
@@ -27,38 +23,64 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee createTrainee(Trainee trainee) {
-        logger.info("Creating trainee with ID: {}", trainee.getUserId());
-        trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName());
+        try {
+            logger.info("Creating trainee with ID: {}", trainee.getUserId());
+            trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName());
 
-        if(traineeDAO.getAllTrainees().stream().anyMatch(x -> x.getUsername().equals(trainee.getUsername())))
-            trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName() + trainee.getUserId());
+            if(traineeDAO.getAllTrainees().stream().anyMatch(x -> x.getUsername().equals(trainee.getUsername())))
+                trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName() + trainee.getUserId());
 
-        trainee.setPassword(Utilities.generatePassword(10));
+            trainee.setPassword(Utilities.generatePassword(10));
 
-        return traineeDAO.createTrainee(trainee);
+            return traineeDAO.createTrainee(trainee);
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new RuntimeException(e.getMessage(),e);
+        }
     }
 
     @Override
     public Trainee getTraineeById(Long id) {
-        logger.debug("Fetching trainee with ID: {}", id);
-        return traineeDAO.getTraineeById(id);
+        try {
+            logger.info("Fetching trainee with ID: {}", id);
+            return traineeDAO.getTraineeById(id);
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new RuntimeException(e.getMessage(),e);
+        }
+
     }
 
     @Override
     public List<Trainee> getAllTrainees() {
-        logger.debug("Fetching all trainees");
-        return traineeDAO.getAllTrainees();
+        try {
+            logger.info("Fetching all trainees");
+            return traineeDAO.getAllTrainees();
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new RuntimeException(e.getMessage(),e);
+        }
     }
 
     @Override
     public Trainee updateTrainee(Trainee trainee) {
-        logger.info("Updating trainee with ID: {}", trainee.getUserId());
-        return traineeDAO.updateTrainee(trainee);
+        try {
+            logger.info("Updating trainee with ID: {}", trainee.getUserId());
+            return traineeDAO.updateTrainee(trainee);
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new RuntimeException(e.getMessage(),e);
+        }
     }
 
     @Override
     public void deleteTrainee(Long id) {
-        logger.info("Deleting trainee with ID: {}", id);
-        traineeDAO.deleteTrainee(id);
+        try {
+            logger.info("Deleting trainee with ID: {}", id);
+            traineeDAO.deleteTrainee(id);
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new RuntimeException(e.getMessage(),e);
+        }
     }
 }

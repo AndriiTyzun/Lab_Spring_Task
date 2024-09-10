@@ -37,19 +37,19 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Trainer getTrainer(Long id) {
-        logger.debug("Fetching trainer with ID: {}", id);
+        logger.info("Fetching trainer with ID: {}", id);
         return trainerDAO.getTrainer(id);
     }
 
     @Override
     public List<Trainer> getAllTrainers() {
-        logger.debug("Fetching all trainers");
+        logger.info("Fetching all trainers");
         return trainerDAO.getAllTrainers();
     }
 
     @Override
     public Trainer updateTrainer(Trainer trainer) {
-        logger.debug("Updating trainer with ID: {}", trainer.getUserId());
+        logger.info("Updating trainer with ID: {}", trainer.getUserId());
 
         return trainerDAO.updateTrainer(trainer);
     }

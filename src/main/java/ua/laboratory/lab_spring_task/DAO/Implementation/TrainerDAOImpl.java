@@ -33,19 +33,19 @@ public class TrainerDAOImpl implements TrainerDAO {
 
     @Override
     public Trainer getTrainer(Long id) {
-        logger.debug("Fetching trainer with ID: {}", id);
+        logger.info("Fetching trainer with ID: {}", id);
         return trainerStorage.get(id);
     }
 
     @Override
     public List<Trainer> getAllTrainers() {
-        logger.debug("Fetching all trainers");
+        logger.info("Fetching all trainers");
         return new ArrayList<>(trainerStorage.values());
     }
 
     @Override
     public Trainer updateTrainer(Trainer trainer) {
-        logger.debug("Updating trainer with ID: {}", trainer.getUserId());
+        logger.info("Updating trainer with ID: {}", trainer.getUserId());
         trainerStorage.put(trainer.getUserId(), trainer);
         return trainerStorage.get(trainer.getUserId());
     }

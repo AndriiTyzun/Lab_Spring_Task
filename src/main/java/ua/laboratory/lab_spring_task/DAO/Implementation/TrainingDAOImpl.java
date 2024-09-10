@@ -32,13 +32,13 @@ public class TrainingDAOImpl implements TrainingDAO {
 
     @Override
     public Training getTraining(Long id) {
-        logger.debug("Fetching training with ID: {}", id);
+        logger.info("Fetching training with ID: {}", id);
         return trainingStorage.get(id);
     }
 
     @Override
     public List<Training> getAllTrainings() {
-        logger.debug("Fetching all trainings");
+        logger.info("Fetching all trainings");
         return new ArrayList<>(trainingStorage.values());
     }
 }
