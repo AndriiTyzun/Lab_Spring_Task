@@ -14,10 +14,14 @@ import java.util.List;
 @Service
 public class TraineeServiceImpl implements TraineeService {
     private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImpl.class);
-    private final TraineeDAO traineeDAO;
+    private TraineeDAO traineeDAO;
+
+    public TraineeServiceImpl(TraineeDAO traineeDAO) {
+        this.traineeDAO = traineeDAO;
+    }
 
     @Autowired
-    public TraineeServiceImpl(TraineeDAO traineeDAO) {
+    public void setTraineeDAO(TraineeDAO traineeDAO) {
         this.traineeDAO = traineeDAO;
     }
 

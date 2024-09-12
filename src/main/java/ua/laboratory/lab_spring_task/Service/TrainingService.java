@@ -4,8 +4,8 @@ import ua.laboratory.lab_spring_task.Model.Training;
 
 import java.util.List;
 
-public interface TrainingService {
-    public Training createTraining(Training training);
-    public Training getTraining(Long id);
-    public List<Training> getAllTrainings();
+public  interface TrainingService {
+    Training createTraining(Training training);
+    Training getTraining(Long id);
+    List<Training> getAllTrainings();
 }

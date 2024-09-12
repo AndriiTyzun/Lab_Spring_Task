@@ -7,10 +7,10 @@ import java.util.List;
 
 @Repository
 public interface TraineeDAO {
-    public Trainee createTrainee(Trainee trainee);
-    public Trainee getTraineeById(Long id);
-    public List<Trainee> getAllTrainees();
-    public Trainee updateTrainee(Trainee trainee);
-    public Trainee deleteTrainee(Long id);
+    Trainee createTrainee(Trainee trainee);
+    Trainee getTraineeById(Long id);
+    List<Trainee> getAllTrainees();
+    Trainee updateTrainee(Trainee trainee);
+    Trainee deleteTrainee(Long id);
 }
 

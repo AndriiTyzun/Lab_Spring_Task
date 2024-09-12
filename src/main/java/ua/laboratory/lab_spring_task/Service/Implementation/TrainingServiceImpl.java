@@ -13,28 +13,47 @@ import java.util.List;
 @Service
 public class TrainingServiceImpl implements TrainingService {
     private static final Logger logger = LoggerFactory.getLogger(TrainingServiceImpl.class);
-    private final TrainingDAO trainingDAO;
+    private TrainingDAO trainingDAO;
+
+    public TrainingServiceImpl(TrainingDAO trainingDAO) {
+        this.trainingDAO = trainingDAO;
+    }
 
     @Autowired
-    public TrainingServiceImpl(TrainingDAO trainingDAO) {
+    public void setTrainingDAO(TrainingDAO trainingDAO) {
         this.trainingDAO = trainingDAO;
     }
 
     @Override
     public Training createTraining(Training training) {
-        logger.info("Creating training with ID: {}", training.getTrainingId());
-        return trainingDAO.createTraining(training);
+        try {
+            logger.info("Creating training with ID: {}", training.getTrainingId());
+            return trainingDAO.createTraining(training);
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new RuntimeException(e.getMessage(),e);
+        }
     }
 
     @Override
     public Training getTraining(Long id) {
-        logger.info("Fetching training with ID: {}", id);
-        return trainingDAO.getTraining(id);
+        try {
+            logger.info("Fetching training with ID: {}", id);
+            return trainingDAO.getTraining(id);
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new RuntimeException(e.getMessage(),e);
+        }
     }
 
     @Override
     public List<Training> getAllTrainings() {
-        logger.info("Fetching all trainings");
-        return trainingDAO.getAllTrainings();
+        try {
+            logger.info("Fetching all trainings");
+            return trainingDAO.getAllTrainings();
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new RuntimeException(e.getMessage(),e);
+        }
     }
 }

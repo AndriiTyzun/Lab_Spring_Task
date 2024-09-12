@@ -25,28 +25,48 @@ public class TrainerDAOImpl implements TrainerDAO {
 
     @Override
     public Trainer createTrainer(Trainer trainer) {
-        logger.info("Creating trainer with ID: {}", trainer.getUserId());
+        try {
+            logger.info("Creating trainer with ID: {}", trainer.getUserId());
 
-        trainerStorage.put(trainer.getUserId(), trainer);
-        return trainerStorage.get(trainer.getUserId());
+            trainerStorage.put(trainer.getUserId(), trainer);
+            return trainerStorage.get(trainer.getUserId());
+        } catch (Exception e) {
+            logger.error("Failed to create trainer with ID: {}", trainer.getUserId());
+            throw new RuntimeException("Failed to create trainer with ID: " + trainer.getUserId(), e);
+        }
     }
 
     @Override
     public Trainer getTrainer(Long id) {
-        logger.info("Fetching trainer with ID: {}", id);
-        return trainerStorage.get(id);
+        try {
+            logger.info("Fetching trainer with ID: {}", id);
+            return trainerStorage.get(id);
+        }catch (Exception e) {
+            logger.error("Failed to fetch trainer with ID: {}", id);
+            throw new RuntimeException("Failed to fetch trainer with ID: " + id, e);
+        }
     }
 
     @Override
     public List<Trainer> getAllTrainers() {
-        logger.info("Fetching all trainers");
-        return new ArrayList<>(trainerStorage.values());
+        try {
+            logger.info("Fetching all trainers");
+            return new ArrayList<>(trainerStorage.values());
+        } catch (Exception e) {
+            logger.error("Failed to fetch all trainers", e);
+            throw new RuntimeException("Failed to fetch all trainers", e);
+        }
     }
 
     @Override
     public Trainer updateTrainer(Trainer trainer) {
-        logger.info("Updating trainer with ID: {}", trainer.getUserId());
-        trainerStorage.put(trainer.getUserId(), trainer);
-        return trainerStorage.get(trainer.getUserId());
+        try {
+            logger.info("Updating trainer with ID: {}", trainer.getUserId());
+            trainerStorage.put(trainer.getUserId(), trainer);
+            return trainerStorage.get(trainer.getUserId());
+        }catch (Exception e){
+            logger.error("Failed to update trainer with ID: {}", trainer.getUserId());
+            throw new RuntimeException("Failed to update trainer with ID: " + trainer.getUserId(), e);
+        }
     }
 }

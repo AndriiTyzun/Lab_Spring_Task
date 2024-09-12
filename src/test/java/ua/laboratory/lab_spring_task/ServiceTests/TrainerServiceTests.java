@@ -8,6 +8,7 @@ import ua.laboratory.lab_spring_task.Model.Trainer;
 import ua.laboratory.lab_spring_task.Service.Implementation.TrainerServiceImpl;
 import ua.laboratory.lab_spring_task.Service.TrainerService;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class TrainerServiceTests {
     }
 
     @Test
-    public void testCreateTrainer() {
+    public void testCreateTrainer() throws NoSuchAlgorithmException {
         Trainer trainer = new Trainer("Tom", "Thompson","tom.tompson","abctgFdJQ5",
                 true, 3L, "Athletics");
         trainerService.createTrainer(trainer);

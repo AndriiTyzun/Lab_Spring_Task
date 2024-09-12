@@ -25,20 +25,35 @@ public class TrainingDAOImpl implements TrainingDAO {
 
     @Override
     public Training createTraining(Training training) {
-        logger.info("Creating training with ID: {}", training.getTrainingId());
-        trainingStorage.put(training.getTrainingId(), training);
-        return trainingStorage.get(training.getTrainingId());
+        try {
+            logger.info("Creating training with ID: {}", training.getTrainingId());
+            trainingStorage.put(training.getTrainingId(), training);
+            return trainingStorage.get(training.getTrainingId());
+        }catch (Exception e) {
+            logger.error("Failed to create training with ID: {}", training.getTrainingId());
+            throw new RuntimeException("Failed to create training with ID: " + training.getTrainingId(), e);
+        }
     }
 
     @Override
     public Training getTraining(Long id) {
-        logger.info("Fetching training with ID: {}", id);
-        return trainingStorage.get(id);
+        try {
+            logger.info("Fetching training with ID: {}", id);
+            return trainingStorage.get(id);
+        } catch (Exception e) {
+            logger.error("Failed to fetch training with ID: {}", id);
+            throw new RuntimeException("Failed to fetch training with ID: " + id, e);
+        }
     }
 
     @Override
     public List<Training> getAllTrainings() {
-        logger.info("Fetching all trainings");
-        return new ArrayList<>(trainingStorage.values());
+        try {
+            logger.info("Fetching all trainings");
+            return new ArrayList<>(trainingStorage.values());
+        } catch (Exception e) {
+            logger.error("Failed to fetch all trainings", e);
+            throw new RuntimeException("Failed to fetch all trainings", e);
+        }
     }
 }

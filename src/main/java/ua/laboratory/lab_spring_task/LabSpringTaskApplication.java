@@ -20,5 +20,6 @@ public class LabSpringTaskApplication {
         TrainerService trainerService = context.getBean(TrainerService.class);
         TrainingService trainingService = context.getBean(TrainingService.class);
 
+        
     }
 }
