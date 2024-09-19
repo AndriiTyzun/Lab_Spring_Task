@@ -10,20 +10,20 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Trainer extends User{
-    private Long userId;
+    private Long trainerId;
     private String specialization;
 
     public Trainer(String firstName, String lastName,
                    boolean isActive, long userId, String specialization) {
         super(firstName, lastName, isActive);
-        this.userId = userId;
+        this.trainerId = userId;
         this.specialization = specialization;
     }
 
     public Trainer(String firstName, String lastName, String username, String password,
                    boolean isActive, Long userId, String specialization) {
         super(firstName, lastName, username, password, isActive);
-        this.userId = userId;
+        this.trainerId = userId;
         this.specialization = specialization;
     }
 }

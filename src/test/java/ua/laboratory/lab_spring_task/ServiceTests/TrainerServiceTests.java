@@ -44,7 +44,7 @@ public class TrainerServiceTests {
         assertEquals(3, storage.size());
         assertEquals("Tom.Thompson", trainerService.getTrainer(3L).getUsername());
         assertFalse(trainerService.getTrainer(3L).getPassword().isEmpty());
-        assertTrue(storage.containsKey(trainer.getUserId()));
+        assertTrue(storage.containsKey(trainer.getTrainerId()));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class TrainerServiceTests {
         Trainer found = trainerService.getTrainer(1L);
 
         assertEquals(2, storage.size());
-        assertTrue(storage.containsKey(found.getUserId()));
+        assertTrue(storage.containsKey(found.getTrainerId()));
     }
 
     @Test
@@ -60,8 +60,8 @@ public class TrainerServiceTests {
         List<Trainer> found = trainerService.getAllTrainers();
 
         assertEquals(2, found.size());
-        assertTrue(storage.containsKey(found.get(0).getUserId()));
-        assertTrue(storage.containsKey(found.get(1).getUserId()));
+        assertTrue(storage.containsKey(found.get(0).getTrainerId()));
+        assertTrue(storage.containsKey(found.get(1).getTrainerId()));
     }
 
     @Test

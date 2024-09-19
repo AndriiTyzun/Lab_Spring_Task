@@ -39,7 +39,7 @@ public class TraineeDAOTests {
         traineeDAO.createTrainee(trainee);
 
         assertEquals(3, storage.size());
-        assertTrue(storage.containsKey(trainee.getUserId()));
+        assertTrue(storage.containsKey(trainee.getTraineeId()));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class TraineeDAOTests {
         Trainee found = traineeDAO.getTraineeById(1L);
 
         assertEquals(2, storage.size());
-        assertTrue(storage.containsKey(found.getUserId()));
+        assertTrue(storage.containsKey(found.getTraineeId()));
     }
 
     @Test
@@ -55,8 +55,8 @@ public class TraineeDAOTests {
         List<Trainee> found = traineeDAO.getAllTrainees();
 
         assertEquals(2, found.size());
-        assertTrue(storage.containsKey(found.get(0).getUserId()));
-        assertTrue(storage.containsKey(found.get(1).getUserId()));
+        assertTrue(storage.containsKey(found.get(0).getTraineeId()));
+        assertTrue(storage.containsKey(found.get(1).getTraineeId()));
     }
 
     @Test

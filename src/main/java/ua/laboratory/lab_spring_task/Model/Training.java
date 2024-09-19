@@ -1,9 +1,9 @@
 package ua.laboratory.lab_spring_task.Model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ua.laboratory.lab_spring_task.Model.Enum.TrainingType;
 
 import java.time.LocalDate;
 

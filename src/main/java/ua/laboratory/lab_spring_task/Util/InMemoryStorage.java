@@ -8,9 +8,8 @@ import org.springframework.context.annotation.PropertySource;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 import ua.laboratory.lab_spring_task.Model.Trainer;
 import ua.laboratory.lab_spring_task.Model.Training;
-import ua.laboratory.lab_spring_task.Model.TrainingType;
+import ua.laboratory.lab_spring_task.Model.Enum.TrainingType;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -50,7 +49,6 @@ public class InMemoryStorage {
         return trainingStorage;
     }
 
-    @PostConstruct
     public void init() throws IOException {
         try {
             List<String> lines = Files.readAllLines(Paths.get(dataFilePath));
@@ -66,7 +64,7 @@ public class InMemoryStorage {
                                 Boolean.parseBoolean(parts[6]), Long.parseLong(parts[7]),
                                 LocalDate.parse(parts[8]),parts[9]
                         );
-                        traineeStorage.put(trainee.getUserId(), trainee);
+                        traineeStorage.put(trainee.getTraineeId(), trainee);
                         break;
                     case "trainer":
                         Trainer trainer = new Trainer(
@@ -74,7 +72,7 @@ public class InMemoryStorage {
                                 Boolean.parseBoolean(parts[6]), Long.parseLong(parts[7]),
                                 parts[8]
                         );
-                        trainerStorage.put(trainer.getUserId(), trainer);
+                        trainerStorage.put(trainer.getTrainerId(), trainer);
                         break;
                     case "training":
                         Training training = new Training(

@@ -2,7 +2,6 @@ package ua.laboratory.lab_spring_task.DAOTests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import ua.laboratory.lab_spring_task.DAO.Implementation.TraineeDAOImpl;
 import ua.laboratory.lab_spring_task.DAO.Implementation.TrainerDAOImpl;
 import ua.laboratory.lab_spring_task.DAO.Implementation.TrainingDAOImpl;
@@ -12,8 +11,7 @@ import ua.laboratory.lab_spring_task.DAO.TrainingDAO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 import ua.laboratory.lab_spring_task.Model.Trainer;
 import ua.laboratory.lab_spring_task.Model.Training;
-import ua.laboratory.lab_spring_task.Model.TrainingType;
-import ua.laboratory.lab_spring_task.Util.InMemoryStorage;
+import ua.laboratory.lab_spring_task.Model.Enum.TrainingType;
 
 import java.time.LocalDate;
 import java.util.HashMap;

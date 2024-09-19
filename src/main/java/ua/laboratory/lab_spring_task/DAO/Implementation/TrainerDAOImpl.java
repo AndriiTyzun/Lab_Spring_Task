@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ua.laboratory.lab_spring_task.DAO.TrainerDAO;
 import ua.laboratory.lab_spring_task.Model.Trainer;
-import ua.laboratory.lab_spring_task.Util.InMemoryStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +25,13 @@ public class TrainerDAOImpl implements TrainerDAO {
     @Override
     public Trainer createTrainer(Trainer trainer) {
         try {
-            logger.info("Creating trainer with ID: {}", trainer.getUserId());
+            logger.info("Creating trainer with ID: {}", trainer.getTrainerId());
 
-            trainerStorage.put(trainer.getUserId(), trainer);
-            return trainerStorage.get(trainer.getUserId());
+            trainerStorage.put(trainer.getTrainerId(), trainer);
+            return trainerStorage.get(trainer.getTrainerId());
         } catch (Exception e) {
-            logger.error("Failed to create trainer with ID: {}", trainer.getUserId());
-            throw new RuntimeException("Failed to create trainer with ID: " + trainer.getUserId(), e);
+            logger.error("Failed to create trainer with ID: {}", trainer.getTrainerId());
+            throw new RuntimeException("Failed to create trainer with ID: " + trainer.getTrainerId(), e);
         }
     }
 
@@ -61,12 +60,12 @@ public class TrainerDAOImpl implements TrainerDAO {
     @Override
     public Trainer updateTrainer(Trainer trainer) {
         try {
-            logger.info("Updating trainer with ID: {}", trainer.getUserId());
-            trainerStorage.put(trainer.getUserId(), trainer);
-            return trainerStorage.get(trainer.getUserId());
+            logger.info("Updating trainer with ID: {}", trainer.getTrainerId());
+            trainerStorage.put(trainer.getTrainerId(), trainer);
+            return trainerStorage.get(trainer.getTrainerId());
         }catch (Exception e){
-            logger.error("Failed to update trainer with ID: {}", trainer.getUserId());
-            throw new RuntimeException("Failed to update trainer with ID: " + trainer.getUserId(), e);
+            logger.error("Failed to update trainer with ID: {}", trainer.getTrainerId());
+            throw new RuntimeException("Failed to update trainer with ID: " + trainer.getTrainerId(), e);
         }
     }
 }

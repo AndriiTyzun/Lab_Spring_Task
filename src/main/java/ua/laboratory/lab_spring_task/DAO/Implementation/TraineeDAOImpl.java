@@ -3,7 +3,6 @@ package ua.laboratory.lab_spring_task.DAO.Implementation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
@@ -27,13 +26,13 @@ public class TraineeDAOImpl implements TraineeDAO {
     @Override
     public Trainee createTrainee(Trainee trainee) {
         try {
-            logger.info("Creating trainee with ID: {}", trainee.getUserId());
+            logger.info("Creating trainee with ID: {}", trainee.getTraineeId());
 
-            traineeStorage.put(trainee.getUserId(), trainee);
-            return traineeStorage.get(trainee.getUserId());
+            traineeStorage.put(trainee.getTraineeId(), trainee);
+            return traineeStorage.get(trainee.getTraineeId());
         }catch (Exception e) {
-            logger.error("Failed to create trainee with ID: {}", trainee.getUserId());
-            throw new RuntimeException("Failed to create trainee with ID: " + trainee.getUserId(), e);
+            logger.error("Failed to create trainee with ID: {}", trainee.getTraineeId());
+            throw new RuntimeException("Failed to create trainee with ID: " + trainee.getTraineeId(), e);
         }
     }
 
@@ -62,12 +61,12 @@ public class TraineeDAOImpl implements TraineeDAO {
     @Override
     public Trainee updateTrainee(Trainee trainee) {
         try {
-            logger.info("Updating trainee with ID: {}", trainee.getUserId());
-            traineeStorage.put(trainee.getUserId(), trainee);
-            return traineeStorage.get(trainee.getUserId());
+            logger.info("Updating trainee with ID: {}", trainee.getTraineeId());
+            traineeStorage.put(trainee.getTraineeId(), trainee);
+            return traineeStorage.get(trainee.getTraineeId());
         } catch (Exception e){
-            logger.error("Failed to update trainee with ID: {}", trainee.getUserId());
-            throw new RuntimeException("Failed to update trainee with ID: " + trainee.getUserId(), e);
+            logger.error("Failed to update trainee with ID: {}", trainee.getTraineeId());
+            throw new RuntimeException("Failed to update trainee with ID: " + trainee.getTraineeId(), e);
         }
     }
 

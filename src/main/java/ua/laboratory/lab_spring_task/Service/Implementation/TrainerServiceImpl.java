@@ -29,11 +29,12 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public Trainer createTrainer(Trainer trainer) throws NoSuchAlgorithmException {
         try {
-            logger.info("Creating trainer with ID: {}", trainer.getUserId());
+            logger.info("Creating trainer with ID: {}", trainer.getTrainerId());
             trainer.setUsername(trainer.getFirstName() + "." + trainer.getLastName());
 
-            if (trainerDAO.getAllTrainers().stream().anyMatch(x -> x.getUsername().equals(trainer.getUsername())))
-                trainer.setUsername(trainer.getFirstName() + "." + trainer.getLastName() + trainer.getUserId());
+            boolean isPresent = trainerDAO.getAllTrainers().stream().anyMatch(x -> x.getUsername().equals(trainer.getUsername()));
+            if (isPresent)
+                trainer.setUsername(trainer.getFirstName() + "." + trainer.getLastName() + trainer.getTrainerId());
 
             trainer.setPassword(Utilities.generatePassword(10));
 
@@ -69,7 +70,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public Trainer updateTrainer(Trainer trainer) {
         try {
-            logger.info("Updating trainer with ID: {}", trainer.getUserId());
+            logger.info("Updating trainer with ID: {}", trainer.getTrainerId());
 
             return trainerDAO.updateTrainer(trainer);
         }catch (Exception e){

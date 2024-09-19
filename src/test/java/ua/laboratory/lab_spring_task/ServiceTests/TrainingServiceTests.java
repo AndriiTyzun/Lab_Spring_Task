@@ -11,10 +11,8 @@ import ua.laboratory.lab_spring_task.DAO.TrainingDAO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 import ua.laboratory.lab_spring_task.Model.Trainer;
 import ua.laboratory.lab_spring_task.Model.Training;
-import ua.laboratory.lab_spring_task.Model.TrainingType;
-import ua.laboratory.lab_spring_task.Service.Implementation.TraineeServiceImpl;
+import ua.laboratory.lab_spring_task.Model.Enum.TrainingType;
 import ua.laboratory.lab_spring_task.Service.Implementation.TrainingServiceImpl;
-import ua.laboratory.lab_spring_task.Service.TraineeService;
 import ua.laboratory.lab_spring_task.Service.TrainingService;
 
 import java.time.LocalDate;

@@ -28,11 +28,11 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public Trainee createTrainee(Trainee trainee) {
         try {
-            logger.info("Creating trainee with ID: {}", trainee.getUserId());
+            logger.info("Creating trainee with ID: {}", trainee.getTraineeId());
             trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName());
 
             if(traineeDAO.getAllTrainees().stream().anyMatch(x -> x.getUsername().equals(trainee.getUsername())))
-                trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName() + trainee.getUserId());
+                trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName() + trainee.getTraineeId());
 
             trainee.setPassword(Utilities.generatePassword(10));
 
@@ -69,7 +69,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public Trainee updateTrainee(Trainee trainee) {
         try {
-            logger.info("Updating trainee with ID: {}", trainee.getUserId());
+            logger.info("Updating trainee with ID: {}", trainee.getTraineeId());
             return traineeDAO.updateTrainee(trainee);
         } catch (Exception e){
             logger.error(e.getMessage());
@@ -88,3 +88,4 @@ public class TraineeServiceImpl implements TraineeService {
         }
     }
 }
+
