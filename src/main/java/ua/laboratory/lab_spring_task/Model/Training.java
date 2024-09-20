@@ -11,17 +11,19 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 public class Training {
-    private Long trainingId;
+    private Long id;
     private Long traineeId;
     private Long trainerId;
     private String trainingName;
     private TrainingType trainingType;
     private LocalDate trainingDate;
     private Long trainingDuration;
+    private Trainee trainee;
+    private Trainer trainer;
 
     public Training(Long trainingId, Long traineeId, Long trainerId, String trainingName,
                     TrainingType trainingType, LocalDate trainingDate, Long trainingDuration) {
-        this.trainingId = trainingId;
+        this.id = trainingId;
         this.traineeId = traineeId;
         this.trainerId = trainerId;
         this.trainingName = trainingName;

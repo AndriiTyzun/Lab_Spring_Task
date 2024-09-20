@@ -1,0 +1,15 @@
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ua.laboratory.lab_spring_task.Model.Training" table="Training">
+        <id name="id" column="ID">
+            <generator class="identity"/>
+        </id>
+        <property name="trainingName" column="TrainingName" not-null="true"/>
+        <property name="trainingDate" column="TrainingDate" not-null="true"/>
+        <property name="trainingDuration" column="TrainingDuration" not-null="true"/>
+        <property name="trainingType" column="TrainingTypeName" type="string"/>
+        <many-to-one name="trainee" column="TraineeId" class="ua.laboratory.lab_spring_task.Model.Trainee" not-null="true" cascade="delete"/>
+        <many-to-one name="trainer" column="TrainerId" class="ua.laboratory.lab_spring_task.Model.Trainer" not-null="true" cascade="delete"/>
+    </class>
+</hibernate-mapping>

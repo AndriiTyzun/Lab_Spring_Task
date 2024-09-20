@@ -4,26 +4,35 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ua.laboratory.lab_spring_task.Model.Enum.TrainingType;
+
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Trainer extends User{
-    private Long trainerId;
-    private String specialization;
+    private Long id;
+    private TrainingType specialization;
+    private User user;
+    private List<Trainee> trainees;
 
     public Trainer(String firstName, String lastName,
-                   boolean isActive, long userId, String specialization) {
+                   boolean isActive, long id, TrainingType specialization) {
         super(firstName, lastName, isActive);
-        this.trainerId = userId;
+        this.id = id;
         this.specialization = specialization;
     }
 
     public Trainer(String firstName, String lastName, String username, String password,
-                   boolean isActive, Long userId, String specialization) {
+                   boolean isActive, Long id, TrainingType specialization) {
         super(firstName, lastName, username, password, isActive);
-        this.trainerId = userId;
+        this.id = id;
         this.specialization = specialization;
+    }
+
+    public void addTrainee(Trainee trainee) {
+        trainees.add(trainee);
     }
 }

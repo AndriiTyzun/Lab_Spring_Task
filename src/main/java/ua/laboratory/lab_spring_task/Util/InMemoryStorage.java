@@ -64,15 +64,15 @@ public class InMemoryStorage {
                                 Boolean.parseBoolean(parts[6]), Long.parseLong(parts[7]),
                                 LocalDate.parse(parts[8]),parts[9]
                         );
-                        traineeStorage.put(trainee.getTraineeId(), trainee);
+                        traineeStorage.put(trainee.getId(), trainee);
                         break;
                     case "trainer":
                         Trainer trainer = new Trainer(
                                 parts[2],parts[3],parts[4],parts[5],
                                 Boolean.parseBoolean(parts[6]), Long.parseLong(parts[7]),
-                                parts[8]
+                                TrainingType.valueOf(parts[8])
                         );
-                        trainerStorage.put(trainer.getTrainerId(), trainer);
+                        trainerStorage.put(trainer.getId(), trainer);
                         break;
                     case "training":
                         Training training = new Training(
@@ -81,7 +81,7 @@ public class InMemoryStorage {
                                 TrainingType.valueOf(parts[5]), LocalDate.parse(parts[6]),
                                 Long.parseLong(parts[7])
                         );
-                        trainingStorage.put(training.getTrainingId(), training);
+                        trainingStorage.put(training.getId(), training);
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown entity type: " + entityType);

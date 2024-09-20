@@ -27,7 +27,7 @@ public class TrainingServiceImpl implements TrainingService {
     @Override
     public Training createTraining(Training training) {
         try {
-            logger.info("Creating training with ID: {}", training.getTrainingId());
+            logger.info("Creating training with ID: {}", training.getId());
             return trainingDAO.createTraining(training);
         } catch (Exception e){
             logger.error(e.getMessage());

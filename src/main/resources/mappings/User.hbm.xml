@@ -1,0 +1,17 @@
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ua.laboratory.lab_spring_task.Model.User" table="User_entity">
+        <id name="id" column="ID">
+            <generator class="identity"/>
+        </id>
+        <property name="firstName" column="First_Name" not-null="true"/>
+        <property name="lastName" column="Last_Name" not-null="true"/>
+        <property name="username" column="Username" not-null="true" unique="true"/>
+        <property name="password" column="Password" not-null="true"/>
+        <property name="active" column="IsActive" not-null="true"/>
+
+        <one-to-one name="trainee" class="ua.laboratory.lab_spring_task.Model.Trainee" cascade="delete"/>
+        <one-to-one name="trainer" class="ua.laboratory.lab_spring_task.Model.Trainer" cascade="delete"/>
+    </class>
+</hibernate-mapping>

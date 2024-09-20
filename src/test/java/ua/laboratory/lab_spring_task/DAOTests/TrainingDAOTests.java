@@ -54,19 +54,19 @@ public class TrainingDAOTests {
                 true, 2L, "Athletics"));
 
         trainingStorage.put(1L, new Training(1L, 1L, 1L, "Heavy weight exercise",
-                TrainingType.HEAVYWEIGHT, LocalDate.now(), 2L));
+                TrainingType.Agility, LocalDate.now(), 2L));
         trainingStorage.put(2L, new Training(2L, 2L, 2L, "Athletics exercise",
-                TrainingType.ATHLETICS, LocalDate.now(), 2L));
+                TrainingType.Strength, LocalDate.now(), 2L));
     }
 
     @Test
     public void testCreateTraining() {
         Training training = new Training(3L, 1L, 2L, "Athletics",
-                TrainingType.ATHLETICS, LocalDate.now(), 2L);
+                TrainingType.Agility, LocalDate.now(), 2L);
         trainingDAO.createTraining(training);
 
         assertEquals(3, trainingStorage.size());
-        assertTrue(trainingStorage.containsKey(training.getTrainingId()));
+        assertTrue(trainingStorage.containsKey(training.getId()));
     }
 
     @Test
@@ -74,7 +74,7 @@ public class TrainingDAOTests {
         Training found = trainingDAO.getTraining(1L);
 
         assertEquals(2, trainingStorage.size());
-        assertTrue(trainingStorage.containsKey(found.getTrainingId()));
+        assertTrue(trainingStorage.containsKey(found.getId()));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class TrainingDAOTests {
         List<Training> found = trainingDAO.getAllTrainings();
 
         assertEquals(2, found.size());
-        assertTrue(trainingStorage.containsKey(found.get(0).getTrainingId()));
-        assertTrue(trainingStorage.containsKey(found.get(1).getTrainingId()));
+        assertTrue(trainingStorage.containsKey(found.get(0).getId()));
+        assertTrue(trainingStorage.containsKey(found.get(1).getId()));
     }
 }

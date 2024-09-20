@@ -1,6 +1,0 @@
-trainee,1,Tom,Thompson,tom.tompson,abctgFdJQ5,true,1,2024-09-05,City Street House1
-trainee,2,John,Thompson,john.tompson,a5ctg2dJQ5,true,2,2024-09-05,City Street House2
-trainer,1,Rob,Thompson,rob.tompson,abctgFdJQ5,true,1,Heavyweight
-trainer,2,Bob,Thompson,bob.tompson,a5ctg2dJQ5,true,2,Athletics
-training,1,1,1,Heavyweight exercise,HEAVYWEIGHT,2024-09-05,2
-training,2,2,2,Athletics exercise,ATHLETICS,2024-09-05,2

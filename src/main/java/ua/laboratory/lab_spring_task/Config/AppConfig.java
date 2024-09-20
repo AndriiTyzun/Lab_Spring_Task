@@ -20,6 +20,10 @@ public class AppConfig {
     public SessionFactory sessionFactory() {
         Configuration configuration = new Configuration();
         configuration.configure();
+        configuration.addResource("mappings/User.hbm.xml");
+        configuration.addResource("mappings/Trainee.hbm.xml");
+        configuration.addResource("mappings/Trainer.hbm.xml");
+        configuration.addResource("mappings/Training.hbm.xml");
         configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Trainee.class);
         configuration.addAnnotatedClass(Trainer.class);

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ua.laboratory.lab_spring_task.DAO.TrainingDAO;
 import ua.laboratory.lab_spring_task.Model.Training;
-import ua.laboratory.lab_spring_task.Util.InMemoryStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +25,12 @@ public class TrainingDAOImpl implements TrainingDAO {
     @Override
     public Training createTraining(Training training) {
         try {
-            logger.info("Creating training with ID: {}", training.getTrainingId());
-            trainingStorage.put(training.getTrainingId(), training);
-            return trainingStorage.get(training.getTrainingId());
+            logger.info("Creating training with ID: {}", training.getId());
+            trainingStorage.put(training.getId(), training);
+            return trainingStorage.get(training.getId());
         }catch (Exception e) {
-            logger.error("Failed to create training with ID: {}", training.getTrainingId());
-            throw new RuntimeException("Failed to create training with ID: " + training.getTrainingId(), e);
+            logger.error("Failed to create training with ID: {}", training.getId());
+            throw new RuntimeException("Failed to create training with ID: " + training.getId(), e);
         }
     }
 

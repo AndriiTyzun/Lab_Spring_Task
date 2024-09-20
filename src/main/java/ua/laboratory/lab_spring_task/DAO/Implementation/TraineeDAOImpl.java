@@ -26,13 +26,13 @@ public class TraineeDAOImpl implements TraineeDAO {
     @Override
     public Trainee createTrainee(Trainee trainee) {
         try {
-            logger.info("Creating trainee with ID: {}", trainee.getTraineeId());
+            logger.info("Creating trainee with ID: {}", trainee.getId());
 
-            traineeStorage.put(trainee.getTraineeId(), trainee);
-            return traineeStorage.get(trainee.getTraineeId());
+            traineeStorage.put(trainee.getId(), trainee);
+            return traineeStorage.get(trainee.getId());
         }catch (Exception e) {
-            logger.error("Failed to create trainee with ID: {}", trainee.getTraineeId());
-            throw new RuntimeException("Failed to create trainee with ID: " + trainee.getTraineeId(), e);
+            logger.error("Failed to create trainee with ID: {}", trainee.getId());
+            throw new RuntimeException("Failed to create trainee with ID: " + trainee.getId(), e);
         }
     }
 
@@ -61,12 +61,12 @@ public class TraineeDAOImpl implements TraineeDAO {
     @Override
     public Trainee updateTrainee(Trainee trainee) {
         try {
-            logger.info("Updating trainee with ID: {}", trainee.getTraineeId());
-            traineeStorage.put(trainee.getTraineeId(), trainee);
-            return traineeStorage.get(trainee.getTraineeId());
+            logger.info("Updating trainee with ID: {}", trainee.getId());
+            traineeStorage.put(trainee.getId(), trainee);
+            return traineeStorage.get(trainee.getId());
         } catch (Exception e){
-            logger.error("Failed to update trainee with ID: {}", trainee.getTraineeId());
-            throw new RuntimeException("Failed to update trainee with ID: " + trainee.getTraineeId(), e);
+            logger.error("Failed to update trainee with ID: {}", trainee.getId());
+            throw new RuntimeException("Failed to update trainee with ID: " + trainee.getId(), e);
         }
     }
 

@@ -25,13 +25,13 @@ public class TrainerDAOImpl implements TrainerDAO {
     @Override
     public Trainer createTrainer(Trainer trainer) {
         try {
-            logger.info("Creating trainer with ID: {}", trainer.getTrainerId());
+            logger.info("Creating trainer with ID: {}", trainer.getId());
 
-            trainerStorage.put(trainer.getTrainerId(), trainer);
-            return trainerStorage.get(trainer.getTrainerId());
+            trainerStorage.put(trainer.getId(), trainer);
+            return trainerStorage.get(trainer.getId());
         } catch (Exception e) {
-            logger.error("Failed to create trainer with ID: {}", trainer.getTrainerId());
-            throw new RuntimeException("Failed to create trainer with ID: " + trainer.getTrainerId(), e);
+            logger.error("Failed to create trainer with ID: {}", trainer.getId());
+            throw new RuntimeException("Failed to create trainer with ID: " + trainer.getId(), e);
         }
     }
 
@@ -60,12 +60,12 @@ public class TrainerDAOImpl implements TrainerDAO {
     @Override
     public Trainer updateTrainer(Trainer trainer) {
         try {
-            logger.info("Updating trainer with ID: {}", trainer.getTrainerId());
-            trainerStorage.put(trainer.getTrainerId(), trainer);
-            return trainerStorage.get(trainer.getTrainerId());
+            logger.info("Updating trainer with ID: {}", trainer.getId());
+            trainerStorage.put(trainer.getId(), trainer);
+            return trainerStorage.get(trainer.getId());
         }catch (Exception e){
-            logger.error("Failed to update trainer with ID: {}", trainer.getTrainerId());
-            throw new RuntimeException("Failed to update trainer with ID: " + trainer.getTrainerId(), e);
+            logger.error("Failed to update trainer with ID: {}", trainer.getId());
+            throw new RuntimeException("Failed to update trainer with ID: " + trainer.getId(), e);
         }
     }
 }

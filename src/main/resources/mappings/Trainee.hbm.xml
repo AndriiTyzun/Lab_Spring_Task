@@ -1,0 +1,13 @@
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ua.laboratory.lab_spring_task.Model.Trainee" table="Trainee">
+        <id name="id" column="ID">
+            <generator class="identity"/>
+        </id>
+        <property name="dateOfBirth" column="DateOfBirth"/>
+        <property name="address" column="Address"/>
+        <one-to-one name="user" class="ua.laboratory.lab_spring_task.Model.User"
+                    cascade="delete"/>
+    </class>
+</hibernate-mapping>
