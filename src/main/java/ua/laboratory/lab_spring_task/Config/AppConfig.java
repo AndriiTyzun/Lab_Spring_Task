@@ -19,7 +19,7 @@ public class AppConfig {
     @Bean
     public SessionFactory sessionFactory() {
         Configuration configuration = new Configuration();
-        configuration.configure();
+        configuration.configure("hibernate.cfg.xml");
         configuration.addResource("mappings/User.hbm.xml");
         configuration.addResource("mappings/Trainee.hbm.xml");
         configuration.addResource("mappings/Trainer.hbm.xml");

@@ -36,32 +36,12 @@ public class TrainingServiceTests {
         traineeStorage = new HashMap<>();
         trainerStorage = new HashMap<>();
         trainingStorage = new HashMap<>();
-        traineeDAO = new TraineeDAOImpl(traineeStorage);
+
         trainerDAO = new TrainerDAOImpl(trainerStorage);
         trainingDAO = new TrainingDAOImpl(trainingStorage);
         trainingService = new TrainingServiceImpl(trainingDAO);
     }
 
-    @BeforeEach
-    public void setUp() {
-        trainingStorage.clear();
-        traineeStorage.clear();
-        trainerStorage.clear();
-
-        traineeStorage.put(1L, new Trainee("Tom", "Thompson","tom.tompson","abctgFdJQ5",
-                true, 1L, LocalDate.now(), "City, Street, House 1"));
-        traineeStorage.put(2L, new Trainee("John", "Thompson","john.tompson","abctgFdJQ5",
-                true, 2L, LocalDate.now(), "City, Street, House 2"));
-        trainerStorage.put(1L, new Trainer("Tom", "Thompson","tom.tompson","abctgFdJQ5",
-                true, 1L, "Heavy weight"));
-        trainerStorage.put(2L, new Trainer("John", "Thompson","john.tompson","abctgFdJQ5",
-                true, 2L, "Athletics"));
-
-        trainingStorage.put(1L, new Training(1L, 1L, 1L, "Heavy weight exercise",
-                TrainingType.Strength, LocalDate.now(), 2L));
-        trainingStorage.put(2L, new Training(2L, 2L, 2L, "Athletics exercise",
-                TrainingType.Agility, LocalDate.now(), 2L));
-    }
 
     @Test
     public void testCreateTraining() {

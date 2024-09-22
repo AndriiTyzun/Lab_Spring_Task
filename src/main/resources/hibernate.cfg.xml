@@ -15,5 +15,9 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
 
+        <mapping resource="mappings/Trainee.hbm.xml"/>
+        <mapping resource="mappings/Trainer.hbm.xml"/>
+        <mapping resource="mappings/Training.hbm.xml"/>
+        <mapping resource="mappings/User.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>

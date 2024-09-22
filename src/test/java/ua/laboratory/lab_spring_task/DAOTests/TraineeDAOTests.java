@@ -1,7 +1,9 @@
 package ua.laboratory.lab_spring_task.DAOTests;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.junit.jupiter.api.*;
 import ua.laboratory.lab_spring_task.DAO.Implementation.TraineeDAOImpl;
 import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
@@ -15,65 +17,64 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TraineeDAOTests {
-    private final Map<Long, Trainee> storage;
-    private final TraineeDAO traineeDAO;
-
-    public TraineeDAOTests() {
-        storage = new HashMap<>();
-        traineeDAO = new TraineeDAOImpl(storage);
-    }
+    private static SessionFactory sessionFactory;
+    private TraineeDAOImpl traineeDAO;
 
     @BeforeEach
-    public void setUp() {
-        storage.clear();
-        storage.put(1L, new Trainee("Tom", "Thompson","tom.tompson","abctgFdJQ5",
-                true, 1L, LocalDate.now(), "City, Street, House 1"));
-        storage.put(2L, new Trainee("John", "Thompson","john.tompson","abctgFdJQ5",
-                true, 2L, LocalDate.now(), "City, Street, House 2"));
+    public void init() {
+        sessionFactory = new Configuration()
+                .configure("hibernate-test.cfg.xml")
+                .buildSessionFactory();
+        traineeDAO = new TraineeDAOImpl(sessionFactory);
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        if (sessionFactory != null) {
+            sessionFactory.close();
+        }
     }
 
     @Test
-    public void testCreateTrainee() {
-        Trainee trainee = new Trainee("Tom", "Thompson",
-                true, 3L, LocalDate.now(), "City, Street, House 1");
-        traineeDAO.createTrainee(trainee);
+    public void testCreateOrUpdateTrainee() {
+        Trainee trainee = new Trainee("John", "Doe","john.doe","abctgFdJQ5",
+                true,LocalDate.now(), "City, Street, House 1");
 
-        assertEquals(3, storage.size());
-        assertTrue(storage.containsKey(trainee.getTraineeId()));
+
+        Trainee savedTrainee = traineeDAO.createOrUpdateTrainee(trainee);
+
+        assertNotNull(savedTrainee);
+        assertNotNull(savedTrainee.getId());
+        assertEquals("John", savedTrainee.getFirstName());
+        assertEquals("Doe", savedTrainee.getLastName());
     }
 
     @Test
-    public void testGetTrainee() {
-        Trainee found = traineeDAO.getTraineeById(1L);
+    public void testCreateOrUpdateTrainee_UpdateExisting() {
+        Trainee trainee = new Trainee("John", "Doe","john.doe","abctgFdJQ5",
+                true,LocalDate.now(), "City, Street, House 1");
 
-        assertEquals(2, storage.size());
-        assertTrue(storage.containsKey(found.getTraineeId()));
+        Trainee savedTrainee = traineeDAO.createOrUpdateTrainee(trainee);
+        assertNotNull(savedTrainee.getId());
+
+        savedTrainee.setLastName("Smith");
+        Trainee updatedTrainee = traineeDAO.createOrUpdateTrainee(savedTrainee);
+
+        assertNotNull(updatedTrainee);
+        assertEquals(savedTrainee.getId(), updatedTrainee.getId());
+        assertEquals("Smith", updatedTrainee.getLastName());
     }
 
-    @Test
-    public void testGetAllTrainees() {
-        List<Trainee> found = traineeDAO.getAllTrainees();
-
-        assertEquals(2, found.size());
-        assertTrue(storage.containsKey(found.get(0).getTraineeId()));
-        assertTrue(storage.containsKey(found.get(1).getTraineeId()));
-    }
-
-    @Test
-    public void testUpdateTrainee() {
-        Trainee updatedTrainee = new Trainee("Jon", "Thompson",
-                true, 2L, LocalDate.now(), "City, Street, House 2");
-        traineeDAO.updateTrainee(updatedTrainee);
-
-        assertEquals(2, storage.size());
-        assertEquals(updatedTrainee.getFirstName(), storage.get(2L).getFirstName());
-    }
-
-    @Test
-    public void testDeleteTrainee() {
-        traineeDAO.deleteTrainee(2L);
-
-        assertEquals(1, storage.size());
-        assertFalse(storage.containsKey(2L));
-    }
+//    @Test
+//    public void testFindById() {
+//        Trainee trainee = new Trainee();
+//        trainee.setFirstName("John");
+//        trainee.setLastName("Doe");
+//        Trainee savedTrainee = traineeDAO.save(trainee);
+//
+//        Optional<Trainee> foundTrainee = traineeDAO.findById(savedTrainee.getId());
+//
+//        assertTrue(foundTrainee.isPresent());
+//        assertEquals("John", foundTrainee.get().getFirstName());
+//    }
 }

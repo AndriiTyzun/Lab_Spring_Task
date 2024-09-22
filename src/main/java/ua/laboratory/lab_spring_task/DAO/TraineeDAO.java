@@ -7,10 +7,9 @@ import java.util.List;
 
 @Repository
 public interface TraineeDAO {
-    Trainee createTrainee(Trainee trainee);
+    Trainee createOrUpdateTrainee(Trainee trainee);
     Trainee getTraineeById(Long id);
     List<Trainee> getAllTrainees();
-    Trainee updateTrainee(Trainee trainee);
-    Trainee deleteTrainee(Long id);
+    void deleteTrainee(Long id);
 }
 

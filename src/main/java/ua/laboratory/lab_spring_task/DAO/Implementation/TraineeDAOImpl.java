@@ -1,5 +1,8 @@
 package ua.laboratory.lab_spring_task.DAO.Implementation;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,31 +19,34 @@ import java.util.Map;
 public class TraineeDAOImpl implements TraineeDAO {
     private static final Logger logger = LoggerFactory.getLogger(TraineeDAOImpl.class);
 
-    @Autowired
-    private Map<Long, Trainee> traineeStorage;
+    private final SessionFactory sessionFactory;
 
-    public TraineeDAOImpl(Map<Long, Trainee> traineeStorage) {
-        this.traineeStorage = traineeStorage;
+    public TraineeDAOImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     @Override
-    public Trainee createTrainee(Trainee trainee) {
-        try {
+    public Trainee createOrUpdateTrainee(Trainee trainee) {
+        Trainee savedTrainee = null;
+        Transaction transaction = null;
+        try (Session session = sessionFactory.openSession()){
             logger.info("Creating trainee with ID: {}", trainee.getId());
 
-            traineeStorage.put(trainee.getId(), trainee);
-            return traineeStorage.get(trainee.getId());
+            transaction = session.beginTransaction();
+            savedTrainee = session.merge(trainee);
+            transaction.commit();
         }catch (Exception e) {
             logger.error("Failed to create trainee with ID: {}", trainee.getId());
             throw new RuntimeException("Failed to create trainee with ID: " + trainee.getId(), e);
         }
+        return savedTrainee;
     }
 
     @Override
     public Trainee getTraineeById(Long id) {
-        try {
+        try (Session session = sessionFactory.openSession()){
             logger.info("Fetching trainee with ID: {}", id);
-            return traineeStorage.get(id);
+            return session.get(Trainee.class, id);
         }catch (Exception e) {
             logger.error("Failed to fetch trainee with ID: {}", id);
             throw new RuntimeException("Failed to fetch trainee with ID: " + id, e);
@@ -49,9 +55,9 @@ public class TraineeDAOImpl implements TraineeDAO {
 
     @Override
     public List<Trainee> getAllTrainees() {
-        try {
+        try (Session session = sessionFactory.openSession()){
             logger.info("Fetching all trainees");
-            return new ArrayList<>(traineeStorage.values());
+            return session.createQuery("from ua.laboratory.lab_spring_task.Model.Trainee", Trainee.class).list();
         } catch (Exception e){
             logger.error("Failed to fetch all trainees", e);
             throw new RuntimeException("Failed to fetch all trainees", e);
@@ -59,22 +65,12 @@ public class TraineeDAOImpl implements TraineeDAO {
     }
 
     @Override
-    public Trainee updateTrainee(Trainee trainee) {
-        try {
-            logger.info("Updating trainee with ID: {}", trainee.getId());
-            traineeStorage.put(trainee.getId(), trainee);
-            return traineeStorage.get(trainee.getId());
-        } catch (Exception e){
-            logger.error("Failed to update trainee with ID: {}", trainee.getId());
-            throw new RuntimeException("Failed to update trainee with ID: " + trainee.getId(), e);
-        }
-    }
-
-    @Override
-    public Trainee deleteTrainee(Long id) {
-        try {
-            logger.info("Deleting trainee with ID: {}", id);
-            return traineeStorage.remove(id);
+    public void deleteTrainee(Long id) {
+        Transaction transaction = null;
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            session.remove(getTraineeById(id));
+            transaction.commit();
         } catch (Exception e){
             logger.error("Failed to delete trainee with ID: {}", id);
             throw new RuntimeException("Failed to delete trainee with ID: " + id, e);

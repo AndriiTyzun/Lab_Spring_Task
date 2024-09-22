@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Repository
+//@Repository
 public class TrainingDAOImpl implements TrainingDAO {
     private static final Logger logger = LoggerFactory.getLogger(TrainingDAOImpl.class);
 

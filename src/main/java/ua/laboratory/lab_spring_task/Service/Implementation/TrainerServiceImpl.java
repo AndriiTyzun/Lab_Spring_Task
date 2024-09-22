@@ -12,7 +12,7 @@ import ua.laboratory.lab_spring_task.Util.Utilities;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-@Service
+//@Service
 public class TrainerServiceImpl implements TrainerService {
     private static final Logger logger = LoggerFactory.getLogger(TrainerServiceImpl.class);
     private TrainerDAO trainerDAO;

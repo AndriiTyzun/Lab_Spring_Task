@@ -10,7 +10,7 @@ import ua.laboratory.lab_spring_task.Service.TrainingService;
 
 import java.util.List;
 
-@Service
+//@Service
 public class TrainingServiceImpl implements TrainingService {
     private static final Logger logger = LoggerFactory.getLogger(TrainingServiceImpl.class);
     private TrainingDAO trainingDAO;

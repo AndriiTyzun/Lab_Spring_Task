@@ -9,6 +9,8 @@ import org.hibernate.cfg.Configuration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ua.laboratory.lab_spring_task.Config.AppConfig;
+import ua.laboratory.lab_spring_task.DAO.Implementation.TraineeDAOImpl;
+import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 import ua.laboratory.lab_spring_task.Model.User;
 import ua.laboratory.lab_spring_task.Service.TraineeService;
@@ -19,28 +21,22 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class LabSpringTaskApplication {
-//    private static SessionFactory sessionFactory;
-//    private static StandardServiceRegistry sessionFactoryRegistry;
 
     public static void main(String[] args) {
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-        TraineeService traineeService = context.getBean(TraineeService.class);
-        TrainerService trainerService = context.getBean(TrainerService.class);
-        TrainingService trainingService = context.getBean(TrainingService.class);
+//        TraineeService traineeService = context.getBean(TraineeService.class);
+//        TrainerService trainerService = context.getBean(TrainerService.class);
+//        TrainingService trainingService = context.getBean(TrainingService.class);
 
         AppConfig config = new AppConfig();
-        SessionFactory sessionFactory = config.sessionFactory();
 
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+        TraineeDAO traineeDAO = new TraineeDAOImpl(config.sessionFactory());
 
-            Trainee entity = new Trainee();
-            session.save(entity);
+        Trainee trainee = new Trainee("John", "Doe","john.doe","abctgFdJQ5",
+                true,LocalDate.now(), "City, Street, House 1");
 
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Trainee savedTrainee = traineeDAO.createOrUpdateTrainee(trainee);
+        Trainee anotherTrainee = traineeDAO.getTraineeById(savedTrainee.getId());
 
 //        try {
 //            Configuration configuration = new Configuration().configure();

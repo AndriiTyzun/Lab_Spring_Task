@@ -11,7 +11,7 @@ import ua.laboratory.lab_spring_task.Util.Utilities;
 
 import java.util.List;
 
-@Service
+//@Service
 public class TraineeServiceImpl implements TraineeService {
     private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImpl.class);
     private TraineeDAO traineeDAO;
@@ -26,7 +26,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public Trainee createTrainee(Trainee trainee) {
+    public Trainee createOrUpdateTrainee(Trainee trainee) {
         try {
             logger.info("Creating trainee with ID: {}", trainee.getId());
             trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName());
@@ -36,7 +36,7 @@ public class TraineeServiceImpl implements TraineeService {
 
             trainee.setPassword(Utilities.generatePassword(10));
 
-            return traineeDAO.createTrainee(trainee);
+            return traineeDAO.createOrUpdateTrainee(trainee);
         } catch (Exception e){
             logger.error(e.getMessage());
             throw new RuntimeException(e.getMessage(),e);
@@ -60,17 +60,6 @@ public class TraineeServiceImpl implements TraineeService {
         try {
             logger.info("Fetching all trainees");
             return traineeDAO.getAllTrainees();
-        } catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(),e);
-        }
-    }
-
-    @Override
-    public Trainee updateTrainee(Trainee trainee) {
-        try {
-            logger.info("Updating trainee with ID: {}", trainee.getId());
-            return traineeDAO.updateTrainee(trainee);
         } catch (Exception e){
             logger.error(e.getMessage());
             throw new RuntimeException(e.getMessage(),e);
