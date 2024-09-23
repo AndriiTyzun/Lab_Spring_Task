@@ -8,8 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
+import ua.laboratory.lab_spring_task.DAO.UserDAO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
-
+import ua.laboratory.lab_spring_task.Model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +19,11 @@ import java.util.Map;
 @Repository
 public class TraineeDAOImpl implements TraineeDAO {
     private static final Logger logger = LoggerFactory.getLogger(TraineeDAOImpl.class);
-
+    private final UserDAO userDAO;
     private final SessionFactory sessionFactory;
 
-    public TraineeDAOImpl(SessionFactory sessionFactory) {
+    public TraineeDAOImpl(UserDAO userDAO, SessionFactory sessionFactory) {
+        this.userDAO = userDAO;
         this.sessionFactory = sessionFactory;
     }
 
@@ -31,11 +33,19 @@ public class TraineeDAOImpl implements TraineeDAO {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()){
             logger.info("Creating trainee with ID: {}", trainee.getId());
-
             transaction = session.beginTransaction();
+
+            if(trainee.getUser() != null){
+                User user = userDAO.createOrUpdateUser(trainee.getUser());
+                trainee.setUser(user);
+            }
             savedTrainee = session.merge(trainee);
+
             transaction.commit();
         }catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             logger.error("Failed to create trainee with ID: {}", trainee.getId());
             throw new RuntimeException("Failed to create trainee with ID: " + trainee.getId(), e);
         }
@@ -72,6 +82,9 @@ public class TraineeDAOImpl implements TraineeDAO {
             session.remove(getTraineeById(id));
             transaction.commit();
         } catch (Exception e){
+            if (transaction != null) {
+                transaction.rollback();
+            }
             logger.error("Failed to delete trainee with ID: {}", id);
             throw new RuntimeException("Failed to delete trainee with ID: " + id, e);
         }

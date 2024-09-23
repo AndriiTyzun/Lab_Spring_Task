@@ -20,27 +20,28 @@ public class TraineeServiceImpl implements TraineeService {
         this.traineeDAO = traineeDAO;
     }
 
-    @Autowired
+    //@Autowired
     public void setTraineeDAO(TraineeDAO traineeDAO) {
         this.traineeDAO = traineeDAO;
     }
 
     @Override
     public Trainee createOrUpdateTrainee(Trainee trainee) {
-        try {
-            logger.info("Creating trainee with ID: {}", trainee.getId());
-            trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName());
-
-            if(traineeDAO.getAllTrainees().stream().anyMatch(x -> x.getUsername().equals(trainee.getUsername())))
-                trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName() + trainee.getId());
-
-            trainee.setPassword(Utilities.generatePassword(10));
-
-            return traineeDAO.createOrUpdateTrainee(trainee);
-        } catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(),e);
-        }
+//        try {
+//            logger.info("Creating trainee with ID: {}", trainee.getId());
+//            trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName());
+//
+//            if(traineeDAO.getAllTrainees().stream().anyMatch(x -> x.getUsername().equals(trainee.getUsername())))
+//                trainee.setUsername(trainee.getFirstName() + "." + trainee.getLastName() + trainee.getId());
+//
+//            trainee.setPassword(Utilities.generatePassword(10));
+//
+//            return traineeDAO.createOrUpdateTrainee(trainee);
+//        } catch (Exception e){
+//            logger.error(e.getMessage());
+//            throw new RuntimeException(e.getMessage(),e);
+//        }
+        return null;
     }
 
     @Override

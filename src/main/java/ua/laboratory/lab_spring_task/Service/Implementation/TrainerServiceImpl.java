@@ -21,28 +21,28 @@ public class TrainerServiceImpl implements TrainerService {
         this.trainerDAO = trainerDAO;
     }
 
-    @Autowired
     public void setTrainerDAO(TrainerDAO trainerDAO) {
         this.trainerDAO = trainerDAO;
     }
 
     @Override
     public Trainer createTrainer(Trainer trainer) throws NoSuchAlgorithmException {
-        try {
-            logger.info("Creating trainer with ID: {}", trainer.getId());
-            trainer.setUsername(trainer.getFirstName() + "." + trainer.getLastName());
-
-            boolean isPresent = trainerDAO.getAllTrainers().stream().anyMatch(x -> x.getUsername().equals(trainer.getUsername()));
-            if (isPresent)
-                trainer.setUsername(trainer.getFirstName() + "." + trainer.getLastName() + trainer.getId());
-
-            trainer.setPassword(Utilities.generatePassword(10));
-
-            return trainerDAO.createTrainer(trainer);
-        }catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(),e);
-        }
+//        try {
+//            logger.info("Creating trainer with ID: {}", trainer.getId());
+//            trainer.setUsername(trainer.getFirstName() + "." + trainer.getLastName());
+//
+//            boolean isPresent = trainerDAO.getAllTrainers().stream().anyMatch(x -> x.getUsername().equals(trainer.getUsername()));
+//            if (isPresent)
+//                trainer.setUsername(trainer.getFirstName() + "." + trainer.getLastName() + trainer.getId());
+//
+//            trainer.setPassword(Utilities.generatePassword(10));
+//
+//            return trainerDAO.createTrainer(trainer);
+//        }catch (Exception e){
+//            logger.error(e.getMessage());
+//            throw new RuntimeException(e.getMessage(),e);
+//        }
+        return null;
     }
 
     @Override

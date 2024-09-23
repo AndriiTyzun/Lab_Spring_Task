@@ -5,8 +5,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.*;
 import ua.laboratory.lab_spring_task.DAO.Implementation.TraineeDAOImpl;
+import ua.laboratory.lab_spring_task.DAO.Implementation.UserDAOImpl;
 import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
+import ua.laboratory.lab_spring_task.Model.User;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -19,13 +21,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TraineeDAOTests {
     private static SessionFactory sessionFactory;
     private TraineeDAOImpl traineeDAO;
+    private UserDAOImpl userDAO;
 
     @BeforeEach
     public void init() {
         sessionFactory = new Configuration()
                 .configure("hibernate-test.cfg.xml")
                 .buildSessionFactory();
-        traineeDAO = new TraineeDAOImpl(sessionFactory);
+        userDAO = new UserDAOImpl(sessionFactory);
+        traineeDAO = new TraineeDAOImpl(userDAO,sessionFactory);
     }
 
     @AfterAll
@@ -37,32 +41,31 @@ public class TraineeDAOTests {
 
     @Test
     public void testCreateOrUpdateTrainee() {
-        Trainee trainee = new Trainee("John", "Doe","john.doe","abctgFdJQ5",
-                true,LocalDate.now(), "City, Street, House 1");
-
+        Trainee trainee = new Trainee(LocalDate.now(), "City, Street, House 1",
+                new User("John", "Doe","john.doe","1233211231", true));
 
         Trainee savedTrainee = traineeDAO.createOrUpdateTrainee(trainee);
 
         assertNotNull(savedTrainee);
         assertNotNull(savedTrainee.getId());
-        assertEquals("John", savedTrainee.getFirstName());
-        assertEquals("Doe", savedTrainee.getLastName());
+        assertEquals("John", savedTrainee.getUser().getFirstName());
+        assertEquals("Doe", savedTrainee.getUser().getLastName());
     }
 
     @Test
     public void testCreateOrUpdateTrainee_UpdateExisting() {
-        Trainee trainee = new Trainee("John", "Doe","john.doe","abctgFdJQ5",
-                true,LocalDate.now(), "City, Street, House 1");
+        Trainee trainee = new Trainee(LocalDate.now(), "City, Street, House 1",
+                new User("John", "Doe","john.doe","1233211231", true));
 
         Trainee savedTrainee = traineeDAO.createOrUpdateTrainee(trainee);
         assertNotNull(savedTrainee.getId());
 
-        savedTrainee.setLastName("Smith");
+        savedTrainee.getUser().setLastName("Smith");
         Trainee updatedTrainee = traineeDAO.createOrUpdateTrainee(savedTrainee);
 
         assertNotNull(updatedTrainee);
         assertEquals(savedTrainee.getId(), updatedTrainee.getId());
-        assertEquals("Smith", updatedTrainee.getLastName());
+        assertEquals("Smith", updatedTrainee.getUser().getLastName());
     }
 
 //    @Test

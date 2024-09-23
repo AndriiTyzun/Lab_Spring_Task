@@ -20,23 +20,25 @@ import ua.laboratory.lab_spring_task.Service.TrainingService;
 import java.time.LocalDate;
 import java.util.List;
 
+
 public class LabSpringTaskApplication {
 
     public static void main(String[] args) {
+
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 //        TraineeService traineeService = context.getBean(TraineeService.class);
 //        TrainerService trainerService = context.getBean(TrainerService.class);
 //        TrainingService trainingService = context.getBean(TrainingService.class);
 
         AppConfig config = new AppConfig();
-
-        TraineeDAO traineeDAO = new TraineeDAOImpl(config.sessionFactory());
-
-        Trainee trainee = new Trainee("John", "Doe","john.doe","abctgFdJQ5",
-                true,LocalDate.now(), "City, Street, House 1");
-
-        Trainee savedTrainee = traineeDAO.createOrUpdateTrainee(trainee);
-        Trainee anotherTrainee = traineeDAO.getTraineeById(savedTrainee.getId());
+//
+//        TraineeDAO traineeDAO = new TraineeDAOImpl(config.sessionFactory());
+//
+//        Trainee trainee = new Trainee("John", "Doe","john.doe","abctgFdJQ5",
+//                true,LocalDate.now(), "City, Street, House 1");
+//
+//        Trainee savedTrainee = traineeDAO.createOrUpdateTrainee(trainee);
+//        Trainee anotherTrainee = traineeDAO.getTraineeById(savedTrainee.getId());
 
 //        try {
 //            Configuration configuration = new Configuration().configure();
