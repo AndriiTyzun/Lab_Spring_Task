@@ -23,11 +23,4 @@ public class Trainee {
         this.address = address;
         this.user = user;
     }
-//
-//    public Trainee(String firstName, String lastName, String username, String password,
-//                   boolean isActive, LocalDate dateOfBirth, String address) {
-//        super(firstName, lastName, username, password, isActive);
-//        this.dateOfBirth = dateOfBirth;
-//        this.address = address;
-//    }
 }

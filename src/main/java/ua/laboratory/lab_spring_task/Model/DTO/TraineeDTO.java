@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 import ua.laboratory.lab_spring_task.Model.Trainer;
+import ua.laboratory.lab_spring_task.Model.User;
 
 import java.time.LocalDate;
 
@@ -23,4 +24,16 @@ public class TraineeDTO {
     private boolean active;
     private LocalDate dateOfBirth;
     private String address;
+
+    public TraineeDTO(User user, Trainee trainee) {
+        this.userId = user.getId();
+        this.traineeId = trainee.getId();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.active = user.isActive();
+        this.dateOfBirth = trainee.getDateOfBirth();
+        this.address = trainee.getAddress();
+    }
 }

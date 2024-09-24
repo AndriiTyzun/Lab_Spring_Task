@@ -28,7 +28,7 @@ public class TrainingServiceImpl implements TrainingService {
     public Training createTraining(Training training) {
         try {
             logger.info("Creating training with ID: {}", training.getId());
-            return trainingDAO.createTraining(training);
+            return trainingDAO.createOrUpdateTraining(training);
         } catch (Exception e){
             logger.error(e.getMessage());
             throw new RuntimeException(e.getMessage(),e);
@@ -39,7 +39,7 @@ public class TrainingServiceImpl implements TrainingService {
     public Training getTraining(Long id) {
         try {
             logger.info("Fetching training with ID: {}", id);
-            return trainingDAO.getTraining(id);
+            return trainingDAO.getTrainingById(id);
         } catch (Exception e){
             logger.error(e.getMessage());
             throw new RuntimeException(e.getMessage(),e);

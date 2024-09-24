@@ -33,6 +33,9 @@ public class UserDAOImpl implements UserDAO {
             savedUser = session.merge(user);
             transaction.commit();
         }catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             logger.error("Failed to create user with ID: {}", user.getId());
             throw new RuntimeException("Failed to create user with ID: " + user.getId(), e);
         }
@@ -69,6 +72,9 @@ public class UserDAOImpl implements UserDAO {
             session.remove(getUserById(id));
             transaction.commit();
         } catch (Exception e){
+            if (transaction != null) {
+                transaction.rollback();
+            }
             logger.error("Failed to delete user with ID: {}", id);
             throw new RuntimeException("Failed to delete user with ID: " + id, e);
         }

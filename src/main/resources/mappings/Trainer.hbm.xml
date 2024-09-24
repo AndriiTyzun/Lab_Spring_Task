@@ -5,7 +5,8 @@
         <id name="id" column="ID">
             <generator class="identity"/>
         </id>
-        <property name="specialization" column="Specialization" type="string"/>
+        <many-to-one name="specialization" class="ua.laboratory.lab_spring_task.Model.TrainingType"
+                    cascade="delete"/>
         <one-to-one name="user" class="ua.laboratory.lab_spring_task.Model.User"
                     cascade="delete"/>
     </class>

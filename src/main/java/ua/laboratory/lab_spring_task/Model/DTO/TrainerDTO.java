@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ua.laboratory.lab_spring_task.Model.Enum.TrainingType;
-import ua.laboratory.lab_spring_task.Model.Trainee;
+import ua.laboratory.lab_spring_task.Model.TrainingType;
 import ua.laboratory.lab_spring_task.Model.Trainer;
+import ua.laboratory.lab_spring_task.Model.User;
 
 @Getter
 @Setter
@@ -21,4 +21,16 @@ public class TrainerDTO {
     private String password;
     private boolean active;
     private TrainingType specialization;
+
+
+    public TrainerDTO(User user, Trainer trainer) {
+        this.userId = user.getId();
+        this.trainerId = trainer.getId();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.active = user.isActive();
+        this.specialization = trainer.getSpecialization();
+    }
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 import ua.laboratory.lab_spring_task.DAO.UserDAO;
+import ua.laboratory.lab_spring_task.Model.DTO.TraineeDTO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 import ua.laboratory.lab_spring_task.Model.User;
 
@@ -31,7 +32,9 @@ public class TraineeDAOImpl implements TraineeDAO {
     public Trainee createOrUpdateTrainee(Trainee trainee) {
         Trainee savedTrainee = null;
         Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()){
+        Session session = null;
+        try {
+            session = sessionFactory.openSession();
             logger.info("Creating trainee with ID: {}", trainee.getId());
             transaction = session.beginTransaction();
 
@@ -46,8 +49,12 @@ public class TraineeDAOImpl implements TraineeDAO {
             if (transaction != null) {
                 transaction.rollback();
             }
-            logger.error("Failed to create trainee with ID: {}", trainee.getId());
+            logger.error("Failed to create trainee with ID: {}", trainee.getId(),e);
             throw new RuntimeException("Failed to create trainee with ID: " + trainee.getId(), e);
+        }finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
         }
         return savedTrainee;
     }
@@ -58,10 +65,24 @@ public class TraineeDAOImpl implements TraineeDAO {
             logger.info("Fetching trainee with ID: {}", id);
             return session.get(Trainee.class, id);
         }catch (Exception e) {
-            logger.error("Failed to fetch trainee with ID: {}", id);
+            logger.error("Failed to fetch trainee with ID: {}", id,e);
             throw new RuntimeException("Failed to fetch trainee with ID: " + id, e);
         }
     }
+
+    @Override
+    public TraineeDTO getTraineeDTOById(Long id) {
+        try (Session session = sessionFactory.openSession()){
+            logger.info("Fetching trainee with ID: {}", id);
+            Trainee trainee = session.get(Trainee.class, id);
+            User user = userDAO.getUserById(trainee.getUser().getId());
+            return new TraineeDTO(user, trainee);
+        }catch (Exception e) {
+            logger.error("Failed to fetch trainee with ID: {}, ", id,e);
+            throw new RuntimeException("Failed to fetch trainee with ID: " + id, e);
+        }
+    }
+
 
     @Override
     public List<Trainee> getAllTrainees() {
@@ -85,7 +106,7 @@ public class TraineeDAOImpl implements TraineeDAO {
             if (transaction != null) {
                 transaction.rollback();
             }
-            logger.error("Failed to delete trainee with ID: {}", id);
+            logger.error("Failed to delete trainee with ID: {}", id,e);
             throw new RuntimeException("Failed to delete trainee with ID: " + id, e);
         }
     }

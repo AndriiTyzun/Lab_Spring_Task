@@ -49,7 +49,7 @@ public class TrainerServiceImpl implements TrainerService {
     public Trainer getTrainer(Long id) {
         try {
             logger.info("Fetching trainer with ID: {}", id);
-            return trainerDAO.getTrainer(id);
+            return trainerDAO.getTrainerById(id);
         } catch (Exception e){
             logger.error(e.getMessage());
             throw new RuntimeException(e.getMessage(),e);
@@ -72,7 +72,7 @@ public class TrainerServiceImpl implements TrainerService {
         try {
             logger.info("Updating trainer with ID: {}", trainer.getId());
 
-            return trainerDAO.updateTrainer(trainer);
+            return trainerDAO.createOrUpdateTrainer(trainer);
         }catch (Exception e){
             logger.error(e.getMessage());
             throw new RuntimeException(e.getMessage(),e);

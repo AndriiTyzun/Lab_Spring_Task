@@ -1,67 +1,96 @@
 package ua.laboratory.lab_spring_task.DAOTests;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ua.laboratory.lab_spring_task.DAO.Implementation.TrainerDAOImpl;
-import ua.laboratory.lab_spring_task.DAO.TrainerDAO;
-import ua.laboratory.lab_spring_task.Model.Enum.TrainingType;
+import ua.laboratory.lab_spring_task.DAO.Implementation.TrainingTypeDAOImpl;
+import ua.laboratory.lab_spring_task.DAO.Implementation.UserDAOImpl;
+import ua.laboratory.lab_spring_task.DAO.TrainingTypeDAO;
+import ua.laboratory.lab_spring_task.Model.TrainingType;
 import ua.laboratory.lab_spring_task.Model.Trainer;
+import ua.laboratory.lab_spring_task.Model.User;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TrainerDAOTests {
-    private final Map<Long, Trainer> storage;
-    private final TrainerDAO trainerDAO;
-
-    public TrainerDAOTests() {
-        storage = new HashMap<>();
-        trainerDAO = new TrainerDAOImpl(storage);
-    }
+    private static SessionFactory sessionFactory;
+    private TrainerDAOImpl trainerDAO;
+    private UserDAOImpl userDAO;
+    private TrainingTypeDAOImpl trainingTypeDAO;
 
     @BeforeEach
-    public void setUp() {
+    public void init() {
+        sessionFactory = new Configuration()
+                .configure("hibernate-test.cfg.xml")
+                .buildSessionFactory();
+        userDAO = new UserDAOImpl(sessionFactory);
+        trainingTypeDAO = new TrainingTypeDAOImpl(sessionFactory);
+        trainerDAO = new TrainerDAOImpl(userDAO,trainingTypeDAO,sessionFactory);
+        User user = new User("John", "Doe","j.d","1233211231", true);
+        Trainer trainer = new Trainer(new TrainingType("Agility"), user);
 
+        trainingTypeDAO.addTrainingType(new TrainingType("Agility"));
+        trainerDAO.createOrUpdateTrainer(trainer);
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        if (sessionFactory != null) {
+            sessionFactory.close();
+        }
     }
 
     @Test
-    public void testCreateTrainer() {
-//        Trainer trainer = new Trainer("Tom", "Thompson",
-//                true, 3L,  TrainingType.Agility);
-//        trainerDAO.createTrainer(trainer);
-//
-//        assertEquals(3, storage.size());
-//        assertTrue(storage.containsKey(trainer.getId()));
+    public void testCreateOrUpdateTrainer() {
+        Trainer trainer = new Trainer(new TrainingType("Agility"),
+                new User("John", "Doe","john.doe","1233211231", true));
+
+        Trainer savedTrainer = trainerDAO.createOrUpdateTrainer(trainer);
+
+        assertNotNull(savedTrainer);
+        assertNotNull(savedTrainer.getId());
+        assertEquals("John", savedTrainer.getUser().getFirstName());
+        assertEquals("Doe", savedTrainer.getUser().getLastName());
     }
 
     @Test
-    public void testGetTrainer() {
-        Trainer found = trainerDAO.getTrainer(1L);
+    public void testCreateOrUpdateTrainer_UpdateExisting() {
+        Trainer trainer = new Trainer(new TrainingType("Agility"),
+                new User("John", "Doe","john.doe","1233211231", true));
 
-        assertEquals(2, storage.size());
-        assertTrue(storage.containsKey(found.getId()));
+        Trainer savedTrainer = trainerDAO.createOrUpdateTrainer(trainer);
+        assertNotNull(savedTrainer.getId());
+
+        savedTrainer.getUser().setLastName("Smith");
+        Trainer updatedTrainer = trainerDAO.createOrUpdateTrainer(savedTrainer);
+
+        assertNotNull(updatedTrainer);
+        assertEquals(savedTrainer.getId(), updatedTrainer.getId());
+        assertEquals("Smith", updatedTrainer.getUser().getLastName());
+    }
+
+    @Test
+    public void testFindById() {
+        Trainer trainer = trainerDAO.getTrainerById(1L);
+
+        assertNotNull(trainer);
+        assertEquals("John", trainer.getUser().getFirstName());
     }
 
     @Test
     public void testGetAllTrainers() {
-        List<Trainer> found = trainerDAO.getAllTrainers();
+        List<Trainer> trainers = trainerDAO.getAllTrainers();
 
-        assertEquals(2, found.size());
-        assertTrue(storage.containsKey(found.get(0).getId()));
-        assertTrue(storage.containsKey(found.get(1).getId()));
-    }
-
-    @Test
-    public void testUpdateTrainer() {
-//        Trainer updatedTrainer = new Trainer("Jon", "Thompson",
-//                true, 2L, TrainingType.Agility);
-//        trainerDAO.updateTrainer(updatedTrainer);
-//
-//        assertEquals(2, storage.size());
-//        assertEquals(updatedTrainer.getFirstName(), storage.get(2L).getFirstName());
+        assertFalse(trainers.isEmpty());
+        assertTrue(trainers.stream().anyMatch(t -> t.getId().equals(1L)));
     }
 }

@@ -1,8 +1,12 @@
 package ua.laboratory.lab_spring_task.Util;
 
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import ua.laboratory.lab_spring_task.Model.TrainingType;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Random;
+import java.util.List;
 
 public class Utilities {
 

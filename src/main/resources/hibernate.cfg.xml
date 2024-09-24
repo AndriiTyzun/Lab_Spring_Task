@@ -19,5 +19,6 @@
         <mapping resource="mappings/Trainer.hbm.xml"/>
         <mapping resource="mappings/Training.hbm.xml"/>
         <mapping resource="mappings/User.hbm.xml"/>
+        <mapping resource="mappings/TrainingType.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>

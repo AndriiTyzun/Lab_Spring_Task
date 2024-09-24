@@ -1,6 +1,7 @@
 package ua.laboratory.lab_spring_task.DAO;
 
 import org.springframework.stereotype.Repository;
+import ua.laboratory.lab_spring_task.Model.DTO.TraineeDTO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 public interface TraineeDAO {
     Trainee createOrUpdateTrainee(Trainee trainee);
     Trainee getTraineeById(Long id);
+    TraineeDTO getTraineeDTOById(Long id);
     List<Trainee> getAllTrainees();
     void deleteTrainee(Long id);
 }

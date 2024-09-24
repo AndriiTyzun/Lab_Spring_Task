@@ -2,6 +2,7 @@ package ua.laboratory.lab_spring_task.DAOTests;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.*;
 import ua.laboratory.lab_spring_task.DAO.Implementation.TraineeDAOImpl;
@@ -30,6 +31,10 @@ public class TraineeDAOTests {
                 .buildSessionFactory();
         userDAO = new UserDAOImpl(sessionFactory);
         traineeDAO = new TraineeDAOImpl(userDAO,sessionFactory);
+
+        User user = new User("John", "Doe","j.d","1233211231", true);
+        Trainee trainee = new Trainee(LocalDate.now(), "City, Street, House 1", user);
+        traineeDAO.createOrUpdateTrainee(trainee);
     }
 
     @AfterAll
@@ -68,16 +73,26 @@ public class TraineeDAOTests {
         assertEquals("Smith", updatedTrainee.getUser().getLastName());
     }
 
-//    @Test
-//    public void testFindById() {
-//        Trainee trainee = new Trainee();
-//        trainee.setFirstName("John");
-//        trainee.setLastName("Doe");
-//        Trainee savedTrainee = traineeDAO.save(trainee);
-//
-//        Optional<Trainee> foundTrainee = traineeDAO.findById(savedTrainee.getId());
-//
-//        assertTrue(foundTrainee.isPresent());
-//        assertEquals("John", foundTrainee.get().getFirstName());
-//    }
+    @Test
+    public void testFindById() {
+        Trainee trainee = traineeDAO.getTraineeById(1L);
+
+        assertNotNull(trainee);
+        assertEquals("John", trainee.getUser().getFirstName());
+    }
+
+    @Test
+    public void testGetAllTrainees() {
+        List<Trainee> trainees = traineeDAO.getAllTrainees();
+
+        assertFalse(trainees.isEmpty());
+        assertTrue(trainees.stream().anyMatch(t -> t.getId().equals(1L)));
+    }
+
+    @Test
+    public void testDeleteById() {
+        traineeDAO.deleteTrainee(1L);
+        Trainee deletedTrainee = traineeDAO.getTraineeById(1L);
+        assertNull(deletedTrainee);
+    }
 }
