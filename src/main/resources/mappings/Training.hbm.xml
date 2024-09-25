@@ -9,7 +9,7 @@
         <property name="trainingDate" column="TrainingDate" not-null="true"/>
         <property name="trainingDuration" column="TrainingDuration" not-null="true"/>
         <many-to-one name="trainingType" class="ua.laboratory.lab_spring_task.Model.TrainingType"
-                     cascade="delete"/>
+                     cascade="delete" lazy="false"/>
         <many-to-one name="trainee" column="TraineeId" class="ua.laboratory.lab_spring_task.Model.Trainee" not-null="true" cascade="delete"/>
         <many-to-one name="trainer" column="TrainerId" class="ua.laboratory.lab_spring_task.Model.Trainer" not-null="true" cascade="delete"/>
     </class>

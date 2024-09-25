@@ -3,6 +3,7 @@ package ua.laboratory.lab_spring_task.DAO.Implementation;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import ua.laboratory.lab_spring_task.Model.Training;
 import ua.laboratory.lab_spring_task.Model.TrainingType;
 import ua.laboratory.lab_spring_task.Model.User;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,7 @@ public class TrainingDAOImpl implements TrainingDAO {
             }
 
             TrainingType trainingType = trainingTypeDAO.getTrainingType(training
-                    .getTrainingType().getTrainingTypeName());
+                    .getTrainingType().getTrainingTypeName(), session);
 
             if (trainingType == null) {
                 throw new RuntimeException("TrainingType is null");
@@ -98,4 +100,108 @@ public class TrainingDAOImpl implements TrainingDAO {
             throw new RuntimeException("Failed to fetch all trainings", e);
         }
     }
+
+    @Override
+    public List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate,
+                                                        String trainerName, TrainingType trainingType) {
+        Session session = null;
+        List<Training> trainings = new ArrayList<>();
+
+        try {
+            session = sessionFactory.openSession();
+            StringBuilder hql = new StringBuilder("SELECT t FROM Training t JOIN t.trainees tr WHERE tr.user.username = :username");
+
+            if (fromDate != null) {
+                hql.append(" AND t.date >= :fromDate");
+            }
+            if (toDate != null) {
+                hql.append(" AND t.date <= :toDate");
+            }
+            if (trainerName != null && !trainerName.isEmpty()) {
+                hql.append(" AND t.trainer.user.firstName || ' ' || t.trainer.user.lastName = :trainerName");
+            }
+            if (trainingType != null) {
+                hql.append(" AND t.trainingType = :trainingType");
+            }
+
+            Query<Training> query = session.createQuery(hql.toString(), Training.class);
+            query.setParameter("username", username);
+
+            if (fromDate != null) {
+                query.setParameter("fromDate", fromDate);
+            }
+            if (toDate != null) {
+                query.setParameter("toDate", toDate);
+            }
+            if (trainerName != null && !trainerName.isEmpty()) {
+                query.setParameter("trainerName", trainerName);
+            }
+            if (trainingType != null) {
+                query.setParameter("trainingType", trainingType);
+            }
+
+            trainings = query.getResultList();
+        } catch (Exception e) {
+            logger.error("Failed to fetch Trainings for Trainee with username: {}", username, e);
+            throw new RuntimeException("Failed to fetch Trainings for Trainee with username: " + username, e);
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
+        return trainings;
+    }
+
+    @Override
+    public List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate,
+                                                        String traineeName, TrainingType trainingType) {
+        Session session = null;
+        List<Training> trainings = new ArrayList<>();
+
+        try {
+            session = sessionFactory.openSession();
+            StringBuilder hql = new StringBuilder("SELECT t FROM Training t JOIN t.trainer tr WHERE tr.user.username = :username");
+
+            if (fromDate != null) {
+                hql.append(" AND t.date >= :fromDate");
+            }
+            if (toDate != null) {
+                hql.append(" AND t.date <= :toDate");
+            }
+            if (traineeName != null && !traineeName.isEmpty()) {
+                hql.append(" AND t.trainee.user.firstName || ' ' || t.trainee.user.lastName = :trainerName");
+            }
+            if (trainingType != null) {
+                hql.append(" AND t.trainingType = :trainingType");
+            }
+
+            Query<Training> query = session.createQuery(hql.toString(), Training.class);
+            query.setParameter("username", username);
+
+            if (fromDate != null) {
+                query.setParameter("fromDate", fromDate);
+            }
+            if (toDate != null) {
+                query.setParameter("toDate", toDate);
+            }
+            if (traineeName != null && !traineeName.isEmpty()) {
+                query.setParameter("trainerName", traineeName);
+            }
+            if (trainingType != null) {
+                query.setParameter("trainingType", trainingType);
+            }
+
+            trainings = query.getResultList();
+        } catch (Exception e) {
+            logger.error("Failed to fetch Trainings for Trainee with username: {}", username, e);
+            throw new RuntimeException("Failed to fetch Trainings for Trainee with username: " + username, e);
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
+        return trainings;
+    }
+
+
 }

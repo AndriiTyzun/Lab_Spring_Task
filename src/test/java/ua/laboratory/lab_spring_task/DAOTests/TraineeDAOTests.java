@@ -82,6 +82,14 @@ public class TraineeDAOTests {
     }
 
     @Test
+    public void testFindByUsername() {
+        Trainee trainee = userDAO.getUserByUsername("j.d").getTrainee();
+
+        assertNotNull(trainee);
+        assertEquals("John", trainee.getUser().getFirstName());
+    }
+
+    @Test
     public void testGetAllTrainees() {
         List<Trainee> trainees = traineeDAO.getAllTrainees();
 

@@ -9,5 +9,9 @@
         <property name="address" column="Address"/>
         <one-to-one name="user" class="ua.laboratory.lab_spring_task.Model.User"
                     cascade="delete"/>
+        <set name="trainers" table="Trainer_Trainee" inverse="true">
+            <key column="Trainee_ID"/>
+            <many-to-many column="Trainer_ID" class="ua.laboratory.lab_spring_task.Model.Trainer"/>
+        </set>
     </class>
 </hibernate-mapping>

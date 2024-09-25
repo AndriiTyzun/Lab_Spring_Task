@@ -10,11 +10,9 @@ import org.springframework.stereotype.Repository;
 import ua.laboratory.lab_spring_task.DAO.TrainerDAO;
 import ua.laboratory.lab_spring_task.DAO.TrainingTypeDAO;
 import ua.laboratory.lab_spring_task.DAO.UserDAO;
+import ua.laboratory.lab_spring_task.Model.*;
 import ua.laboratory.lab_spring_task.Model.DTO.TrainerDTO;
 import ua.laboratory.lab_spring_task.Model.Trainer;
-import ua.laboratory.lab_spring_task.Model.Trainer;
-import ua.laboratory.lab_spring_task.Model.TrainingType;
-import ua.laboratory.lab_spring_task.Model.User;
 import ua.laboratory.lab_spring_task.Util.Utilities;
 
 import java.util.ArrayList;
@@ -82,6 +80,11 @@ public class TrainerDAOImpl implements TrainerDAO {
             logger.error("Failed to fetch trainer with ID: {}", id,e);
             throw new RuntimeException("Failed to fetch trainer with ID: " + id, e);
         }
+    }
+
+    @Override
+    public Trainer getTrainerByUsername(String username) {
+        return userDAO.getUserByUsername(username).getTrainer();
     }
 
     @Override

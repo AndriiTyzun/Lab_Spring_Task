@@ -10,6 +10,7 @@ import java.util.List;
 public interface TraineeDAO {
     Trainee createOrUpdateTrainee(Trainee trainee);
     Trainee getTraineeById(Long id);
+    Trainee getTraineeByUsername(String username);
     TraineeDTO getTraineeDTOById(Long id);
     List<Trainee> getAllTrainees();
     void deleteTrainee(Long id);

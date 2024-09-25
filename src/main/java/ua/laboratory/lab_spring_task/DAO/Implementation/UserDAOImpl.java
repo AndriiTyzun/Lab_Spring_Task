@@ -3,11 +3,13 @@ package ua.laboratory.lab_spring_task.DAO.Implementation;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import ua.laboratory.lab_spring_task.DAO.UserDAO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
+import ua.laboratory.lab_spring_task.Model.TrainingType;
 import ua.laboratory.lab_spring_task.Model.User;
 
 import java.util.List;
@@ -50,6 +52,21 @@ public class UserDAOImpl implements UserDAO {
         }catch (Exception e) {
             logger.error("Failed to fetch user with ID: {}", id);
             throw new RuntimeException("Failed to fetch user with ID: " + id, e);
+        }
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        try (Session session = sessionFactory.openSession()){
+            logger.info("Fetching user with Username: {}", username);
+
+            Query<User> query = session.createQuery(
+                    "FROM User WHERE username = :name", User.class);
+            query.setParameter("name", username);
+            return query.uniqueResultOptional().orElse(null);
+        }catch (Exception e) {
+            logger.error("Failed to fetch user", e);
+            throw new RuntimeException("Failed to fetch user ", e);
         }
     }
 

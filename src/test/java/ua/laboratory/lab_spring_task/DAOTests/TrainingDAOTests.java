@@ -24,7 +24,8 @@ public class TrainingDAOTests {
     private TrainingTypeDAO trainingTypeDAO;
     Trainer trainer;
     Trainee trainee;
-    TrainingType trainingType;
+    TrainingType trainingTypeAg;
+    TrainingType trainingTypeSt;
     User user;
 
     @BeforeEach
@@ -39,11 +40,14 @@ public class TrainingDAOTests {
         trainingDAO = new TrainingDAOImpl(userDAO, trainingTypeDAO, traineeDAO, sessionFactory);
 
         user = userDAO.createOrUpdateUser(new User("John", "Doe","j.d","1233211231", true));
-        trainingType = trainingTypeDAO.addTrainingType(new TrainingType("Agility"));
+        trainingTypeAg = trainingTypeDAO.addTrainingType(new TrainingType("Agility"));
+        trainingTypeSt = trainingTypeDAO.addTrainingType(new TrainingType("Strength"));
         trainee = traineeDAO.createOrUpdateTrainee(new Trainee(LocalDate.now(), "City, Street, House 1", user));
-        trainer = trainerDAO.createOrUpdateTrainer(new Trainer(new TrainingType("Agility"), user));
-        Training presavedTraining = trainingDAO.createOrUpdateTraining(new Training("New training", trainingType,
+        trainer = trainerDAO.createOrUpdateTrainer(new Trainer(trainingTypeAg, user));
+        Training presavedTrainingAg = trainingDAO.createOrUpdateTraining(new Training("New training", trainingTypeAg,
                 LocalDate.now(),2L,trainee,trainer));
+        Training presavedTrainingSt = trainingDAO.createOrUpdateTraining(new Training("New training", trainingTypeSt,
+                LocalDate.now(),3L,trainee,trainer));
     }
 
     @AfterAll
@@ -53,9 +57,28 @@ public class TrainingDAOTests {
         }
     }
 
+
     @Test
-    public void testCreateOrUpdateTrainer() {
-        Training training = new Training("New training", trainingType,
+    public void testCreateOrUpdateTrainee_AddTrainer() {
+        Trainee trainee = new Trainee(LocalDate.now(), "City, Street, House 1",
+                new User("John", "Doe","john.doe","1233211231", true));
+
+        Trainee savedTrainee = traineeDAO.createOrUpdateTrainee(trainee);
+        assertNotNull(savedTrainee.getId());
+
+        savedTrainee.addTrainer(trainer);
+        Trainee updatedTrainee = traineeDAO.createOrUpdateTrainee(savedTrainee);
+        Trainer updatedTrainer = trainerDAO.createOrUpdateTrainer(trainer);
+
+        assertNotNull(updatedTrainee);
+        assertEquals(savedTrainee.getId(), updatedTrainee.getId());
+        assertTrue(updatedTrainee.getTrainers().stream().anyMatch(x -> x.getId().equals(trainer.getId())));
+        assertTrue(updatedTrainer.getTrainees().stream().anyMatch(x -> x.getId().equals(updatedTrainee.getId())));
+    }
+
+    @Test
+    public void testCreateOrUpdateTraining() {
+        Training training = new Training("New training", trainingTypeAg,
                 LocalDate.now(),2L,trainee,trainer);
         Training savedTraining = trainingDAO.createOrUpdateTraining(training);
 
@@ -83,4 +106,21 @@ public class TrainingDAOTests {
         assertTrue(trainings.stream().anyMatch(t -> t.getId().equals(1L)));
     }
 
+    @Test
+    public void testGetTrainingsFiltered() {
+        List<Training> trainings = trainingDAO.getTrainerTrainingsByCriteria(
+                "j.d",null,null,null,trainingTypeAg);
+
+        assertFalse(trainings.isEmpty());
+        assertTrue(trainings.stream().anyMatch(t -> t.getTrainingType().getTrainingTypeName()
+                .equals(trainingTypeAg.getTrainingTypeName())));
+
+        trainings = trainingDAO.getTrainerTrainingsByCriteria(
+                "j.d",null,null,null,trainingTypeSt);
+
+        assertFalse(trainings.isEmpty());
+        assertTrue(trainings.stream().anyMatch(t -> t.getTrainingType().getTrainingTypeName()
+                .equals(trainingTypeSt.getTrainingTypeName())));
+
+    }
 }

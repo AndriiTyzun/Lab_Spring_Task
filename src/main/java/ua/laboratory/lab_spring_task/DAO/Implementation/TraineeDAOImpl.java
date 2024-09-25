@@ -83,6 +83,10 @@ public class TraineeDAOImpl implements TraineeDAO {
         }
     }
 
+    @Override
+    public Trainee getTraineeByUsername(String username) {
+        return userDAO.getUserByUsername(username).getTrainee();
+    }
 
     @Override
     public List<Trainee> getAllTrainees() {
