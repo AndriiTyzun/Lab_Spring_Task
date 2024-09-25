@@ -7,8 +7,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface TrainerService {
-    Trainer createTrainer(Trainer trainer) throws NoSuchAlgorithmException;
-    Trainer getTrainer(Long id);
+    Trainer createOrUpdateTrainer(Trainer trainer);
+    Boolean checkCredentials(String username, String password);
+    Trainer getTrainerById(Long id);
+    Trainer getTrainerByUsername(String username);
     List<Trainer> getAllTrainers();
-    Trainer updateTrainer(Trainer trainer);
+    Trainer changePassword(String username, String newPassword);
+    Trainer activateTrainer(Long id);
+    Trainer deactivateTrainer(Long id);
 }

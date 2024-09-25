@@ -114,4 +114,20 @@ public class TraineeDAOImpl implements TraineeDAO {
             throw new RuntimeException("Failed to delete trainee with ID: " + id, e);
         }
     }
+
+    @Override
+    public void deleteTrainee(String username) {
+        Transaction transaction = null;
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            session.remove(getTraineeByUsername(username));
+            transaction.commit();
+        } catch (Exception e){
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            logger.error("Failed to delete trainee with username: {}", username,e);
+            throw new RuntimeException("Failed to delete trainee with username: " + username, e);
+        }
+    }
 }

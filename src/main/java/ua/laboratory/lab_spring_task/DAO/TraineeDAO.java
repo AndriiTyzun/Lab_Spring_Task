@@ -14,5 +14,6 @@ public interface TraineeDAO {
     TraineeDTO getTraineeDTOById(Long id);
     List<Trainee> getAllTrainees();
     void deleteTrainee(Long id);
+    void deleteTrainee(String username);
 }
 

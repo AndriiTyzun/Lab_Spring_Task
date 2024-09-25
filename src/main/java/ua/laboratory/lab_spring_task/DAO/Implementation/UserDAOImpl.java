@@ -96,4 +96,20 @@ public class UserDAOImpl implements UserDAO {
             throw new RuntimeException("Failed to delete user with ID: " + id, e);
         }
     }
+
+    @Override
+    public void deleteUser(String username) {
+        Transaction transaction = null;
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            session.remove(getUserByUsername(username));
+            transaction.commit();
+        } catch (Exception e){
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            logger.error("Failed to delete user with username: {}", username);
+            throw new RuntimeException("Failed to delete user with username: " + username, e);
+        }
+    }
 }

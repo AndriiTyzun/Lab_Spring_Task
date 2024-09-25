@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.laboratory.lab_spring_task.DAO.TrainingDAO;
 import ua.laboratory.lab_spring_task.Model.Training;
+import ua.laboratory.lab_spring_task.Model.TrainingType;
 import ua.laboratory.lab_spring_task.Service.TrainingService;
 
+import java.time.LocalDate;
 import java.util.List;
 
-//@Service
+@Service
 public class TrainingServiceImpl implements TrainingService {
     private static final Logger logger = LoggerFactory.getLogger(TrainingServiceImpl.class);
     private TrainingDAO trainingDAO;
@@ -25,7 +27,7 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
-    public Training createTraining(Training training) {
+    public Training createOrUpdateTraining(Training training) {
         try {
             logger.info("Creating training with ID: {}", training.getId());
             return trainingDAO.createOrUpdateTraining(training);
@@ -55,5 +57,15 @@ public class TrainingServiceImpl implements TrainingService {
             logger.error(e.getMessage());
             throw new RuntimeException(e.getMessage(),e);
         }
+    }
+
+    @Override
+    public List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String trainerName, TrainingType trainingType) {
+        return trainingDAO.getTraineeTrainingsByCriteria(username, fromDate, toDate, trainerName, trainingType);
+    }
+
+    @Override
+    public List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String traineeName, TrainingType trainingType) {
+        return trainingDAO.getTrainerTrainingsByCriteria(username, fromDate, toDate, traineeName, trainingType);
     }
 }
