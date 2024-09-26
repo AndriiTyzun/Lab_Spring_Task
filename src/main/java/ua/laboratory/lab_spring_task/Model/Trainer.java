@@ -25,12 +25,12 @@ public class Trainer {
         this.user = user;
     }
 
-    public void addTrainer(Trainee trainee) {
+    public void addTrainee(Trainee trainee) {
         trainees.add(trainee);
         trainee.getTrainers().add(this);
     }
 
-    public void removeTrainer(Trainee trainee) {
+    public void removeTrainee(Trainee trainee) {
         trainees.remove(trainee);
         trainee.getTrainers().remove(this);
     }

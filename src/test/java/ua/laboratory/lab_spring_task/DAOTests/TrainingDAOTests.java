@@ -36,7 +36,7 @@ public class TrainingDAOTests {
         userDAO = new UserDAOImpl(sessionFactory);
         trainingTypeDAO = new TrainingTypeDAOImpl(sessionFactory);
         traineeDAO = new TraineeDAOImpl(userDAO,sessionFactory);
-        trainerDAO = new TrainerDAOImpl(userDAO,trainingTypeDAO,sessionFactory);
+        trainerDAO = new TrainerDAOImpl(userDAO,trainingTypeDAO,sessionFactory, traineeDAO);
         trainingDAO = new TrainingDAOImpl(userDAO, trainingTypeDAO, traineeDAO, sessionFactory);
 
         user = userDAO.createOrUpdateUser(new User("John", "Doe","j.d","1233211231", true));

@@ -29,6 +29,9 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public Trainer createOrUpdateTrainer(Trainer trainer) {
         try {
+            if(trainer == null)
+                throw new IllegalArgumentException("trainer is null");
+
             logger.info("Creating trainer with ID: {}", trainer.getId());
             Utilities.setTrainerUsername(trainer, trainerDAO);
 
@@ -55,6 +58,9 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public Trainer getTrainerById(Long id) {
         try {
+            if(id == null)
+                throw new IllegalArgumentException("Id cannot be null");
+
             logger.info("Fetching trainer with ID: {}", id);
             return trainerDAO.getTrainerById(id);
         } catch (Exception e){
@@ -66,6 +72,9 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public Trainer getTrainerByUsername(String username) {
         try {
+            if(username == null)
+                throw new IllegalArgumentException("Username cannot be null");
+
             logger.info("Fetching trainer with username: {}", username);
             return trainerDAO.getTrainerByUsername(username);
         } catch (Exception e){
@@ -87,6 +96,11 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Trainer changePassword(String username, String newPassword) {
+        if(username == null || newPassword == null)
+            throw new IllegalArgumentException("Username and password are required");
+        if(username.isEmpty() || newPassword.isEmpty())
+            throw new IllegalArgumentException("Username and password are required");
+
         Trainer trainer = trainerDAO.getTrainerByUsername(username);
         trainer.getUser().setPassword(newPassword);
         return trainerDAO.createOrUpdateTrainer(trainer);
@@ -94,6 +108,9 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Trainer activateTrainer(Long id) {
+        if(id == null)
+            throw new IllegalArgumentException("Id cannot be null");
+
         Trainer trainer = trainerDAO.getTrainerById(id);
         trainer.getUser().setActive(true);
         return trainerDAO.createOrUpdateTrainer(trainer);
@@ -101,6 +118,9 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Trainer deactivateTrainer(Long id) {
+        if(id == null)
+            throw new IllegalArgumentException("Id cannot be null");
+
         Trainer trainer = trainerDAO.getTrainerById(id);
         trainer.getUser().setActive(false);
         return trainerDAO.createOrUpdateTrainer(trainer);

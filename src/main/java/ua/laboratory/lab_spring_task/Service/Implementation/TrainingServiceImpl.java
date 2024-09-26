@@ -29,6 +29,9 @@ public class TrainingServiceImpl implements TrainingService {
     @Override
     public Training createOrUpdateTraining(Training training) {
         try {
+            if(training == null)
+                throw new IllegalArgumentException("Training is null");
+
             logger.info("Creating training with ID: {}", training.getId());
             return trainingDAO.createOrUpdateTraining(training);
         } catch (Exception e){
@@ -40,6 +43,9 @@ public class TrainingServiceImpl implements TrainingService {
     @Override
     public Training getTraining(Long id) {
         try {
+            if(id == null)
+                throw new IllegalArgumentException("Id cannot be null");
+
             logger.info("Fetching training with ID: {}", id);
             return trainingDAO.getTrainingById(id);
         } catch (Exception e){
@@ -61,11 +67,15 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     public List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String trainerName, TrainingType trainingType) {
+        if(username == null && fromDate == null && toDate == null && trainerName == null && trainingType == null)
+            throw new IllegalArgumentException("At least one criteria is required");
         return trainingDAO.getTraineeTrainingsByCriteria(username, fromDate, toDate, trainerName, trainingType);
     }
 
     @Override
     public List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String traineeName, TrainingType trainingType) {
+        if(username == null && fromDate == null && toDate == null && traineeName == null && trainingType == null)
+            throw new IllegalArgumentException("At least one criteria is required");
         return trainingDAO.getTrainerTrainingsByCriteria(username, fromDate, toDate, traineeName, trainingType);
     }
 }

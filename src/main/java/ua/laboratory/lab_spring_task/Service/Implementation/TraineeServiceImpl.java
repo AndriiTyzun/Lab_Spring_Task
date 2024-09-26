@@ -26,6 +26,9 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public Trainee createOrUpdateTrainee(Trainee trainee) {
         try {
+            if(trainee == null)
+                throw new IllegalArgumentException("Trainee cannot be null");
+
             logger.info("Creating trainee with ID: {}", trainee.getId());
             Utilities.setTraineeUsername(trainee, traineeDAO);
             trainee.getUser().setPassword(Utilities.generatePassword(10));
@@ -51,6 +54,9 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public Trainee getTraineeById(Long id) {
         try {
+            if(id == null)
+                throw new IllegalArgumentException("Id cannot be null");
+
             logger.info("Fetching trainee with ID: {}", id);
             return traineeDAO.getTraineeById(id);
         } catch (Exception e){
@@ -63,6 +69,9 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public Trainee getTraineeByUsername(String username) {
         try {
+            if(username == null)
+                throw new IllegalArgumentException("Username cannot be null");
+
             logger.info("Fetching trainee with username: {}", username);
             return traineeDAO.getTraineeByUsername(username);
         } catch (Exception e){
@@ -73,6 +82,11 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee changePassword(String username, String newPassword) {
+        if(username == null || newPassword == null)
+            throw new IllegalArgumentException("Username and password are required");
+        if(username.isEmpty() || newPassword.isEmpty())
+            throw new IllegalArgumentException("Username and password are required");
+
         Trainee trainee = traineeDAO.getTraineeByUsername(username);
         trainee.getUser().setPassword(newPassword);
         return traineeDAO.createOrUpdateTrainee(trainee);
@@ -80,6 +94,9 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee activateTrainee(Long id) {
+        if(id == null)
+            throw new IllegalArgumentException("Id cannot be null");
+
         Trainee trainee = traineeDAO.getTraineeById(id);
         trainee.getUser().setActive(true);
         return traineeDAO.createOrUpdateTrainee(trainee);
@@ -87,6 +104,9 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee deactivateTrainee(Long id) {
+        if(id == null)
+            throw new IllegalArgumentException("Id cannot be null");
+
         Trainee trainee = traineeDAO.getTraineeById(id);
         trainee.getUser().setActive(false);
         return traineeDAO.createOrUpdateTrainee(trainee);
@@ -94,6 +114,11 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee updateTrainers(Long id, Set<Trainer> trainers) {
+        if(id == null)
+            throw new IllegalArgumentException("Id cannot be null");
+        if(trainers == null || trainers.isEmpty())
+            throw new IllegalArgumentException("Trainers cannot be null or empty");
+
         Trainee trainee = traineeDAO.getTraineeById(id);
         trainee.setTrainers(trainers);
         return traineeDAO.createOrUpdateTrainee(trainee);
@@ -113,6 +138,9 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public void deleteTrainee(Long id) {
         try {
+            if(id == null)
+                throw new IllegalArgumentException("Id cannot be null");
+
             logger.info("Deleting trainee with ID: {}", id);
             traineeDAO.deleteTrainee(id);
         } catch (Exception e){
@@ -124,6 +152,9 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public void deleteTrainee(String username) {
         try {
+            if(username == null)
+                throw new IllegalArgumentException("Username cannot be null");
+
             logger.info("Deleting trainee with username: {}", username);
             traineeDAO.deleteTrainee(username);
         } catch (Exception e){

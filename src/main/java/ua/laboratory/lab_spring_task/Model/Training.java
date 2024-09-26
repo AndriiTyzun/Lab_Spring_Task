@@ -20,7 +20,8 @@ public class Training {
     private Trainee trainee;
     private Trainer trainer;
 
-    public Training(String trainingName, TrainingType trainingType, LocalDate trainingDate, Long trainingDuration, Trainee trainee, Trainer trainer) {
+    public Training(String trainingName, TrainingType trainingType, LocalDate trainingDate,
+                    Long trainingDuration, Trainee trainee, Trainer trainer) {
         this.trainingName = trainingName;
         this.trainingType = trainingType;
         this.trainingDate = trainingDate;

@@ -12,4 +12,5 @@ public interface TrainerDAO {
     Trainer getTrainerByUsername(String username);
     TrainerDTO getTrainerDTOById(Long id);
     List<Trainer> getAllTrainers();
+    List<Trainer> getUnassignedTrainersByTraineeUsername(String traineeUsername);
 }

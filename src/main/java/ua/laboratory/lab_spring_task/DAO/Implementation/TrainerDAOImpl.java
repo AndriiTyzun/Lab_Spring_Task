@@ -3,10 +3,12 @@ package ua.laboratory.lab_spring_task.DAO.Implementation;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 import ua.laboratory.lab_spring_task.DAO.TrainerDAO;
 import ua.laboratory.lab_spring_task.DAO.TrainingTypeDAO;
 import ua.laboratory.lab_spring_task.DAO.UserDAO;
@@ -25,11 +27,13 @@ public class TrainerDAOImpl implements TrainerDAO {
     private final UserDAO userDAO;
     private final TrainingTypeDAO trainingTypeDAO;
     private final SessionFactory sessionFactory;
+    private final TraineeDAO traineeDAO;
 
-    public TrainerDAOImpl(UserDAO userDAO, TrainingTypeDAO trainingTypeDAO, SessionFactory sessionFactory) {
+    public TrainerDAOImpl(UserDAO userDAO, TrainingTypeDAO trainingTypeDAO, SessionFactory sessionFactory, TraineeDAO traineeDAO) {
         this.userDAO = userDAO;
         this.trainingTypeDAO = trainingTypeDAO;
         this.sessionFactory = sessionFactory;
+        this.traineeDAO = traineeDAO;
     }
 
     @Override
@@ -110,5 +114,42 @@ public class TrainerDAOImpl implements TrainerDAO {
             logger.error("Failed to fetch all trainers", e);
             throw new RuntimeException("Failed to fetch all trainers", e);
         }
+    }
+
+    @Override
+    public List<Trainer> getUnassignedTrainersByTraineeUsername(String traineeUsername) {
+        Session session = null;
+        List<Trainer> unassignedTrainers = new ArrayList<>();
+        try {
+            logger.info("Fetching all trainers not assigned to trainee: {}", traineeUsername);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            Trainee trainee = traineeDAO.getTraineeByUsername(traineeUsername);
+
+            if (trainee == null) {
+                throw new RuntimeException("Trainee with username " + traineeUsername + " not found.");
+            }
+
+            Query<Trainer> query = session.createQuery(
+                    "FROM Trainer tr WHERE tr.id NOT IN (" +
+                            "SELECT t.id FROM Trainer t JOIN t.trainees trainee WHERE trainee.id = :traineeId)",
+                    Trainer.class);
+            query.setParameter("traineeId", trainee.getId());
+
+            unassignedTrainers = query.list();
+            session.getTransaction().commit();
+
+        } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            throw new RuntimeException("Failed to get unassigned trainers", e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return unassignedTrainers;
     }
 }
