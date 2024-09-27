@@ -14,6 +14,7 @@ import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 import ua.laboratory.lab_spring_task.DAO.TrainerDAO;
 import ua.laboratory.lab_spring_task.DAO.TrainingTypeDAO;
 import ua.laboratory.lab_spring_task.DAO.UserDAO;
+import ua.laboratory.lab_spring_task.Model.DTO.Credentials;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 import ua.laboratory.lab_spring_task.Model.Trainer;
 import ua.laboratory.lab_spring_task.Model.TrainingType;
@@ -31,27 +32,31 @@ public class TraineeServiceTests {
     private TraineeServiceImpl traineeService;
     private TrainerServiceImpl trainerService;
     private static SessionFactory sessionFactory;
-    User presavedUser;
-    Trainee presavedTrainee;
-    Trainer presavedTrainer;
-    TrainingType presavedTrainingType;
+    private UserDAO userDAO;
+    private User presavedUser;
+    private TraineeDAO traineeDAO;
+    private Trainee presavedTrainee;
+    private Trainer presavedTrainer;
+    private TrainingType presavedTrainingType;
+    private Credentials credentials;
 
     @BeforeEach
     public void init() {
         sessionFactory = new Configuration()
                 .configure("hibernate-test.cfg.xml")
                 .buildSessionFactory();
-        UserDAO userDAO = new UserDAOImpl(sessionFactory);
+        userDAO = new UserDAOImpl(sessionFactory);
         TrainingTypeDAO trainingTypeDAO = new TrainingTypeDAOImpl(sessionFactory);
-        TraineeDAO traineeDAO = new TraineeDAOImpl(userDAO,sessionFactory);
+        traineeDAO = new TraineeDAOImpl(userDAO,sessionFactory);
         TrainerDAO trainerDAO = new TrainerDAOImpl(userDAO, trainingTypeDAO, sessionFactory, traineeDAO);
         traineeService = new TraineeServiceImpl(traineeDAO);
         trainerService = new TrainerServiceImpl(trainerDAO);
 
         presavedTrainingType = trainingTypeDAO.addTrainingType( new TrainingType("Agility"));
         presavedUser = userDAO.createOrUpdateUser(new User("John", "Doe","j.d","1233211231", true));
-        presavedTrainee = traineeService.createOrUpdateTrainee(new Trainee(LocalDate.now(), "City, Street, House 1", presavedUser));
+        presavedTrainee = traineeDAO.createOrUpdateTrainee(new Trainee(LocalDate.now(), "City, Street, House 1", presavedUser));
         presavedTrainer = trainerDAO.createOrUpdateTrainer(new Trainer(presavedTrainingType, presavedUser));
+        credentials = new Credentials(presavedTrainee.getUser().getUsername(), presavedTrainee.getUser().getPassword());
     }
 
     @AfterAll
@@ -75,14 +80,14 @@ public class TraineeServiceTests {
     @Test
     void testCheckCredentials() {
         Trainee trainee = traineeService.createOrUpdateTrainee(presavedTrainee);
-        Boolean result = traineeService.checkCredentials(trainee.getUser().getUsername(), trainee.getUser().getPassword());
+        Boolean result = traineeService.checkCredentials(new Credentials(trainee.getUser().getUsername(), trainee.getUser().getPassword()));
 
         assertTrue(result);
     }
 
     @Test
     void testGetTraineeById() {
-        Trainee foundTrainee = traineeService.getTraineeById(1L);
+        Trainee foundTrainee = traineeService.getTraineeById(1L,credentials);
 
         assertNotNull(foundTrainee);
         assertEquals(presavedTrainee.getId(), foundTrainee.getId());
@@ -90,7 +95,7 @@ public class TraineeServiceTests {
 
     @Test
     void testGetTraineeByUsername() {
-        Trainee foundTrainee = traineeService.getTraineeByUsername("John.Doe");
+        Trainee foundTrainee = traineeService.getTraineeByUsername("j.d",credentials);
 
         assertNotNull(foundTrainee);
         assertEquals(presavedTrainee.getUser().getUsername(), foundTrainee.getUser().getUsername());
@@ -98,7 +103,7 @@ public class TraineeServiceTests {
 
     @Test
     void testChangePassword() {
-        Trainee updatedTrainee = traineeService.changePassword("John.Doe", "newPassword");
+        Trainee updatedTrainee = traineeService.changePassword("j.d", "newPassword",credentials);
 
         assertNotNull(updatedTrainee);
         assertEquals("newPassword", updatedTrainee.getUser().getPassword());
@@ -107,9 +112,9 @@ public class TraineeServiceTests {
     @Test
     void testActivateTrainee() {
         presavedTrainee.getUser().setActive(false);
-        traineeService.createOrUpdateTrainee(presavedTrainee);
+        traineeDAO.createOrUpdateTrainee(presavedTrainee);
 
-        Trainee activatedTrainee = traineeService.activateTrainee(1L);
+        Trainee activatedTrainee = traineeService.activateTrainee(1L, credentials);
 
         assertNotNull(activatedTrainee);
         assertTrue(activatedTrainee.getUser().isActive());
@@ -117,7 +122,7 @@ public class TraineeServiceTests {
 
     @Test
     void testDeactivateTrainee() {
-        Trainee deactivatedTrainee = traineeService.deactivateTrainee(1L);
+        Trainee deactivatedTrainee = traineeService.deactivateTrainee(1L, credentials);
 
         assertNotNull(deactivatedTrainee);
         assertFalse(deactivatedTrainee.getUser().isActive());
@@ -128,7 +133,7 @@ public class TraineeServiceTests {
         Set<Trainer> trainers = new HashSet<>();
         trainers.add(presavedTrainer);
 
-        Trainee updatedTrainee = traineeService.updateTrainers(1L, trainers);
+        Trainee updatedTrainee = traineeService.updateTrainers(1L, trainers, credentials);
 
         assertNotNull(updatedTrainee);
         assertEquals(trainers.size(), updatedTrainee.getTrainers().size());
@@ -136,21 +141,26 @@ public class TraineeServiceTests {
 
     @Test
     void testDeleteTraineeById() {
-        traineeService.deleteTrainee(1L);
+        User anotherUser = userDAO.createOrUpdateUser(new User("John", "Smith","j.s","1233211231", true));
+        Trainee anotherUserTrainee = traineeDAO.createOrUpdateTrainee(new Trainee(LocalDate.now(), "City, Street, House 1", anotherUser));
 
-        assertTrue(traineeService.getAllTrainees().isEmpty());
+        traineeService.deleteTrainee(2L, credentials);
+
+        assertEquals(1, traineeService.getAllTrainees(credentials).size());
     }
 
     @Test
     void testDeleteTraineeByUsername() {
-        traineeService.deleteTrainee("John.Doe");
+        User anotherUser = userDAO.createOrUpdateUser(new User("John", "Smith","j.s","1233211231", true));
+        Trainee anotherUserTrainee = traineeDAO.createOrUpdateTrainee(new Trainee(LocalDate.now(), "City, Street, House 1", anotherUser));
+        traineeService.deleteTrainee("j.s", credentials);
 
-        assertTrue(traineeService.getAllTrainees().isEmpty());
+        assertEquals(1, traineeService.getAllTrainees(credentials).size());
     }
 
     @Test
     void testGetAllTrainees() {
-        List<Trainee> trainees = traineeService.getAllTrainees();
+        List<Trainee> trainees = traineeService.getAllTrainees(credentials);
 
         assertNotNull(trainees);
         assertFalse(trainees.isEmpty());

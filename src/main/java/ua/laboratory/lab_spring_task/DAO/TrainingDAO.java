@@ -11,7 +11,7 @@ public interface TrainingDAO {
     Training getTrainingById(Long id);
     List<Training> getAllTrainings();
     List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate,
-                                                 String trainerName, TrainingType trainingType);
+                                                 String trainerName);
     List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate,
-                                                 String traineeName, TrainingType trainingType);
+                                                 String traineeName);
 }

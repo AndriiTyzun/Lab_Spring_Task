@@ -13,6 +13,7 @@ import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 import ua.laboratory.lab_spring_task.DAO.TrainerDAO;
 import ua.laboratory.lab_spring_task.DAO.TrainingTypeDAO;
 import ua.laboratory.lab_spring_task.DAO.UserDAO;
+import ua.laboratory.lab_spring_task.Model.DTO.Credentials;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 import ua.laboratory.lab_spring_task.Model.Trainer;
 import ua.laboratory.lab_spring_task.Model.TrainingType;
@@ -34,6 +35,7 @@ public class TrainerServiceTests {
     Trainee presavedTrainee;
     Trainer presavedTrainer;
     TrainingType presavedTrainingType;
+    Credentials credentials;
 
     @BeforeEach
     public void init() {
@@ -51,6 +53,7 @@ public class TrainerServiceTests {
         presavedUser = userDAO.createOrUpdateUser(new User("John", "Doe","j.d","1233211231", true));
         presavedTrainee = traineeService.createOrUpdateTrainee(new Trainee(LocalDate.now(), "City, Street, House 1", presavedUser));
         presavedTrainer = trainerDAO.createOrUpdateTrainer(new Trainer(presavedTrainingType, presavedUser));
+        credentials = new Credentials(presavedTrainer.getUser().getUsername(), presavedTrainer.getUser().getPassword());
     }
 
     @AfterAll
@@ -74,15 +77,15 @@ public class TrainerServiceTests {
     @Test
     void testCheckCredentials() {
         Trainer trainer = trainerService.createOrUpdateTrainer(presavedTrainer);
-        Boolean result = trainerService.checkCredentials(trainer.getUser().getUsername(),
-                trainer.getUser().getPassword());
+        Boolean result = trainerService.checkCredentials(new Credentials(trainer.getUser().getUsername(),
+                trainer.getUser().getPassword()));
 
         assertTrue(result);
     }
 
     @Test
     public void testGetTrainerById() {
-        Trainer foundTrainer = trainerService.getTrainerById(1L);
+        Trainer foundTrainer = trainerService.getTrainerById(1L,credentials);
 
         assertNotNull(foundTrainer);
         assertEquals(presavedTrainee.getId(), foundTrainer.getId());
@@ -90,7 +93,7 @@ public class TrainerServiceTests {
 
     @Test
     void testGetTrainerByUsername() {
-        Trainer foundTrainer = trainerService.getTrainerByUsername("John.Doe");
+        Trainer foundTrainer = trainerService.getTrainerByUsername("John.Doe",credentials);
 
         assertNotNull(foundTrainer);
         assertEquals(presavedTrainer.getUser().getUsername(), foundTrainer.getUser().getUsername());
@@ -98,7 +101,7 @@ public class TrainerServiceTests {
 
     @Test
     public void testGetAllTrainers() {
-        List<Trainer> trainers = trainerService.getAllTrainers();
+        List<Trainer> trainers = trainerService.getAllTrainers(credentials);
 
         assertNotNull(trainers);
         assertFalse(trainers.isEmpty());
@@ -106,7 +109,8 @@ public class TrainerServiceTests {
 
     @Test
     void testChangePassword() {
-        Trainer updatedTrainer = trainerService.changePassword("John.Doe", "newPassword");
+        Trainer updatedTrainer = trainerService.changePassword("John.Doe",
+                "newPassword",credentials);
 
         assertNotNull(updatedTrainer);
         assertEquals("newPassword", updatedTrainer.getUser().getPassword());
@@ -117,7 +121,8 @@ public class TrainerServiceTests {
         presavedTrainer.getUser().setActive(false);
         trainerService.createOrUpdateTrainer(presavedTrainer);
 
-        Trainer activatedTrainer = trainerService.activateTrainer(1L);
+        Trainer activatedTrainer = trainerService.activateTrainer(1L,
+                new Credentials(presavedTrainer.getUser().getUsername(), presavedTrainer.getUser().getPassword()));
 
         assertNotNull(activatedTrainer);
         assertTrue(activatedTrainer.getUser().isActive());
@@ -125,9 +130,23 @@ public class TrainerServiceTests {
 
     @Test
     void testDeactivateTrainer() {
-        Trainer deactivatedTrainer = trainerService.deactivateTrainer(1L);
+        Trainer deactivatedTrainer = trainerService.deactivateTrainer(1L,credentials);
 
         assertNotNull(deactivatedTrainer);
         assertFalse(deactivatedTrainer.getUser().isActive());
     }
+
+    @Test
+    void testGetUnassignedTrainersByTraineeUsername(){
+        User user = new User("John", "Doe","j.d","1233211231", true);
+        Trainer trainer = new Trainer(presavedTrainingType, user);
+
+        Trainer savedTrainer = trainerService.createOrUpdateTrainer(trainer);
+        List<Trainer> trainers = trainerService.getUnassignedTrainersByTraineeUsername(
+                presavedTrainee.getUser().getUsername(),credentials);
+
+        assertNotNull(trainers);
+        assertFalse(trainers.isEmpty());
+    }
+
 }

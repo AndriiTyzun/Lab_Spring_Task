@@ -2,15 +2,13 @@ package ua.laboratory.lab_spring_task.Service.Implementation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.laboratory.lab_spring_task.DAO.TrainerDAO;
-import ua.laboratory.lab_spring_task.Model.Trainee;
+import ua.laboratory.lab_spring_task.Model.DTO.Credentials;
 import ua.laboratory.lab_spring_task.Model.Trainer;
 import ua.laboratory.lab_spring_task.Service.TrainerService;
-import ua.laboratory.lab_spring_task.Util.Utilities;
+import ua.laboratory.lab_spring_task.util.Utilities;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Service
@@ -45,19 +43,20 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Boolean checkCredentials(String username, String password) {
-        if(username == null || password == null) {
+    public Boolean checkCredentials(Credentials credentials) {
+        if(credentials.getUsername() == null || credentials.getPassword() == null ||
+                credentials.getUsername().isEmpty() || credentials.getPassword().isEmpty()) {
             throw new IllegalArgumentException("Username and password are required");
         }
-        if(username.isEmpty() || password.isEmpty()) {
-            throw new IllegalArgumentException("Username and password are required");
-        }
-        return Utilities.checkCredentials(username, password, trainerDAO);
+
+        return Utilities.checkCredentials(credentials.getUsername(), credentials.getPassword(), trainerDAO);
     }
 
     @Override
-    public Trainer getTrainerById(Long id) {
+    public Trainer getTrainerById(Long id, Credentials credentials) {
         try {
+            if(!checkCredentials(credentials))
+                throw new IllegalArgumentException("Username and password are required");
             if(id == null)
                 throw new IllegalArgumentException("Id cannot be null");
 
@@ -70,8 +69,10 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer getTrainerByUsername(String username) {
+    public Trainer getTrainerByUsername(String username, Credentials credentials) {
         try {
+            if(!checkCredentials(credentials))
+                throw new IllegalArgumentException("Username and password are required");
             if(username == null)
                 throw new IllegalArgumentException("Username cannot be null");
 
@@ -84,8 +85,10 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public List<Trainer> getAllTrainers() {
+    public List<Trainer> getAllTrainers(Credentials credentials) {
         try {
+            if(!checkCredentials(credentials))
+                throw new IllegalArgumentException("Username and password are required");
             logger.info("Fetching all trainers");
             return trainerDAO.getAllTrainers();
         } catch (Exception e){
@@ -95,11 +98,12 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer changePassword(String username, String newPassword) {
-        if(username == null || newPassword == null)
+    public Trainer changePassword(String username, String newPassword, Credentials credentials) {
+        if(!checkCredentials(credentials))
             throw new IllegalArgumentException("Username and password are required");
-        if(username.isEmpty() || newPassword.isEmpty())
+        if(username == null || newPassword == null || username.isEmpty() || newPassword.isEmpty())
             throw new IllegalArgumentException("Username and password are required");
+
 
         Trainer trainer = trainerDAO.getTrainerByUsername(username);
         trainer.getUser().setPassword(newPassword);
@@ -107,7 +111,9 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer activateTrainer(Long id) {
+    public Trainer activateTrainer(Long id, Credentials credentials) {
+        if(!checkCredentials(credentials))
+            throw new IllegalArgumentException("Username and password are required");
         if(id == null)
             throw new IllegalArgumentException("Id cannot be null");
 
@@ -117,7 +123,9 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer deactivateTrainer(Long id) {
+    public Trainer deactivateTrainer(Long id, Credentials credentials) {
+        if(!checkCredentials(credentials))
+            throw new IllegalArgumentException("Username and password are required");
         if(id == null)
             throw new IllegalArgumentException("Id cannot be null");
 
@@ -126,4 +134,17 @@ public class TrainerServiceImpl implements TrainerService {
         return trainerDAO.createOrUpdateTrainer(trainer);
     }
 
+    @Override
+    public List<Trainer> getUnassignedTrainersByTraineeUsername(String traineeUsername, Credentials credentials) {
+        try {
+            if(!checkCredentials(credentials))
+                throw new IllegalArgumentException("Username and password are required");
+
+            logger.info("Fetching all trainers not assigned to trainee");
+            return trainerDAO.getUnassignedTrainersByTraineeUsername(traineeUsername);
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new RuntimeException(e.getMessage(),e);
+        }
+    }
 }

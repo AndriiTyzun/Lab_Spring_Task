@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import ua.laboratory.lab_spring_task.DAO.*;
 import ua.laboratory.lab_spring_task.DAO.Implementation.*;
 import ua.laboratory.lab_spring_task.Model.*;
+import ua.laboratory.lab_spring_task.Model.DTO.Credentials;
 import ua.laboratory.lab_spring_task.Service.Implementation.TraineeServiceImpl;
 import ua.laboratory.lab_spring_task.Service.Implementation.TrainerServiceImpl;
 import ua.laboratory.lab_spring_task.Service.Implementation.TrainingServiceImpl;
@@ -23,39 +24,44 @@ public class TrainingServiceTests {
     private TrainerServiceImpl trainerService;
     private TrainingServiceImpl trainingService;
     private static SessionFactory sessionFactory;
-    User presavedUser;
-    Trainee presavedTrainee;
-    Trainer presavedTrainer;
-    TrainingType trainingTypeAg;
-    TrainingType trainingTypeSt;
-    Training presavedTrainingAg;
-    Training presavedTrainingSt;
+    private User presavedUser;
+    private Trainee presavedTrainee;
+    private Trainer presavedTrainer;
+    private TrainingType trainingTypeAg;
+    private TrainingType trainingTypeSt;
+    private Training presavedTrainingAg;
+    private Training presavedTrainingSt;
+    private Credentials credentials;
+    private UserDAO userDAO ;
+    private TraineeDAO traineeDAO;
+    private TrainerDAO trainerDAO;
 
     @BeforeEach
     public void init() {
         sessionFactory = new Configuration()
                 .configure("hibernate-test.cfg.xml")
                 .buildSessionFactory();
-        UserDAO userDAO = new UserDAOImpl(sessionFactory);
+        userDAO = new UserDAOImpl(sessionFactory);
         TrainingTypeDAO trainingTypeDAO = new TrainingTypeDAOImpl(sessionFactory);
-        TraineeDAO traineeDAO = new TraineeDAOImpl(userDAO,sessionFactory);
-        TrainerDAO trainerDAO = new TrainerDAOImpl(userDAO, trainingTypeDAO, sessionFactory, traineeDAO);
+        traineeDAO = new TraineeDAOImpl(userDAO,sessionFactory);
+        trainerDAO = new TrainerDAOImpl(userDAO, trainingTypeDAO, sessionFactory, traineeDAO);
         TrainingDAO trainingDAO = new TrainingDAOImpl(userDAO, trainingTypeDAO, traineeDAO, sessionFactory);
         traineeService = new TraineeServiceImpl(traineeDAO);
         trainerService = new TrainerServiceImpl(trainerDAO);
-        trainingService = new TrainingServiceImpl(trainingDAO);
+        trainingService = new TrainingServiceImpl(trainingDAO,userDAO);
 
         trainingTypeAg = trainingTypeDAO.addTrainingType( new TrainingType("Agility"));
         trainingTypeSt = trainingTypeDAO.addTrainingType( new TrainingType("Strength"));
 
         presavedUser = userDAO.createOrUpdateUser(new User("John", "Doe","j.d","1233211231", true));
-        presavedTrainee = traineeService.createOrUpdateTrainee(new Trainee(LocalDate.now(), "City, Street, House 1", presavedUser));
+        presavedTrainee = traineeDAO.createOrUpdateTrainee(new Trainee(LocalDate.now(), "City, Street, House 1", presavedUser));
         presavedTrainer = trainerDAO.createOrUpdateTrainer(new Trainer(trainingTypeAg, presavedUser));
 
         presavedTrainingAg = trainingDAO.createOrUpdateTraining(new Training("New training", trainingTypeAg,
                 LocalDate.now(),2L,presavedTrainee,presavedTrainer));
         presavedTrainingSt = trainingDAO.createOrUpdateTraining(new Training("New training", trainingTypeSt,
                 LocalDate.now(),3L,presavedTrainee,presavedTrainer));
+        credentials = new Credentials(presavedTrainer.getUser().getUsername(),presavedTrainer.getUser().getPassword());
     }
 
     @AfterAll
@@ -77,7 +83,7 @@ public class TrainingServiceTests {
 
     @Test
     public void testGetTraining() {
-        Training found = trainingService.getTraining(1L);
+        Training found = trainingService.getTraining(1L,credentials);
 
         assertNotNull(found);
         assertEquals(found.getTrainingName(), presavedTrainingAg.getTrainingName());
@@ -85,7 +91,7 @@ public class TrainingServiceTests {
 
     @Test
     public void testGetAllTrainings() {
-        List<Training> found = trainingService.getAllTrainings();
+        List<Training> found = trainingService.getAllTrainings(credentials);
 
         assertNotNull(found);
         assertFalse(found.isEmpty());
@@ -94,19 +100,26 @@ public class TrainingServiceTests {
 
     @Test
     public void testGetTrainingsFiltered() {
-        List<Training> trainings = trainingService.getTrainerTrainingsByCriteria(
-                "John.Doe",null,null,null,trainingTypeAg);
+        User anotherUser = userDAO.createOrUpdateUser(new User("John", "Smith","j.s","1233211231", true));
+        Trainee anotherTrainee = traineeDAO.createOrUpdateTrainee(new Trainee(LocalDate.now(), "City, Street, House 1", anotherUser));
+        Trainer anotherTrainer = trainerDAO.createOrUpdateTrainer(new Trainer(trainingTypeAg, anotherUser));
+        Training anotherTraining = trainingService.createOrUpdateTraining(new Training("New training", trainingTypeAg,
+                LocalDate.now(),2L,anotherTrainee,anotherTrainer));
+
+
+        List<Training> trainings = trainingService.getTraineeTrainingsByCriteria(
+                "j.s",null,null,"j.s",credentials);
 
         assertFalse(trainings.isEmpty());
-        assertTrue(trainings.stream().anyMatch(t -> t.getTrainingType().getTrainingTypeName()
-                .equals(trainingTypeAg.getTrainingTypeName())));
+        assertTrue(trainings.stream().anyMatch(t -> t.getTrainee().getUser().getUsername()
+                .equals(anotherUser.getUsername())));
 
         trainings = trainingService.getTrainerTrainingsByCriteria(
-                "John.Doe",null,null,null,trainingTypeSt);
+                "j.s",null,null,"j.s",credentials);
 
         assertFalse(trainings.isEmpty());
-        assertTrue(trainings.stream().anyMatch(t -> t.getTrainingType().getTrainingTypeName()
-                .equals(trainingTypeSt.getTrainingTypeName())));
+        assertTrue(trainings.stream().anyMatch(t -> t.getTrainer().getUser().getUsername()
+                .equals(anotherUser.getUsername())));
 
     }
 }

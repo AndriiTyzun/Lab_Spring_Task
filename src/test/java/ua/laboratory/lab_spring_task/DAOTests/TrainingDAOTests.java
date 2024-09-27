@@ -109,18 +109,18 @@ public class TrainingDAOTests {
     @Test
     public void testGetTrainingsFiltered() {
         List<Training> trainings = trainingDAO.getTrainerTrainingsByCriteria(
-                "j.d",null,null,null,trainingTypeAg);
+                "j.d",null,null,null);
 
         assertFalse(trainings.isEmpty());
-        assertTrue(trainings.stream().anyMatch(t -> t.getTrainingType().getTrainingTypeName()
-                .equals(trainingTypeAg.getTrainingTypeName())));
+        assertTrue(trainings.stream().anyMatch(t -> t.getTrainee().getUser().getUsername()
+                .equals("j.d")));
 
         trainings = trainingDAO.getTrainerTrainingsByCriteria(
-                "j.d",null,null,null,trainingTypeSt);
+                "j.d",null,null,null);
 
         assertFalse(trainings.isEmpty());
-        assertTrue(trainings.stream().anyMatch(t -> t.getTrainingType().getTrainingTypeName()
-                .equals(trainingTypeSt.getTrainingTypeName())));
+        assertTrue(trainings.stream().anyMatch(t -> t.getTrainee().getUser().getUsername()
+                .equals("j.d")));
 
     }
 }

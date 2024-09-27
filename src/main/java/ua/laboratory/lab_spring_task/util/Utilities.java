@@ -1,16 +1,14 @@
-package ua.laboratory.lab_spring_task.Util;
+package ua.laboratory.lab_spring_task.util;
 
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
 import ua.laboratory.lab_spring_task.DAO.TrainerDAO;
+import ua.laboratory.lab_spring_task.DAO.UserDAO;
 import ua.laboratory.lab_spring_task.Model.Trainee;
 import ua.laboratory.lab_spring_task.Model.Trainer;
-import ua.laboratory.lab_spring_task.Model.TrainingType;
+import ua.laboratory.lab_spring_task.Model.User;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.List;
 
 public class Utilities {
 
@@ -69,6 +67,18 @@ public class Utilities {
             return false;
         }
         if(!existingTrainer.getUser().getPassword()
+                .equals(password)){
+            return false;
+        }
+        return true;
+    }
+
+    public static Boolean checkCredentials(String username,String password, UserDAO userDAO){
+        User user = userDAO.getUserByUsername(username);
+        if(user == null){
+            return false;
+        }
+        if(!user.getPassword()
                 .equals(password)){
             return false;
         }

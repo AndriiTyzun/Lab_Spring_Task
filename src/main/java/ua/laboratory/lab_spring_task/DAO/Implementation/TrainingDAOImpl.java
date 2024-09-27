@@ -103,14 +103,17 @@ public class TrainingDAOImpl implements TrainingDAO {
 
     @Override
     public List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate,
-                                                        String trainerName, TrainingType trainingType) {
+                                                        String trainerName) {
         Session session = null;
         List<Training> trainings = new ArrayList<>();
 
         try {
             session = sessionFactory.openSession();
-            StringBuilder hql = new StringBuilder("SELECT t FROM Training t JOIN t.trainees tr WHERE tr.user.username = :username");
+            StringBuilder hql = new StringBuilder("SELECT t FROM Training t JOIN t.trainee tr WHERE tr.user.username = :username");
 
+            if(username == null){
+                throw new IllegalArgumentException("Username is null");
+            }
             if (fromDate != null) {
                 hql.append(" AND t.date >= :fromDate");
             }
@@ -118,10 +121,7 @@ public class TrainingDAOImpl implements TrainingDAO {
                 hql.append(" AND t.date <= :toDate");
             }
             if (trainerName != null && !trainerName.isEmpty()) {
-                hql.append(" AND t.trainer.user.firstName || ' ' || t.trainer.user.lastName = :trainerName");
-            }
-            if (trainingType != null) {
-                hql.append(" AND t.trainingType = :trainingType");
+                hql.append(" AND t.trainer.user.username = :trainerName");
             }
 
             Query<Training> query = session.createQuery(hql.toString(), Training.class);
@@ -136,9 +136,7 @@ public class TrainingDAOImpl implements TrainingDAO {
             if (trainerName != null && !trainerName.isEmpty()) {
                 query.setParameter("trainerName", trainerName);
             }
-            if (trainingType != null) {
-                query.setParameter("trainingType", trainingType);
-            }
+
 
             trainings = query.getResultList();
         } catch (Exception e) {
@@ -154,7 +152,7 @@ public class TrainingDAOImpl implements TrainingDAO {
 
     @Override
     public List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate,
-                                                        String traineeName, TrainingType trainingType) {
+                                                        String traineeName) {
         Session session = null;
         List<Training> trainings = new ArrayList<>();
 
@@ -162,6 +160,9 @@ public class TrainingDAOImpl implements TrainingDAO {
             session = sessionFactory.openSession();
             StringBuilder hql = new StringBuilder("SELECT t FROM Training t JOIN t.trainer tr WHERE tr.user.username = :username");
 
+            if(username == null){
+                throw new IllegalArgumentException("Username is null");
+            }
             if (fromDate != null) {
                 hql.append(" AND t.date >= :fromDate");
             }
@@ -169,10 +170,7 @@ public class TrainingDAOImpl implements TrainingDAO {
                 hql.append(" AND t.date <= :toDate");
             }
             if (traineeName != null && !traineeName.isEmpty()) {
-                hql.append(" AND t.trainee.user.firstName || ' ' || t.trainee.user.lastName = :trainerName");
-            }
-            if (trainingType != null) {
-                hql.append(" AND t.trainingType = :trainingType");
+                hql.append(" AND t.trainee.user.username = :traineeName");
             }
 
             Query<Training> query = session.createQuery(hql.toString(), Training.class);
@@ -185,10 +183,7 @@ public class TrainingDAOImpl implements TrainingDAO {
                 query.setParameter("toDate", toDate);
             }
             if (traineeName != null && !traineeName.isEmpty()) {
-                query.setParameter("trainerName", traineeName);
-            }
-            if (trainingType != null) {
-                query.setParameter("trainingType", trainingType);
+                query.setParameter("traineeName", traineeName);
             }
 
             trainings = query.getResultList();
