@@ -1,16 +1,25 @@
 package ua.laboratory.lab_spring_task.util;
 
-import ua.laboratory.lab_spring_task.DAO.TraineeDAO;
-import ua.laboratory.lab_spring_task.DAO.TrainerDAO;
-import ua.laboratory.lab_spring_task.DAO.UserDAO;
-import ua.laboratory.lab_spring_task.Model.Trainee;
-import ua.laboratory.lab_spring_task.Model.Trainer;
-import ua.laboratory.lab_spring_task.Model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import ua.laboratory.lab_spring_task.dao.TraineeRepository;
+import ua.laboratory.lab_spring_task.dao.TrainerRepository;
+import ua.laboratory.lab_spring_task.dao.UserRepository;
+import ua.laboratory.lab_spring_task.model.Trainee;
+import ua.laboratory.lab_spring_task.model.Trainer;
+import ua.laboratory.lab_spring_task.model.User;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+@Component
 public class Utilities {
+    private static UserRepository userRepository;
+
+    @Autowired
+    public Utilities(UserRepository userRepository) {
+        Utilities.userRepository = userRepository;
+    }
 
     public static String generatePassword(int length) throws NoSuchAlgorithmException {
         if(length < 1)
@@ -25,56 +34,21 @@ public class Utilities {
                 .toString();
     }
 
-    public static Trainee setTraineeUsername(Trainee trainee, TraineeDAO traineeDAO){
-        trainee.getUser().setUsername(trainee.getUser().getFirstName() +
-                "." + trainee.getUser().getLastName());
+    public static void setUserUsername(User user){
+        user.setUsername(user.getFirstName() +
+                "." + user.getLastName());
 
-        if(traineeDAO.getAllTrainees().stream().anyMatch(x -> x.getUser()
-                .getUsername().equals(trainee.getUser().getUsername()))){
-            trainee.getUser().setUsername(trainee.getUser().getFirstName() +
-                    "." + trainee.getUser().getLastName() + trainee.getId());
+        if(userRepository.getAllByOrderByIdDesc().stream().anyMatch(x -> x
+                .getUsername().equals(user.getUsername()))){
+            user.setUsername(user.getFirstName() +
+                    "." + user.getLastName() + user.getId());
         }
-        return trainee;
     }
 
-    public static Trainer setTrainerUsername(Trainer trainer, TrainerDAO trainerDAO){
-        trainer.getUser().setUsername(trainer.getUser().getFirstName() +
-                "." + trainer.getUser().getLastName());
-
-        if(trainerDAO.getAllTrainers().stream().anyMatch(x -> x.getUser()
-                .getUsername().equals(trainer.getUser().getUsername()))){
-            trainer.getUser().setUsername(trainer.getUser().getFirstName() +
-                    "." + trainer.getUser().getLastName() + trainer.getId());
-        }
-        return trainer;
-    }
-
-    public static Boolean checkCredentials(String username,String password, TraineeDAO traineeDAO){
-        Trainee existingTrainee = traineeDAO.getTraineeByUsername(username);
-        if(existingTrainee == null){
-            return false;
-        }
-        if(!existingTrainee.getUser().getPassword()
-                .equals(password)){
-            return false;
-        }
-        return true;
-    }
-
-    public static Boolean checkCredentials(String username,String password, TrainerDAO trainerDAO){
-        Trainer existingTrainer = trainerDAO.getTrainerByUsername(username);
-        if(existingTrainer == null){
-            return false;
-        }
-        if(!existingTrainer.getUser().getPassword()
-                .equals(password)){
-            return false;
-        }
-        return true;
-    }
-
-    public static Boolean checkCredentials(String username,String password, UserDAO userDAO){
-        User user = userDAO.getUserByUsername(username);
+    public static Boolean checkCredentials(String username,String password){
+        User user = userRepository.getByUsername(username).orElseThrow(
+                IllegalArgumentException::new
+        );
         if(user == null){
             return false;
         }
