@@ -35,4 +35,8 @@ public class Trainer {
             inverseJoinColumns = @JoinColumn(name = "trainee_id")
     )
     private Set<Trainee> trainees = new HashSet<>();
+
+    public Trainer(TrainingType specialization) {
+        this.specialization = specialization;
+    }
 }

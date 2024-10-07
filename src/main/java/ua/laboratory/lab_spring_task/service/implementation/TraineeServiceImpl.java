@@ -3,14 +3,17 @@ package ua.laboratory.lab_spring_task.service.implementation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.laboratory.lab_spring_task.dao.TraineeRepository;
 import ua.laboratory.lab_spring_task.dao.UserRepository;
+import ua.laboratory.lab_spring_task.model.User;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.Trainer;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.util.Utilities;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -18,28 +21,44 @@ import java.util.Set;
 public class TraineeServiceImpl implements TraineeService {
     private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImpl.class);
     private final TraineeRepository traineeRepository;
+    private final UserRepository userRepository;
 
-    public TraineeServiceImpl(TraineeRepository traineeRepository) {
+    public TraineeServiceImpl(TraineeRepository traineeRepository, UserRepository userRepository) {
         this.traineeRepository = traineeRepository;
+        this.userRepository = userRepository;
     }
 
 
     @Override
-    public Trainee createOrUpdateTrainee(Trainee trainee) {
+    public Trainee createTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address) {
         try {
-            if(trainee == null)
+            if(firstName == null || lastName == null)
                 throw new IllegalArgumentException("Trainee cannot be null");
+            logger.info("Creating trainee");
 
-            logger.info("Creating trainee with ID: {}", trainee.getId());
+            User user = new User(firstName, lastName);
+            Utilities.setUserUsername(user);
+            user.setPassword(Utilities.generatePassword(10));
+            user.setActive(true);
+            userRepository.save(user);
 
-            Utilities.setUserUsername(trainee.getUser());
-            trainee.getUser().setPassword(Utilities.generatePassword(10));
+            Trainee trainee = new Trainee(dateOfBirth, address);
+            trainee.setUser(user);
 
             return traineeRepository.save(trainee);
         } catch (Exception e){
             logger.error(e.getMessage());
             throw new RuntimeException(e.getMessage(),e);
         }
+    }
+
+    @Override
+    public Trainee updateTrainee(Trainee trainee) {
+        if(trainee == null)
+            throw new IllegalArgumentException("Trainee cannot be null");
+
+        userRepository.save(trainee.getUser());
+        return traineeRepository.save(trainee);
     }
 
     @Override
@@ -108,7 +127,9 @@ public class TraineeServiceImpl implements TraineeService {
         if(id == null)
             throw new IllegalArgumentException("Id cannot be null");
 
-        traineeRepository.updateUserActiveStatusByTraineeId(id, true);
+        User user = traineeRepository.getReferenceById(id).getUser();
+        user.setActive(true);
+        userRepository.save(user);
     }
 
     @Override
@@ -117,8 +138,9 @@ public class TraineeServiceImpl implements TraineeService {
             throw new IllegalArgumentException("Username and password are required");
         if(id == null)
             throw new IllegalArgumentException("Id cannot be null");
-
-        traineeRepository.updateUserActiveStatusByTraineeId(id, false);
+        User user = traineeRepository.getReferenceById(id).getUser();
+        user.setActive(false);
+        userRepository.save(user);
     }
 
     @Override

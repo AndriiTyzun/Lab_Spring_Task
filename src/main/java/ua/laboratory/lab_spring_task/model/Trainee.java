@@ -19,9 +19,9 @@ public class Trainee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
-    @Column(nullable = false)
+    @Column
     private LocalDate dateOfBirth;
-    @Column(nullable = false)
+    @Column
     private String address;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -30,4 +30,9 @@ public class Trainee {
 
     @ManyToMany(mappedBy = "trainees", fetch = FetchType.LAZY)
     private Set<Trainer> trainers = new HashSet<>();
+
+    public Trainee(LocalDate dateOfBirth, String address) {
+        this.dateOfBirth = dateOfBirth;
+        this.address = address;
+    }
 }

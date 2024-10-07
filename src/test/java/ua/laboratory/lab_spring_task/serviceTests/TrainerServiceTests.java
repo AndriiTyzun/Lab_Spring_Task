@@ -5,10 +5,10 @@ import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ua.laboratory.lab_spring_task.dao.implementation.TraineeDAOImpl;
-import ua.laboratory.lab_spring_task.dao.implementation.TrainerDAOImpl;
-import ua.laboratory.lab_spring_task.dao.implementation.TrainingTypeDAOImpl;
-import ua.laboratory.lab_spring_task.dao.implementation.UserDAOImpl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 import ua.laboratory.lab_spring_task.dao.TraineeRepository;
 import ua.laboratory.lab_spring_task.dao.TrainerRepository;
 import ua.laboratory.lab_spring_task.dao.TrainingTypeRepository;
@@ -18,6 +18,7 @@ import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.Trainer;
 import ua.laboratory.lab_spring_task.model.TrainingType;
 import ua.laboratory.lab_spring_task.model.User;
+import ua.laboratory.lab_spring_task.service.TrainerService;
 import ua.laboratory.lab_spring_task.service.implementation.TraineeServiceImpl;
 import ua.laboratory.lab_spring_task.service.implementation.TrainerServiceImpl;
 
@@ -26,127 +27,131 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@SpringBootTest
+@Transactional
 public class TrainerServiceTests {
-    private TraineeServiceImpl traineeService;
-    private TrainerServiceImpl trainerService;
-    private static SessionFactory sessionFactory;
-    User presavedUser;
-    Trainee presavedTrainee;
-    Trainer presavedTrainer;
-    TrainingType presavedTrainingType;
-    Credentials credentials;
+    @Autowired
+    private TrainerService trainerService;
+    @Autowired
+    private TrainerRepository trainerRepository;
+    @Autowired
+    private TraineeRepository traineeRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private TrainingTypeRepository trainingTypeRepository;
+    private Credentials validCredentials;
+    private Trainer testTrainer;
+    private Trainee testTrainee;
+    private TrainingType testTrainingType;
 
     @BeforeEach
-    public void init() {
-        sessionFactory = new Configuration()
-                .configure("hibernate-test.cfg.xml")
-                .buildSessionFactory();
-        UserRepository userDAO = new UserDAOImpl(sessionFactory);
-        TrainingTypeRepository trainingTypeDAO = new TrainingTypeDAOImpl(sessionFactory);
-        TraineeRepository traineeDAO = new TraineeDAOImpl(userDAO,sessionFactory);
-        TrainerRepository trainerDAO = new TrainerDAOImpl(userDAO, trainingTypeDAO, sessionFactory, traineeDAO);
-        traineeService = new TraineeServiceImpl(traineeDAO);
-        trainerService = new TrainerServiceImpl(trainerDAO);
+    public void setup() {
+        User user = new User("John", "Doe", "john.doe", "password123", true);
+        userRepository.save(user);
+        User userBackup = new User("Jane", "Doe", "jane.doe", "password123", true);
+        userRepository.save(userBackup);
+        testTrainingType = new TrainingType("Agility");
+        testTrainingType = trainingTypeRepository.save(testTrainingType);
 
-        presavedTrainingType = trainingTypeDAO.addTrainingType( new TrainingType("Agility"));
-        presavedUser = userDAO.createOrUpdateUser(new User("John", "Doe","j.d","1233211231", true));
-        presavedTrainee = traineeService.createOrUpdateTrainee(new Trainee(LocalDate.now(), "City, Street, House 1", presavedUser));
-        presavedTrainer = trainerDAO.createOrUpdateTrainer(new Trainer(presavedTrainingType, presavedUser));
-        credentials = new Credentials(presavedTrainer.getUser().getUsername(), presavedTrainer.getUser().getPassword());
-    }
+        testTrainer = new Trainer(trainingTypeRepository.getReferenceById(testTrainingType.getId()));
+        testTrainer.setUser(user);
+        testTrainer.getUser().setActive(true);
 
-    @AfterAll
-    public static void tearDown() {
-        if (sessionFactory != null) {
-            sessionFactory.close();
-        }
+        trainerRepository.save(testTrainer);
+        validCredentials = new Credentials("john.doe", "password123");
+
+        testTrainee = new Trainee(LocalDate.now(), "Address 1");
+        testTrainee.setUser(userBackup);
+        testTrainee.getUser().setActive(true);
+        traineeRepository.save(testTrainee);
     }
 
     @Test
     public void testCreateTrainer() {
-        User user = new User("John", "Doe","j.d","1233211231", true);
-        Trainer trainer = new Trainer(presavedTrainingType, user);
+        Trainer newTrainer = trainerService.createTrainer("Jane", "Smith", new TrainingType("Agility"));
 
-        Trainer savedTrainer = trainerService.createOrUpdateTrainer(trainer);
-
-        assertNotNull(savedTrainer);
-        assertEquals(trainer.getUser().getUsername(), savedTrainer.getUser().getUsername());
+        assertNotNull(newTrainer);
+        assertEquals("Jane", newTrainer.getUser().getFirstName());
+        assertEquals("Agility", newTrainer.getSpecialization().getTrainingTypeName());
     }
 
     @Test
-    void testCheckCredentials() {
-        Trainer trainer = trainerService.createOrUpdateTrainer(presavedTrainer);
-        Boolean result = trainerService.checkCredentials(new Credentials(trainer.getUser().getUsername(),
-                trainer.getUser().getPassword()));
+    public void testUpdateTrainer() {
+        testTrainer.getUser().setLastName("UpdatedLastName");
+        Trainer updatedTrainer = trainerService.updateTrainer(testTrainer);
 
-        assertTrue(result);
+        assertNotNull(updatedTrainer);
+        assertEquals("UpdatedLastName", updatedTrainer.getUser().getLastName());
+    }
+
+    @Test
+    public void testCheckCredentials_Valid() {
+        Boolean isValid = trainerService.checkCredentials(validCredentials);
+        assertTrue(isValid);
+    }
+
+    @Test
+    public void testCheckCredentials_Invalid() {
+        Credentials invalidCredentials = new Credentials("johndoe", "wrongpassword");
+        assertThrows(IllegalArgumentException.class,
+                () -> trainerService.checkCredentials(invalidCredentials));
     }
 
     @Test
     public void testGetTrainerById() {
-        Trainer foundTrainer = trainerService.getTrainerById(1L,credentials);
-
-        assertNotNull(foundTrainer);
-        assertEquals(presavedTrainee.getId(), foundTrainer.getId());
+        Trainer trainer = trainerService.getTrainerById(testTrainer.getId(), validCredentials);
+        assertNotNull(trainer);
+        assertEquals(testTrainer.getId(), trainer.getId());
     }
 
     @Test
-    void testGetTrainerByUsername() {
-        Trainer foundTrainer = trainerService.getTrainerByUsername("John.Doe",credentials);
-
-        assertNotNull(foundTrainer);
-        assertEquals(presavedTrainer.getUser().getUsername(), foundTrainer.getUser().getUsername());
+    public void testGetTrainerByUsername() {
+        Trainer trainer = trainerService.getTrainerByUsername(testTrainer.getUser().getUsername(), validCredentials);
+        assertNotNull(trainer);
+        assertEquals(testTrainer.getUser().getUsername(), trainer.getUser().getUsername());
     }
 
     @Test
     public void testGetAllTrainers() {
-        List<Trainer> trainers = trainerService.getAllTrainers(credentials);
-
+        List<Trainer> trainers = trainerService.getAllTrainers(validCredentials);
         assertNotNull(trainers);
         assertFalse(trainers.isEmpty());
     }
 
     @Test
-    void testChangePassword() {
-        Trainer updatedTrainer = trainerService.changePassword("John.Doe",
-                "newPassword",credentials);
+    public void testChangePassword() {
+        trainerService.changePassword(testTrainer.getUser().getUsername(), "newPassword", validCredentials);
 
-        assertNotNull(updatedTrainer);
-        assertEquals("newPassword", updatedTrainer.getUser().getPassword());
+        Credentials updatedCredentials = new Credentials(testTrainer.getUser().getUsername(), "newPassword");
+        Boolean isUpdated = trainerService.checkCredentials(updatedCredentials);
+
+        assertTrue(isUpdated);
     }
 
     @Test
-    void testActivateTrainer() {
-        presavedTrainer.getUser().setActive(false);
-        trainerService.createOrUpdateTrainer(presavedTrainer);
+    public void testActivateTrainer() {
+        trainerService.activateTrainer(testTrainer.getId(), validCredentials);
 
-        Trainer activatedTrainer = trainerService.activateTrainer(1L,
-                new Credentials(presavedTrainer.getUser().getUsername(), presavedTrainer.getUser().getPassword()));
-
-        assertNotNull(activatedTrainer);
+        Trainer activatedTrainer = trainerService.getTrainerById(testTrainer.getId(), validCredentials);
         assertTrue(activatedTrainer.getUser().isActive());
     }
 
     @Test
-    void testDeactivateTrainer() {
-        Trainer deactivatedTrainer = trainerService.deactivateTrainer(1L,credentials);
+    public void testDeactivateTrainer() {
+        trainerService.deactivateTrainer(testTrainer.getId(), validCredentials);
 
-        assertNotNull(deactivatedTrainer);
+        Trainer deactivatedTrainer = trainerService.getTrainerById(testTrainer.getId(), validCredentials);
         assertFalse(deactivatedTrainer.getUser().isActive());
     }
 
     @Test
-    void testGetUnassignedTrainersByTraineeUsername(){
-        User user = new User("John", "Doe","j.d","1233211231", true);
-        Trainer trainer = new Trainer(presavedTrainingType, user);
+    public void testGetUnassignedTrainersByTraineeUsername() {
+        List<Trainer> unassignedTrainers = trainerService.getUnassignedTrainersByTraineeUsername(
+                testTrainee.getUser().getUsername(), validCredentials);
 
-        Trainer savedTrainer = trainerService.createOrUpdateTrainer(trainer);
-        List<Trainer> trainers = trainerService.getUnassignedTrainersByTraineeUsername(
-                presavedTrainee.getUser().getUsername(),credentials);
-
-        assertNotNull(trainers);
-        assertFalse(trainers.isEmpty());
+        assertNotNull(unassignedTrainers);
+        assertFalse(unassignedTrainers.isEmpty());
     }
 
 }

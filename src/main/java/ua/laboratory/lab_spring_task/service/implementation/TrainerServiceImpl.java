@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ua.laboratory.lab_spring_task.dao.TrainerRepository;
 import ua.laboratory.lab_spring_task.dao.UserRepository;
+import ua.laboratory.lab_spring_task.model.Trainee;
+import ua.laboratory.lab_spring_task.model.TrainingType;
+import ua.laboratory.lab_spring_task.model.User;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.model.Trainer;
 import ua.laboratory.lab_spring_task.service.TrainerService;
@@ -16,27 +19,46 @@ import java.util.List;
 public class TrainerServiceImpl implements TrainerService {
     private static final Logger logger = LoggerFactory.getLogger(TrainerServiceImpl.class);
     private final TrainerRepository trainerRepository;
+    private final UserRepository userRepository;
 
-    public TrainerServiceImpl(TrainerRepository trainerRepository) {
+    public TrainerServiceImpl(TrainerRepository trainerRepository, UserRepository userRepository) {
         this.trainerRepository = trainerRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public Trainer createOrUpdateTrainer(Trainer trainer) {
+    public Trainer createTrainer(String firstName, String lastName, TrainingType trainingType) {
         try {
-            if(trainer == null)
-                throw new IllegalArgumentException("trainer is null");
+            if(firstName == null || lastName == null || trainingType == null)
+                throw new IllegalArgumentException("Trainer cannot be null");
 
-            logger.info("Creating trainer with ID: {}", trainer.getId());
-            Utilities.setUserUsername(trainer.getUser());
+            logger.info("Creating trainer");
+            logger.info("Creating trainee");
 
-            trainer.getUser().setPassword(Utilities.generatePassword(10));
+            User user = new User(firstName, lastName);
+            Utilities.setUserUsername(user);
+            user.setPassword(Utilities.generatePassword(10));
+            user.setActive(true);
+
+            userRepository.save(user);
+
+            Trainer trainer = new Trainer(trainingType);
+            trainer.setUser(user);
 
             return trainerRepository.save(trainer);
         }catch (Exception e){
             logger.error(e.getMessage());
             throw new RuntimeException(e.getMessage(),e);
         }
+    }
+
+    @Override
+    public Trainer updateTrainer(Trainer trainer) {
+        if(trainer == null)
+            throw new IllegalArgumentException("Trainee cannot be null");
+
+        userRepository.save(trainer.getUser());
+        return trainerRepository.save(trainer);
     }
 
     @Override
@@ -118,8 +140,9 @@ public class TrainerServiceImpl implements TrainerService {
         if(id == null)
             throw new IllegalArgumentException("Id cannot be null");
 
-
-        trainerRepository.updateUserActiveStatusByTrainerId(id, true);
+        User user = trainerRepository.getReferenceById(id).getUser();
+        user.setActive(true);
+        userRepository.save(user);
     }
 
     @Override
@@ -129,7 +152,9 @@ public class TrainerServiceImpl implements TrainerService {
         if(id == null)
             throw new IllegalArgumentException("Id cannot be null");
 
-        trainerRepository.updateUserActiveStatusByTrainerId(id, false);
+        User user = trainerRepository.getReferenceById(id).getUser();
+        user.setActive(false);
+        userRepository.save(user);
     }
 
     @Override

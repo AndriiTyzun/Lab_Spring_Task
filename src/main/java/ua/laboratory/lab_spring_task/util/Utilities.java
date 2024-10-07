@@ -35,13 +35,13 @@ public class Utilities {
     }
 
     public static void setUserUsername(User user){
-        user.setUsername(user.getFirstName() +
-                "." + user.getLastName());
+        user.setUsername(user.getFirstName().toLowerCase() +
+                "." + user.getLastName().toLowerCase());
 
         if(userRepository.getAllByOrderByIdDesc().stream().anyMatch(x -> x
                 .getUsername().equals(user.getUsername()))){
-            user.setUsername(user.getFirstName() +
-                    "." + user.getLastName() + user.getId());
+            user.setUsername(user.getFirstName().toLowerCase() +
+                    "." + user.getLastName().toLowerCase() + user.getId());
         }
     }
 

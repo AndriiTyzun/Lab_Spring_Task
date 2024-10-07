@@ -1,12 +1,15 @@
 package ua.laboratory.lab_spring_task.service;
 
+import ua.laboratory.lab_spring_task.model.TrainingType;
+import ua.laboratory.lab_spring_task.model.User;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.model.Trainer;
 
 import java.util.List;
 
 public interface TrainerService {
-    Trainer createOrUpdateTrainer(Trainer trainer);
+    Trainer createTrainer(String firstName, String lastName, TrainingType trainingType);
+    Trainer updateTrainer(Trainer trainer);
     Boolean checkCredentials(Credentials credentials);
     Trainer getTrainerById(Long id, Credentials credentials);
     Trainer getTrainerByUsername(String username, Credentials credentials);

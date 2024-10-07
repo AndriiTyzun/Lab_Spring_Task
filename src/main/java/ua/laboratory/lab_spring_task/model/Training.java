@@ -34,4 +34,13 @@ public class Training {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "trainer_id")
     private Trainer trainer;
+
+    public Training(String trainingName, LocalDate trainingDate, Long trainingDuration, TrainingType trainingType, Trainee trainee, Trainer trainer) {
+        this.trainingName = trainingName;
+        this.trainingDate = trainingDate;
+        this.trainingDuration = trainingDuration;
+        this.trainingType = trainingType;
+        this.trainee = trainee;
+        this.trainer = trainer;
+    }
 }

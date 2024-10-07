@@ -14,9 +14,6 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
     Optional<Trainer> getByUserUsername(String username);
     List<Trainer> getAllByOrderByIdDesc();
     @Modifying
-    @Query("UPDATE User u SET u.active = :active WHERE u.id = (SELECT t.user.id FROM Trainer t WHERE t.id = :trainerId)")
-    void updateUserActiveStatusByTrainerId(@Param("trainerId") Long traineeId, @Param("active") boolean active);
-
     @Query("SELECT t FROM Trainer t WHERE t.id NOT IN " +
             "(SELECT tr.id FROM Trainee tr JOIN tr.trainers trainers WHERE tr.user.username = :username)")
     List<Trainer> getUnassignedTrainersByUserUsername(@Param("username") String traineeUsername);

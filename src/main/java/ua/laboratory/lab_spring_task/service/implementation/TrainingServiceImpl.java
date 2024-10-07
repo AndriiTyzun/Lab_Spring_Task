@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.laboratory.lab_spring_task.dao.TrainingRepository;
 import ua.laboratory.lab_spring_task.dao.UserRepository;
+import ua.laboratory.lab_spring_task.model.Trainee;
+import ua.laboratory.lab_spring_task.model.Trainer;
+import ua.laboratory.lab_spring_task.model.TrainingType;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.model.Training;
 import ua.laboratory.lab_spring_task.service.TrainingService;
@@ -24,17 +27,29 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
-    public Training createOrUpdateTraining(Training training) {
+    public Training createTraining(String trainingName, LocalDate trainingDate, Long trainingDuration,
+                                   TrainingType trainingType, Trainee trainee, Trainer trainer) {
         try {
-            if(training == null)
+            if(trainingName == null || trainingDate == null || trainingDuration == null || trainingType == null
+                    || trainee == null || trainer == null)
                 throw new IllegalArgumentException("Training is null");
+            logger.info("Creating training");
 
-            logger.info("Creating training with ID: {}", training.getId());
+            Training training = new Training(trainingName, trainingDate, trainingDuration, trainingType, trainee, trainer);
+
             return trainingRepository.save(training);
         } catch (Exception e){
             logger.error(e.getMessage());
             throw new RuntimeException(e.getMessage(),e);
         }
+    }
+
+    @Override
+    public Training updateTraining(Training training) {
+        if(training == null)
+            throw new IllegalArgumentException("Training cannot be null");
+
+        return trainingRepository.save(training);
     }
 
     @Override
@@ -70,8 +85,8 @@ public class TrainingServiceImpl implements TrainingService {
     public List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String trainerName, Credentials credentials) {
         if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
             throw new IllegalArgumentException("Username and password are required");
-        if(username == null || (fromDate == null && toDate == null && trainerName == null))
-            throw new IllegalArgumentException("At least one criteria is required");
+        if(username == null)
+            throw new IllegalArgumentException("Username is required");
         return trainingRepository.getTraineeTrainingsByCriteria(username, fromDate, toDate, trainerName);
     }
 
@@ -79,8 +94,8 @@ public class TrainingServiceImpl implements TrainingService {
     public List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String traineeName, Credentials credentials) {
         if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
             throw new IllegalArgumentException("Username and password are required");
-        if(username == null || (fromDate == null && toDate == null && traineeName == null))
-            throw new IllegalArgumentException("At least one criteria is required");
+        if(username == null)
+            throw new IllegalArgumentException("Username is required");
         return trainingRepository.getTrainerTrainingsByCriteria(username, fromDate, toDate, traineeName);
     }
 }
