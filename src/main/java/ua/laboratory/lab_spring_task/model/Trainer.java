@@ -24,11 +24,11 @@ public class Trainer {
     @JoinColumn(name = "training_type_id")
     private TrainingType specialization;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "trainer_trainee",
             joinColumns = @JoinColumn(name = "trainer_id"),

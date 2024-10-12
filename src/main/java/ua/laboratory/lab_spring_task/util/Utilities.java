@@ -11,10 +11,14 @@ import ua.laboratory.lab_spring_task.model.User;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.List;
+import java.util.Random;
+import java.util.random.RandomGenerator;
 
 @Component
 public class Utilities {
     private static UserRepository userRepository;
+    private static final RandomGenerator randomGenerator = new SecureRandom();
 
     @Autowired
     public Utilities(UserRepository userRepository) {
@@ -37,11 +41,15 @@ public class Utilities {
     public static void setUserUsername(User user){
         user.setUsername(user.getFirstName().toLowerCase() +
                 "." + user.getLastName().toLowerCase());
-
-        if(userRepository.getAllByOrderByIdDesc().stream().anyMatch(x -> x
-                .getUsername().equals(user.getUsername()))){
-            user.setUsername(user.getFirstName().toLowerCase() +
-                    "." + user.getLastName().toLowerCase() + user.getId());
+        List<User> users = userRepository.getAllByOrderByIdDesc();
+        while (true) {
+            if (users.stream().anyMatch(x -> x
+                    .getUsername().equals(user.getUsername()))) {
+                user.setUsername(user.getFirstName().toLowerCase() +
+                        "." + user.getLastName().toLowerCase() + randomGenerator.nextInt());
+            }else {
+                break;
+            }
         }
     }
 

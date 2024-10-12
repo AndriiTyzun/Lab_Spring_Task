@@ -1,9 +1,5 @@
 package ua.laboratory.lab_spring_task.serviceTests;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +9,6 @@ import ua.laboratory.lab_spring_task.dao.*;
 import ua.laboratory.lab_spring_task.model.*;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.service.TrainingService;
-import ua.laboratory.lab_spring_task.service.implementation.TraineeServiceImpl;
-import ua.laboratory.lab_spring_task.service.implementation.TrainerServiceImpl;
-import ua.laboratory.lab_spring_task.service.implementation.TrainingServiceImpl;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -110,6 +103,7 @@ public class TrainingServiceTests {
                 null,
                 null,
                 null,
+                null,
                 validCredentials
         );
 
@@ -121,6 +115,7 @@ public class TrainingServiceTests {
     public void testGetTrainerTrainingsByCriteria() {
         List<Training> trainings = trainingService.getTrainerTrainingsByCriteria(
                 testTrainer.getUser().getUsername(),
+                null,
                 null,
                 null,
                 null,

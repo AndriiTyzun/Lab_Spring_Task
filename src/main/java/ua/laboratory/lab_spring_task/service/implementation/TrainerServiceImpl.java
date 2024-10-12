@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ua.laboratory.lab_spring_task.dao.TrainerRepository;
+import ua.laboratory.lab_spring_task.dao.TrainingTypeRepository;
 import ua.laboratory.lab_spring_task.dao.UserRepository;
 import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.TrainingType;
@@ -13,16 +14,20 @@ import ua.laboratory.lab_spring_task.model.Trainer;
 import ua.laboratory.lab_spring_task.service.TrainerService;
 import ua.laboratory.lab_spring_task.util.Utilities;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TrainerServiceImpl implements TrainerService {
     private static final Logger logger = LoggerFactory.getLogger(TrainerServiceImpl.class);
     private final TrainerRepository trainerRepository;
+    private final TrainingTypeRepository trainingTypeRepository;
     private final UserRepository userRepository;
 
-    public TrainerServiceImpl(TrainerRepository trainerRepository, UserRepository userRepository) {
+    public TrainerServiceImpl(TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, UserRepository userRepository) {
         this.trainerRepository = trainerRepository;
+        this.trainingTypeRepository = trainingTypeRepository;
         this.userRepository = userRepository;
     }
 
@@ -35,14 +40,18 @@ public class TrainerServiceImpl implements TrainerService {
             logger.info("Creating trainer");
             logger.info("Creating trainee");
 
+            TrainingType type = trainingTypeRepository.getByTrainingTypeName(
+                    trainingType.getTrainingTypeName()).orElse(null);
+            if(type == null)
+                trainingTypeRepository.save(trainingType);
+
+
             User user = new User(firstName, lastName);
             Utilities.setUserUsername(user);
             user.setPassword(Utilities.generatePassword(10));
             user.setActive(true);
 
-            userRepository.save(user);
-
-            Trainer trainer = new Trainer(trainingType);
+            Trainer trainer = new Trainer(type);
             trainer.setUser(user);
 
             return trainerRepository.save(trainer);
@@ -53,7 +62,10 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer updateTrainer(Trainer trainer) {
+    public Trainer updateTrainer(Trainer trainer, Credentials credentials) {
+        if(credentials.getUsername() == null || credentials.getPassword() == null ||
+                credentials.getUsername().isEmpty() || credentials.getPassword().isEmpty())
+            throw new IllegalArgumentException("Username and password are required");
         if(trainer == null)
             throw new IllegalArgumentException("Trainee cannot be null");
 
@@ -64,9 +76,8 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public Boolean checkCredentials(Credentials credentials) {
         if(credentials.getUsername() == null || credentials.getPassword() == null ||
-                credentials.getUsername().isEmpty() || credentials.getPassword().isEmpty()) {
+                credentials.getUsername().isEmpty() || credentials.getPassword().isEmpty())
             throw new IllegalArgumentException("Username and password are required");
-        }
 
         return Utilities.checkCredentials(credentials.getUsername(), credentials.getPassword());
     }
@@ -119,6 +130,20 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
+    public void updateTrainees(Long id, Set<Trainee> trainees, Credentials credentials) {
+        if(!checkCredentials(credentials))
+            throw new IllegalArgumentException("Username and password are required");
+        if(id == null)
+            throw new IllegalArgumentException("Id cannot be null");
+        if(trainees == null || trainees.isEmpty())
+            throw new IllegalArgumentException("Trainers cannot be null or empty");
+
+        Trainer trainee = trainerRepository.getReferenceById(id);
+        trainee.setTrainees(trainees);
+        trainerRepository.save(trainee);
+    }
+
+    @Override
     public Trainer changePassword(String username, String newPassword, Credentials credentials) {
         if(!checkCredentials(credentials))
             throw new IllegalArgumentException("Username and password are required");
@@ -146,6 +171,20 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
+    public void activateTrainer(String username, Credentials credentials) {
+        if(!checkCredentials(credentials))
+            throw new IllegalArgumentException("Username and password are required");
+        if(username == null)
+            throw new IllegalArgumentException("Username cannot be null");
+
+        User user = userRepository.getByUsername(username).orElseThrow(
+                IllegalArgumentException::new
+        );
+        user.setActive(true);
+        userRepository.save(user);
+    }
+
+    @Override
     public void deactivateTrainer(Long id, Credentials credentials) {
         if(!checkCredentials(credentials))
             throw new IllegalArgumentException("Username and password are required");
@@ -158,16 +197,40 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public List<Trainer> getUnassignedTrainersByTraineeUsername(String traineeUsername, Credentials credentials) {
+    public void deactivateTrainer(String username, Credentials credentials) {
+        if(!checkCredentials(credentials))
+            throw new IllegalArgumentException("Username and password are required");
+        if(username == null)
+            throw new IllegalArgumentException("Username cannot be null");
+
+        User user = userRepository.getByUsername(username).orElseThrow(
+                IllegalArgumentException::new
+        );
+        user.setActive(false);
+        userRepository.save(user);
+    }
+
+    @Override
+    public Set<Trainer> getUnassignedTrainersByTraineeUsername(String traineeUsername, Credentials credentials) {
         try {
             if(!checkCredentials(credentials))
                 throw new IllegalArgumentException("Username and password are required");
 
             logger.info("Fetching all trainers not assigned to trainee");
-            return trainerRepository.getUnassignedTrainersByUserUsername(traineeUsername);
+            return new HashSet<>(trainerRepository.getUnassignedTrainersByUserUsername(traineeUsername));
         } catch (Exception e){
             logger.error(e.getMessage());
             throw new RuntimeException(e.getMessage(),e);
         }
+    }
+
+    @Override
+    public Set<Trainee> getAllTrainees(String username, Credentials credentials) {
+        if(!checkCredentials(credentials))
+            throw new IllegalArgumentException("Username and password are required");
+        if(username.isEmpty())
+            throw new IllegalArgumentException("Username cannot be empty");
+
+        return trainerRepository.getAllTraineesByTraineeUsername(username);
     }
 }

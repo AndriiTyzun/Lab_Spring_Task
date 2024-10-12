@@ -68,10 +68,10 @@ public class TraineeServiceTests {
 
     @Test
     public void testCreateTrainee() {
-        Trainee createdTrainee = traineeService.createTrainee("Jane", "Doe", LocalDate.now(), "Address 1");
+        Trainee createdTrainee = traineeService.createTrainee("Jason", "Doe", LocalDate.now(), "Address 1");
 
         assertNotNull(createdTrainee);
-        assertEquals("jane.doe", createdTrainee.getUser().getUsername());
+        assertEquals("jason.doe", createdTrainee.getUser().getUsername());
         assertEquals("Address 1", createdTrainee.getAddress());
     }
 
@@ -139,7 +139,7 @@ public class TraineeServiceTests {
 
     @Test
     public void testGetAllTrainees() {
-        List<Trainee> allTrainees = traineeService.getAllTrainees(validCredentials);
+        Set<Trainee> allTrainees = traineeService.getAllTrainees(validCredentials);
         assertNotNull(allTrainees);
         assertFalse(allTrainees.isEmpty());
     }

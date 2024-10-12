@@ -16,12 +16,14 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
             "WHERE trainee.user.username = :username " +
             "AND (:fromDate IS NULL OR tr.trainingDate >= :fromDate) " +
             "AND (:toDate IS NULL OR tr.trainingDate <= :toDate) " +
-            "AND (:trainerName IS NULL OR trainer.user.username = :trainerName)")
+            "AND (:trainerName IS NULL OR trainer.user.username = :trainerName)" +
+            "AND (:trainingType IS NULL OR tr.trainingType.trainingTypeName = :trainingType)")
     List<Training> getTraineeTrainingsByCriteria(
             @Param("username") String username,
             @Param("fromDate") LocalDate fromDate,
             @Param("toDate") LocalDate toDate,
-            @Param("trainerName") String trainerName
+            @Param("trainerName") String trainerName,
+            @Param("trainingType") String trainingType
     );
 
     @Query("SELECT tr FROM Training tr " +
@@ -30,19 +32,13 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
             "WHERE trainer.user.username = :username " +
             "AND (:fromDate IS NULL OR tr.trainingDate >= :fromDate) " +
             "AND (:toDate IS NULL OR tr.trainingDate <= :toDate) " +
-            "AND (:traineeName IS NULL OR trainee.user.username = :traineeName)")
+            "AND (:traineeName IS NULL OR trainee.user.username = :traineeName)" +
+            "AND (:trainingType IS NULL OR tr.trainingType.trainingTypeName = :trainingType)")
     List<Training> getTrainerTrainingsByCriteria(
             @Param("username") String username,
             @Param("fromDate") LocalDate fromDate,
             @Param("toDate") LocalDate toDate,
-            @Param("traineeName") String traineeName
+            @Param("traineeName") String traineeName,
+            @Param("trainingType") String trainingType
     );
-
-//    Training createOrUpdateTraining(Training training);
-//    Training getTrainingById(Long id);
-//    List<Training> getAllTrainings();
-//    List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate,
-//                                                 String trainerName);
-//    List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate,
-//                                                 String traineeName);
 }

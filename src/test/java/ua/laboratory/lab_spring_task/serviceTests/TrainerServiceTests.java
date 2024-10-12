@@ -24,6 +24,7 @@ import ua.laboratory.lab_spring_task.service.implementation.TrainerServiceImpl;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -79,7 +80,7 @@ public class TrainerServiceTests {
     @Test
     public void testUpdateTrainer() {
         testTrainer.getUser().setLastName("UpdatedLastName");
-        Trainer updatedTrainer = trainerService.updateTrainer(testTrainer);
+        Trainer updatedTrainer = trainerService.updateTrainer(testTrainer, validCredentials);
 
         assertNotNull(updatedTrainer);
         assertEquals("UpdatedLastName", updatedTrainer.getUser().getLastName());
@@ -147,7 +148,7 @@ public class TrainerServiceTests {
 
     @Test
     public void testGetUnassignedTrainersByTraineeUsername() {
-        List<Trainer> unassignedTrainers = trainerService.getUnassignedTrainersByTraineeUsername(
+        Set<Trainer> unassignedTrainers = trainerService.getUnassignedTrainersByTraineeUsername(
                 testTrainee.getUser().getUsername(), validCredentials);
 
         assertNotNull(unassignedTrainers);

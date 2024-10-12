@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.laboratory.lab_spring_task.dao.TrainingRepository;
+import ua.laboratory.lab_spring_task.dao.TrainingTypeRepository;
 import ua.laboratory.lab_spring_task.dao.UserRepository;
 import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.Trainer;
@@ -16,14 +17,17 @@ import ua.laboratory.lab_spring_task.util.Utilities;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TrainingServiceImpl implements TrainingService {
     private static final Logger logger = LoggerFactory.getLogger(TrainingServiceImpl.class);
     private final TrainingRepository trainingRepository;
+    private final TrainingTypeRepository trainingTypeRepository;
 
-    public TrainingServiceImpl(TrainingRepository trainingRepository) {
+    public TrainingServiceImpl(TrainingRepository trainingRepository, TrainingTypeRepository trainingTypeRepository) {
         this.trainingRepository = trainingRepository;
+        this.trainingTypeRepository = trainingTypeRepository;
     }
 
     @Override
@@ -34,6 +38,11 @@ public class TrainingServiceImpl implements TrainingService {
                     || trainee == null || trainer == null)
                 throw new IllegalArgumentException("Training is null");
             logger.info("Creating training");
+
+            TrainingType type = trainingTypeRepository.getByTrainingTypeName(
+                    trainingType.getTrainingTypeName()).orElse(null);
+            if(type == null)
+                trainingTypeRepository.save(trainingType);
 
             Training training = new Training(trainingName, trainingDate, trainingDuration, trainingType, trainee, trainer);
 
@@ -82,20 +91,28 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
-    public List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String trainerName, Credentials credentials) {
+    public Set<TrainingType> getAllTrainingTypes(Credentials credentials) {
         if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
             throw new IllegalArgumentException("Username and password are required");
-        if(username == null)
-            throw new IllegalArgumentException("Username is required");
-        return trainingRepository.getTraineeTrainingsByCriteria(username, fromDate, toDate, trainerName);
+
+        return trainingTypeRepository.getAllByOrderByIdDesc();
     }
 
     @Override
-    public List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String traineeName, Credentials credentials) {
+    public List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String trainerName, String trainingType, Credentials credentials) {
         if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
             throw new IllegalArgumentException("Username and password are required");
         if(username == null)
             throw new IllegalArgumentException("Username is required");
-        return trainingRepository.getTrainerTrainingsByCriteria(username, fromDate, toDate, traineeName);
+        return trainingRepository.getTraineeTrainingsByCriteria(username, fromDate, toDate, trainerName,trainingType);
+    }
+
+    @Override
+    public List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String traineeName, String trainingType, Credentials credentials) {
+        if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
+            throw new IllegalArgumentException("Username and password are required");
+        if(username == null)
+            throw new IllegalArgumentException("Username is required");
+        return trainingRepository.getTrainerTrainingsByCriteria(username, fromDate, toDate, traineeName,trainingType);
     }
 }
