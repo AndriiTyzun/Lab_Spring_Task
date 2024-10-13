@@ -25,11 +25,17 @@ public class Utilities {
         Utilities.userRepository = userRepository;
     }
 
-    public static String generatePassword(int length) throws NoSuchAlgorithmException {
+    public static String generatePassword(int length) {
         if(length < 1)
             throw new IllegalArgumentException("Length must be greater than 0");
         String characters = "0123456789abcdefghijklmnopqrstuvwxyz-_ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        SecureRandom secureRandom = SecureRandom.getInstanceStrong();
+        SecureRandom secureRandom = null;
+
+        try {
+            secureRandom = SecureRandom.getInstanceStrong();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
 
         return secureRandom
                 .ints(length, 0, characters.length())

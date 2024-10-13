@@ -12,6 +12,8 @@ import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.Trainer;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.util.Utilities;
+import ua.laboratory.lab_spring_task.util.exception.EntityNotFoundException;
+import ua.laboratory.lab_spring_task.util.exception.InvalidDataException;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -32,34 +34,29 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee createTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address) {
-        try {
-            if(firstName == null || lastName == null)
-                throw new IllegalArgumentException("Trainee cannot be null");
-            logger.info("Creating trainee");
+        if(firstName == null || lastName == null)
+            throw new InvalidDataException("Trainee cannot be null");
 
-            User user = new User(firstName, lastName);
-            Utilities.setUserUsername(user);
-            user.setPassword(Utilities.generatePassword(10));
-            user.setActive(true);
+        logger.info("Creating trainee");
+        User user = new User(firstName, lastName);
+        Utilities.setUserUsername(user);
+        user.setPassword(Utilities.generatePassword(10));
+        user.setActive(true);
 
-            Trainee trainee = new Trainee(dateOfBirth, address);
-            trainee.setUser(user);
+        Trainee trainee = new Trainee(dateOfBirth, address);
+        trainee.setUser(user);
 
-            return traineeRepository.save(trainee);
-        } catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(),e);
-        }
+        return traineeRepository.save(trainee);
     }
 
     @Override
     public Trainee updateTrainee(Trainee trainee, Credentials credentials) {
         if(credentials.getUsername() == null || credentials.getPassword() == null ||
                 credentials.getUsername().isEmpty() || credentials.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
         }
         if(trainee == null)
-            throw new IllegalArgumentException("Trainee cannot be null");
+            throw new InvalidDataException("Trainee cannot be null");
 
         userRepository.save(trainee.getUser());
         return traineeRepository.save(trainee);
@@ -69,7 +66,7 @@ public class TraineeServiceImpl implements TraineeService {
     public Boolean checkCredentials(Credentials credentials) {
         if(credentials.getUsername() == null || credentials.getPassword() == null ||
                 credentials.getUsername().isEmpty() || credentials.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
         }
 
         return Utilities.checkCredentials(credentials.getUsername(), credentials.getPassword());
@@ -77,49 +74,34 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee getTraineeById(Long id, Credentials credentials) {
-        try {
-            if(!checkCredentials(credentials))
-                throw new IllegalArgumentException("Username and password are required");
-            if(id == null)
-                throw new IllegalArgumentException("Id cannot be null");
+        if(!checkCredentials(credentials))
+            throw new InvalidDataException("Username and password are required");
+        if(id == null)
+            throw new InvalidDataException("Id cannot be null");
 
-            logger.info("Fetching trainee with ID: {}", id);
-            return traineeRepository.getReferenceById(id);
-        } catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(),e);
-        }
-
+        logger.info("Fetching trainee with ID: {}", id);
+        return traineeRepository.getReferenceById(id);
     }
 
     @Override
     public Trainee getTraineeByUsername(String username, Credentials credentials) {
-        try {
-            if(!checkCredentials(credentials))
-                throw new IllegalArgumentException("Username and password are required");
-            if(username == null)
-                throw new IllegalArgumentException("Username cannot be null");
+        if(!checkCredentials(credentials))
+            throw new InvalidDataException("Username and password are required");
+        if(username == null)
+            throw new InvalidDataException("Username cannot be null");
 
-            logger.info("Fetching trainee with username: {}", username);
-            return traineeRepository.getByUserUsername(username).orElseThrow(
-                    IllegalArgumentException::new
-            );
-        } catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(),e);
-        }
+        logger.info("Fetching trainee with username: {}", username);
+        return traineeRepository.getByUserUsername(username).orElseThrow();
     }
 
     @Override
     public Trainee changePassword(String username, String newPassword, Credentials credentials) {
         if(!checkCredentials(credentials))
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
         if(username == null || newPassword == null || username.isEmpty() || newPassword.isEmpty())
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
 
-        Trainee trainee = traineeRepository.getByUserUsername(username).orElseThrow(
-                IllegalArgumentException::new
-        );
+        Trainee trainee = traineeRepository.getByUserUsername(username).orElseThrow();
         trainee.getUser().setPassword(newPassword);
         return traineeRepository.save(trainee);
     }
@@ -127,9 +109,9 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public void activateTrainee(Long id, Credentials credentials) {
         if(!checkCredentials(credentials))
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
         if(id == null)
-            throw new IllegalArgumentException("Id cannot be null");
+            throw new InvalidDataException("Id cannot be null");
 
         User user = traineeRepository.getReferenceById(id).getUser();
         user.setActive(true);
@@ -139,13 +121,11 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public void activateTrainee(String username, Credentials credentials) {
         if(!checkCredentials(credentials))
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
         if(username == null)
-            throw new IllegalArgumentException("Username cannot be null");
+            throw new InvalidDataException("Username cannot be null");
 
-        User user = userRepository.getByUsername(username).orElseThrow(
-                IllegalArgumentException::new
-        );
+        User user = userRepository.getByUsername(username).orElseThrow();
         user.setActive(true);
         userRepository.save(user);
     }
@@ -153,9 +133,10 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public void deactivateTrainee(Long id, Credentials credentials) {
         if(!checkCredentials(credentials))
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
         if(id == null)
-            throw new IllegalArgumentException("Id cannot be null");
+            throw new InvalidDataException("Id cannot be null");
+
         User user = traineeRepository.getReferenceById(id).getUser();
         user.setActive(false);
         userRepository.save(user);
@@ -164,13 +145,11 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public void deactivateTrainee(String username, Credentials credentials) {
         if(!checkCredentials(credentials))
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
         if(username == null)
-            throw new IllegalArgumentException("Username cannot be null");
+            throw new InvalidDataException("Username cannot be null");
 
-        User user = userRepository.getByUsername(username).orElseThrow(
-                IllegalArgumentException::new
-        );
+        User user = userRepository.getByUsername(username).orElseThrow();
         user.setActive(false);
         userRepository.save(user);
     }
@@ -178,11 +157,11 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public void updateTrainers(Long id, Set<Trainer> trainers, Credentials credentials) {
         if(!checkCredentials(credentials))
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
         if(id == null)
-            throw new IllegalArgumentException("Id cannot be null");
+            throw new InvalidDataException("Id cannot be null");
         if(trainers == null || trainers.isEmpty())
-            throw new IllegalArgumentException("Trainers cannot be null or empty");
+            throw new InvalidDataException("Trainers cannot be null or empty");
 
         Trainee trainee = traineeRepository.getReferenceById(id);
         trainee.setTrainers(trainers);
@@ -191,55 +170,41 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Set<Trainee> getAllTrainees(Credentials credentials) {
-        try {
-            if(!checkCredentials(credentials))
-                throw new IllegalArgumentException("Username and password are required");
-            logger.info("Fetching all trainees");
-            return new HashSet<>(traineeRepository.getAllByOrderByIdDesc());
-        } catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(),e);
-        }
+        if(!checkCredentials(credentials))
+            throw new InvalidDataException("Username and password are required");
+
+        logger.info("Fetching all trainees");
+        return new HashSet<>(traineeRepository.getAllByOrderByIdDesc());
     }
 
     @Override
     public void deleteTrainee(Long id, Credentials credentials) {
-        try {
-            if(!checkCredentials(credentials))
-                throw new IllegalArgumentException("Username and password are required");
-            if(id == null)
-                throw new IllegalArgumentException("Id cannot be null");
+        if(!checkCredentials(credentials))
+            throw new InvalidDataException("Username and password are required");
+        if(id == null)
+            throw new InvalidDataException("Id cannot be null");
 
-            logger.info("Deleting trainee with ID: {}", id);
-            traineeRepository.deleteById(id);
-        } catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(),e);
-        }
+        logger.info("Deleting trainee with ID: {}", id);
+        traineeRepository.deleteById(id);
     }
 
     @Override
     public void deleteTrainee(String username, Credentials credentials) {
-        try {
-            if(!checkCredentials(credentials))
-                throw new IllegalArgumentException("Username and password are required");
-            if(username.isEmpty())
-                throw new IllegalArgumentException("Username cannot be empty");
+        if(!checkCredentials(credentials))
+            throw new InvalidDataException("Username and password are required");
+        if(username.isEmpty())
+            throw new InvalidDataException("Username cannot be empty");
 
-            logger.info("Deleting trainee with username: {}", username);
-            traineeRepository.deleteByUserUsername(username);
-        } catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(),e);
-        }
+        logger.info("Deleting trainee with username: {}", username);
+        traineeRepository.deleteByUserUsername(username);
     }
 
     @Override
     public Set<Trainer> getAllTrainers(String username, Credentials credentials) {
         if(!checkCredentials(credentials))
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
         if(username.isEmpty())
-            throw new IllegalArgumentException("Username cannot be empty");
+            throw new InvalidDataException("Username cannot be empty");
 
         return traineeRepository.getAllTrainersByTraineeUsername(username);
     }

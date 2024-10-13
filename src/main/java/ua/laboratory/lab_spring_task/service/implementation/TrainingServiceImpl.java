@@ -14,6 +14,7 @@ import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.model.Training;
 import ua.laboratory.lab_spring_task.service.TrainingService;
 import ua.laboratory.lab_spring_task.util.Utilities;
+import ua.laboratory.lab_spring_task.util.exception.InvalidDataException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,67 +34,54 @@ public class TrainingServiceImpl implements TrainingService {
     @Override
     public Training createTraining(String trainingName, LocalDate trainingDate, Long trainingDuration,
                                    TrainingType trainingType, Trainee trainee, Trainer trainer) {
-        try {
-            if(trainingName == null || trainingDate == null || trainingDuration == null || trainingType == null
-                    || trainee == null || trainer == null)
-                throw new IllegalArgumentException("Training is null");
-            logger.info("Creating training");
+        if(trainingName == null || trainingDate == null || trainingDuration == null || trainingType == null
+                || trainee == null || trainer == null)
+            throw new InvalidDataException("Training is null");
 
-            TrainingType type = trainingTypeRepository.getByTrainingTypeName(
-                    trainingType.getTrainingTypeName()).orElse(null);
-            if(type == null)
-                trainingTypeRepository.save(trainingType);
+        logger.info("Creating training");
 
-            Training training = new Training(trainingName, trainingDate, trainingDuration, trainingType, trainee, trainer);
+        TrainingType type = trainingTypeRepository.getByTrainingTypeName(
+                trainingType.getTrainingTypeName()).orElse(null);
+        if(type == null)
+            trainingTypeRepository.save(trainingType);
 
-            return trainingRepository.save(training);
-        } catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(),e);
-        }
+        Training training = new Training(trainingName, trainingDate, trainingDuration, trainingType, trainee, trainer);
+
+        return trainingRepository.save(training);
     }
 
     @Override
     public Training updateTraining(Training training) {
         if(training == null)
-            throw new IllegalArgumentException("Training cannot be null");
+            throw new InvalidDataException("Training cannot be null");
 
         return trainingRepository.save(training);
     }
 
     @Override
     public Training getTraining(Long id, Credentials credentials) {
-        try {
-            if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
-                throw new IllegalArgumentException("Username and password are required");
-            if(id == null)
-                throw new IllegalArgumentException("Id cannot be null");
+        if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
+            throw new InvalidDataException("Username and password are required");
+        if(id == null)
+            throw new InvalidDataException("Id cannot be null");
 
-            logger.info("Fetching training with ID: {}", id);
-            return trainingRepository.getReferenceById(id);
-        } catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(),e);
-        }
+        logger.info("Fetching training with ID: {}", id);
+        return trainingRepository.getReferenceById(id);
     }
 
     @Override
     public List<Training> getAllTrainings(Credentials credentials) {
-        try {
-            if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
-                throw new IllegalArgumentException("Username and password are required");
-            logger.info("Fetching all trainings");
-            return trainingRepository.getAllByOrderByIdDesc();
-        } catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException(e.getMessage(),e);
-        }
+        if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
+            throw new InvalidDataException("Username and password are required");
+        logger.info("Fetching all trainings");
+
+        return trainingRepository.getAllByOrderByIdDesc();
     }
 
     @Override
     public Set<TrainingType> getAllTrainingTypes(Credentials credentials) {
         if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
 
         return trainingTypeRepository.getAllByOrderByIdDesc();
     }
@@ -101,18 +89,20 @@ public class TrainingServiceImpl implements TrainingService {
     @Override
     public List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String trainerName, String trainingType, Credentials credentials) {
         if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
         if(username == null)
-            throw new IllegalArgumentException("Username is required");
+            throw new InvalidDataException("Username is required");
+
         return trainingRepository.getTraineeTrainingsByCriteria(username, fromDate, toDate, trainerName,trainingType);
     }
 
     @Override
     public List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String traineeName, String trainingType, Credentials credentials) {
         if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
-            throw new IllegalArgumentException("Username and password are required");
+            throw new InvalidDataException("Username and password are required");
         if(username == null)
-            throw new IllegalArgumentException("Username is required");
+            throw new InvalidDataException("Username is required");
+
         return trainingRepository.getTrainerTrainingsByCriteria(username, fromDate, toDate, traineeName,trainingType);
     }
 }
