@@ -1,10 +1,13 @@
 package ua.laboratory.lab_spring_task.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ua.laboratory.lab_spring_task.model.request.UpdateTraineeProfileRequest;
+import ua.laboratory.lab_spring_task.model.request.UpdateTrainerProfileRequest;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,9 +37,21 @@ public class Trainer {
             joinColumns = @JoinColumn(name = "trainer_id"),
             inverseJoinColumns = @JoinColumn(name = "trainee_id")
     )
+    @JsonIgnore
     private Set<Trainee> trainees = new HashSet<>();
 
     public Trainer(TrainingType specialization) {
         this.specialization = specialization;
+    }
+
+    public void updateByRequest(UpdateTrainerProfileRequest request){
+        this.user.setFirstName(request.getFirstName());
+        this.user.setLastName(request.getLastName());
+        this.specialization = request.getSpecialization();
+        this.user.setActive(request.isActive());
+    }
+
+    public void addTrainee(Trainee trainee){
+        trainees.add(trainee);
     }
 }

@@ -19,4 +19,13 @@ public class TrainerProfileResponse {
     private Boolean isActive;
     private TrainingType trainingType;
     private List<TraineeProfileResponse> trainees;
+
+    @Override
+    public String toString() {
+        return "username = " + username + ", " +
+                "firstName = " + firstName + ", " +
+                "lastName = " + lastName + ", " +
+                "active = " + isActive + ", " +
+                "training type = " + trainingType;
+    }
 }

@@ -18,4 +18,13 @@ public class TrainingDetailsResponse {
     private TrainingType trainingType;
     private Long duration;
     private String trainerName;
+
+    @Override
+    public String toString() {
+        return "name = " + name + ", " +
+                "date = " + date + ", " +
+                "trainingType = " + trainingType + ", " +
+                "duration = " + duration + ", " +
+                "trainerName = " + trainerName;
+    }
 }

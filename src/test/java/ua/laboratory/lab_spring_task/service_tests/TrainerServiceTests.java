@@ -1,8 +1,5 @@
-package ua.laboratory.lab_spring_task.serviceTests;
+package ua.laboratory.lab_spring_task.service_tests;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,8 +16,6 @@ import ua.laboratory.lab_spring_task.model.Trainer;
 import ua.laboratory.lab_spring_task.model.TrainingType;
 import ua.laboratory.lab_spring_task.model.User;
 import ua.laboratory.lab_spring_task.service.TrainerService;
-import ua.laboratory.lab_spring_task.service.implementation.TraineeServiceImpl;
-import ua.laboratory.lab_spring_task.service.implementation.TrainerServiceImpl;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -48,11 +43,11 @@ public class TrainerServiceTests {
 
     @BeforeEach
     public void setup() {
-        User user = new User("John", "Doe", "john.doe", "password123", true);
+        User user = new User("John", "Smith", "john.smith", "password123", true);
         userRepository.save(user);
-        User userBackup = new User("Jane", "Doe", "jane.doe", "password123", true);
+        User userBackup = new User("Jane", "Smith", "jane.smith", "password123", true);
         userRepository.save(userBackup);
-        testTrainingType = new TrainingType("Agility");
+        testTrainingType = new TrainingType("Test type 1");
         testTrainingType = trainingTypeRepository.save(testTrainingType);
 
         testTrainer = new Trainer(trainingTypeRepository.getReferenceById(testTrainingType.getId()));
@@ -60,7 +55,7 @@ public class TrainerServiceTests {
         testTrainer.getUser().setActive(true);
 
         trainerRepository.save(testTrainer);
-        validCredentials = new Credentials("john.doe", "password123");
+        validCredentials = new Credentials("john.smith", "password123");
 
         testTrainee = new Trainee(LocalDate.now(), "Address 1");
         testTrainee.setUser(userBackup);
@@ -94,7 +89,7 @@ public class TrainerServiceTests {
 
     @Test
     public void testCheckCredentials_Invalid() {
-        Credentials invalidCredentials = new Credentials("johndoe", "wrongpassword");
+        Credentials invalidCredentials = new Credentials("johnsmith", "wrongpassword");
         assertThrows(IllegalArgumentException.class,
                 () -> trainerService.checkCredentials(invalidCredentials));
     }

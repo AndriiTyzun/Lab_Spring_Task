@@ -1,4 +1,4 @@
-package ua.laboratory.lab_spring_task.serviceTests;
+package ua.laboratory.lab_spring_task.service_tests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,6 @@ import ua.laboratory.lab_spring_task.service.TraineeService;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -44,9 +43,9 @@ public class TraineeServiceTests {
 
     @BeforeEach
     public void setup() {
-        User user = new User("John", "Doe", "john.doe", "password123", true);
+        User user = new User("John", "Smith", "john.smith", "password123", true);
         userRepository.save(user);
-        User userBackup = new User("Jane", "Doe", "jane.doe", "password123", true);
+        User userBackup = new User("Jane", "Smith", "jane.smith", "password123", true);
         userRepository.save(userBackup);
 
         testTrainee = new Trainee(LocalDate.now(), "Address 1");
@@ -55,9 +54,9 @@ public class TraineeServiceTests {
 
         traineeRepository.save(testTrainee);
 
-        validCredentials = new Credentials("john.doe", "password123");
+        validCredentials = new Credentials("john.smith", "password123");
 
-        testTrainingType = new TrainingType("Agility");
+        testTrainingType = new TrainingType("Test type 1");
         testTrainingType = trainingTypeRepository.save(testTrainingType);
         testTrainer = new Trainer(trainingTypeRepository.getReferenceById(testTrainingType.getId()));
         testTrainer.setUser(user);
@@ -68,10 +67,10 @@ public class TraineeServiceTests {
 
     @Test
     public void testCreateTrainee() {
-        Trainee createdTrainee = traineeService.createTrainee("Jason", "Doe", LocalDate.now(), "Address 1");
+        Trainee createdTrainee = traineeService.createTrainee("Jason", "Smith", LocalDate.now(), "Address 1");
 
         assertNotNull(createdTrainee);
-        assertEquals("jason.doe", createdTrainee.getUser().getUsername());
+        assertEquals("jason.smith", createdTrainee.getUser().getUsername());
         assertEquals("Address 1", createdTrainee.getAddress());
     }
 
@@ -83,7 +82,7 @@ public class TraineeServiceTests {
 
     @Test
     public void testCheckCredentials_Invalid() {
-        Credentials invalidCredentials = new Credentials("johndoe", "wrongpassword");
+        Credentials invalidCredentials = new Credentials("johnsmith", "wrongpassword");
         assertThrows(IllegalArgumentException.class,
                 () -> traineeService.checkCredentials(invalidCredentials));
     }
@@ -97,15 +96,15 @@ public class TraineeServiceTests {
 
     @Test
     public void testGetTraineeByUsername() {
-        Trainee retrievedTrainee = traineeService.getTraineeByUsername("john.doe", validCredentials);
+        Trainee retrievedTrainee = traineeService.getTraineeByUsername("john.smith", validCredentials);
         assertNotNull(retrievedTrainee);
         assertEquals("John", retrievedTrainee.getUser().getFirstName());
     }
 
     @Test
     public void testChangePassword() {
-        traineeService.changePassword("john.doe", "newpassword", validCredentials);
-        Credentials newCredentials = new Credentials("john.doe", "newpassword");
+        traineeService.changePassword("john.smith", "newpassword", validCredentials);
+        Credentials newCredentials = new Credentials("john.smith", "newpassword");
         assertTrue(traineeService.checkCredentials(newCredentials));
     }
 
@@ -132,7 +131,7 @@ public class TraineeServiceTests {
 
     @Test
     public void testDeleteTraineeByUsername() {
-        traineeService.deleteTrainee("john.doe", validCredentials);
+        traineeService.deleteTrainee("john.smith", validCredentials);
         Optional<Trainee> deletedTrainee = traineeRepository.findById(testTrainee.getId());
         assertTrue(deletedTrainee.isEmpty());
     }

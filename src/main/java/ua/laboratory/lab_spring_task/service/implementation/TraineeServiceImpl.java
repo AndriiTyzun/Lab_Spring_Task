@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class TraineeServiceImpl implements TraineeService {
@@ -163,7 +164,10 @@ public class TraineeServiceImpl implements TraineeService {
         if(trainers == null || trainers.isEmpty())
             throw new InvalidDataException("Trainers cannot be null or empty");
 
-        Trainee trainee = traineeRepository.getReferenceById(id);
+        Trainee trainee = traineeRepository.getTraineeById(id).orElseThrow();
+        for (Trainer trainer : trainers)
+            trainer.addTrainee(trainee);
+
         trainee.setTrainers(trainers);
         traineeRepository.save(trainee);
     }
@@ -178,6 +182,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
+    @Transactional
     public void deleteTrainee(Long id, Credentials credentials) {
         if(!checkCredentials(credentials))
             throw new InvalidDataException("Username and password are required");
@@ -189,6 +194,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
+    @Transactional
     public void deleteTrainee(String username, Credentials credentials) {
         if(!checkCredentials(credentials))
             throw new InvalidDataException("Username and password are required");

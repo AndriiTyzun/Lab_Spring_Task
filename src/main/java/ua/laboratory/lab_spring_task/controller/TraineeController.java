@@ -125,11 +125,4 @@ public class TraineeController {
         trainerList = traineeService.getAllTrainers(username, credentials);
         return ResponseEntity.ok(trainerList);
     }
-
-
-
-
-
-
-
 }

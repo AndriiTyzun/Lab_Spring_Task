@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/training")
+@RequestMapping("/api/trainings")
 public class TrainingController {
     @Autowired
     private TraineeService traineeService;
@@ -48,8 +48,9 @@ public class TrainingController {
                                                                         @RequestBody SearchCriteriaRequest request) {
         Credentials credentials = new Credentials(username, password);
         List<TrainingDetailsResponse> trainingDetailsResponse = trainingService.getTraineeTrainingsByCriteria(request.getUsername(),
-                request.getFromDate(),request.getToDate(),request.getPartnerName(),request.getType().getTrainingTypeName(), credentials)
-                .stream().map(training -> new TrainingDetailsResponse(training.getTrainingName(), training.getTrainingDate(),
+                request.getFromDate(),request.getToDate(),request.getPartnerName(),
+                        request.getType() == null ? null : request.getType().getTrainingTypeName(),
+                        credentials).stream().map(training -> new TrainingDetailsResponse(training.getTrainingName(), training.getTrainingDate(),
                         training.getTrainingType(), training.getTrainingDuration(), training.getTrainer().getUser().getUsername()))
                 .toList();
         return ResponseEntity.ok(trainingDetailsResponse);
@@ -61,8 +62,9 @@ public class TrainingController {
                                                                              @RequestBody SearchCriteriaRequest request) {
         Credentials credentials = new Credentials(username, password);
         List<TrainingDetailsResponse> trainingDetailsResponse = trainingService.getTrainerTrainingsByCriteria(request.getUsername(),
-                        request.getFromDate(),request.getToDate(),request.getPartnerName(),request.getType().getTrainingTypeName(), credentials)
-                .stream().map(training -> new TrainingDetailsResponse(training.getTrainingName(), training.getTrainingDate(),
+                        request.getFromDate(),request.getToDate(),request.getPartnerName(),
+                        request.getType() == null ? null : request.getType().getTrainingTypeName(),
+                        credentials).stream().map(training -> new TrainingDetailsResponse(training.getTrainingName(), training.getTrainingDate(),
                         training.getTrainingType(), training.getTrainingDuration(), training.getTrainer().getUser().getUsername()))
                 .toList();
         return ResponseEntity.ok(trainingDetailsResponse);

@@ -20,4 +20,14 @@ public class TraineeProfileResponse {
     private LocalDate dateOfBirth;
     private String address;
     private List<TrainerProfileResponse> trainers;
+
+    @Override
+    public String toString() {
+        return "username = " + username + ", " +
+                "firstName = " + firstName + ", " +
+                "lastName = " + lastName + ", " +
+                "active = " + isActive + ", " +
+                "date of birth = " + dateOfBirth + ", " +
+                "address = " + address;
+    }
 }

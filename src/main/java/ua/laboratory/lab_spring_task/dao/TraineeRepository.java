@@ -13,12 +13,13 @@ import java.util.Set;
 
 @Repository
 public interface TraineeRepository extends JpaRepository<Trainee, Long> {
+    Optional<Trainee> getTraineeById(Long id);
     Optional<Trainee> getByUserUsername(String name);
     List<Trainee> getAllByOrderByIdDesc();
 
     @Query("SELECT t.trainers FROM Trainee t WHERE t.user.username = :username")
     Set<Trainer> getAllTrainersByTraineeUsername(@Param("username") String username);
 
-    void deleteByUserUsername(String name);
+    void deleteByUserUsername(String username);
 }
 

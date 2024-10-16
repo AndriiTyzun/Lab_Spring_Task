@@ -1,5 +1,6 @@
 package ua.laboratory.lab_spring_task.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,7 +31,13 @@ public class Trainee {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ManyToMany(mappedBy = "trainees", fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "trainer_trainee",
+            joinColumns = @JoinColumn(name = "trainee_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainer_id")
+    )
+    @JsonIgnore
     private Set<Trainer> trainers = new HashSet<>();
 
     public Trainee(LocalDate dateOfBirth, String address) {
@@ -45,5 +52,4 @@ public class Trainee {
         this.address = request.getAddress();
         this.user.setActive(request.isActive());
     }
-
 }

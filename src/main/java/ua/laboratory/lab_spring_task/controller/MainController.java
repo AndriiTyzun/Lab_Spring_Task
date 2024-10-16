@@ -41,14 +41,28 @@ public class MainController {
         }
     }
 
-    @PutMapping("/change-password")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest request) {
+    @PutMapping("/change-trainee-password")
+    public ResponseEntity<String> changeTraineePassword(@RequestBody ChangePasswordRequest request) {
         Credentials oldCredentials = new Credentials(request.getUsername(), request.getOldPassword());
 
         Boolean isValid = traineeService.checkCredentials(oldCredentials);
 
         if (isValid) {
             traineeService.changePassword(request.getUsername(), request.getNewPassword(), oldCredentials);
+            return ResponseEntity.ok("Password changed successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid old credentials");
+        }
+    }
+
+    @PutMapping("/change-trainer-password")
+    public ResponseEntity<String> changeTrainerPassword(@RequestBody ChangePasswordRequest request) {
+        Credentials oldCredentials = new Credentials(request.getUsername(), request.getOldPassword());
+
+        Boolean isValid = traineeService.checkCredentials(oldCredentials);
+
+        if (isValid) {
+            trainerService.changePassword(request.getUsername(), request.getNewPassword(), oldCredentials);
             return ResponseEntity.ok("Password changed successfully");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid old credentials");

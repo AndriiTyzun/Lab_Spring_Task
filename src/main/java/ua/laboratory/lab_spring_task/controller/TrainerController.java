@@ -7,6 +7,8 @@ import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.Trainer;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.model.request.TrainerRegistrationRequest;
+import ua.laboratory.lab_spring_task.model.request.UpdateTraineeProfileRequest;
+import ua.laboratory.lab_spring_task.model.request.UpdateTrainerProfileRequest;
 import ua.laboratory.lab_spring_task.model.response.TraineeProfileResponse;
 import ua.laboratory.lab_spring_task.model.response.TrainerProfileResponse;
 import ua.laboratory.lab_spring_task.service.TraineeService;
@@ -63,7 +65,7 @@ public class TrainerController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<TrainerProfileResponse> getTraineeProfile(@RequestHeader String username,
+    public ResponseEntity<TrainerProfileResponse> getTrainerProfile(@RequestHeader String username,
                                                                     @RequestHeader String password) {
         Trainer trainer = trainerService.getTrainerByUsername(username, new Credentials(username, password));
 
@@ -81,6 +83,36 @@ public class TrainerController {
                 trainer.getUser().isActive(),
                 trainer.getSpecialization(),
                 trainers
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<TrainerProfileResponse> updateTrainerProfile(
+            @RequestHeader String username,
+            @RequestHeader String password,
+            @RequestBody UpdateTrainerProfileRequest updateRequest) {
+
+        Credentials credentials = new Credentials(username, password);
+        Trainer trainer = trainerService.getTrainerByUsername(username, credentials);
+        trainer.updateByRequest(updateRequest);
+        Trainer updatedTrainer = trainerService.updateTrainer(trainer, credentials);
+
+        List<TraineeProfileResponse> trainees = updatedTrainer.getTrainees().stream()
+                .map(trainee -> new TraineeProfileResponse(trainee.getUser().getUsername(),
+                        trainee.getUser().getFirstName(), trainee.getUser().getLastName(),
+                        trainee.getUser().isActive(),trainee.getDateOfBirth(),trainee.getAddress(),
+                        null))
+                .toList();
+
+        TrainerProfileResponse response = new TrainerProfileResponse(
+                updatedTrainer.getUser().getUsername(),
+                updatedTrainer.getUser().getFirstName(),
+                updatedTrainer.getUser().getLastName(),
+                updatedTrainer.getUser().isActive(),
+                updatedTrainer.getSpecialization(),
+                trainees
         );
 
         return ResponseEntity.ok(response);

@@ -1,4 +1,4 @@
-package ua.laboratory.lab_spring_task.serviceTests;
+package ua.laboratory.lab_spring_task.service_tests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,11 +39,11 @@ public class TrainingServiceTests {
 
     @BeforeEach
     public void setUp() {
-        User user = new User("John", "Doe", "john.doe", "password123", true);
+        User user = new User("John", "Smith", "john.smith", "password123", true);
         userRepository.save(user);
-        User userBackup = new User("Jane", "Doe", "jane.doe", "password123", true);
+        User userBackup = new User("Jane", "Smith", "jane.smith", "password123", true);
         userRepository.save(userBackup);
-        testTrainingType = new TrainingType("Agility");
+        testTrainingType = new TrainingType("Test type 3");
         testTrainingType = trainingTypeRepository.save(testTrainingType);
 
         testTrainer = new Trainer(trainingTypeRepository.getReferenceById(testTrainingType.getId()));
@@ -60,7 +60,7 @@ public class TrainingServiceTests {
                 testTrainingType, testTrainee, testTrainer);
         trainingRepository.save(testTraining);
 
-        validCredentials = new Credentials("john.doe", "password123");
+        validCredentials = new Credentials("john.smith", "password123");
     }
 
     @Test
