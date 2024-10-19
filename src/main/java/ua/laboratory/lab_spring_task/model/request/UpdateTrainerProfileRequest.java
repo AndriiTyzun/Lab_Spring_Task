@@ -18,4 +18,14 @@ public class UpdateTrainerProfileRequest {
     private String lastName;
     private TrainingType specialization;
     private boolean isActive;
+
+    @Override
+    public String toString() {
+        return "UpdateTrainerProfileRequest{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", specialization=" + specialization +
+                ", isActive=" + isActive +
+                '}';
+    }
 }

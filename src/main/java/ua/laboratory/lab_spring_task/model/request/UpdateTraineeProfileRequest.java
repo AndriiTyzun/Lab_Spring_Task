@@ -17,4 +17,15 @@ public class UpdateTraineeProfileRequest {
     private LocalDate dateOfBirth;
     private String address;
     private boolean isActive;
+
+    @Override
+    public String toString() {
+        return "UpdateTraineeProfileRequest{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", address='" + address + '\'' +
+                ", isActive=" + isActive +
+                '}';
+    }
 }

@@ -54,4 +54,13 @@ public class Trainer {
     public void addTrainee(Trainee trainee){
         trainees.add(trainee);
     }
+
+    @Override
+    public String toString() {
+        return "Trainer{" +
+                "user=" + user +
+                ", specialization=" + specialization +
+                ", id=" + id +
+                '}';
+    }
 }

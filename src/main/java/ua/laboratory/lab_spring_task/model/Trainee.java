@@ -52,4 +52,14 @@ public class Trainee {
         this.address = request.getAddress();
         this.user.setActive(request.isActive());
     }
+
+    @Override
+    public String toString() {
+        return "Trainee{" +
+                "id=" + id +
+                ", dateOfBirth=" + dateOfBirth +
+                ", address='" + address + '\'' +
+                ", user=" + user +
+                '}';
+    }
 }

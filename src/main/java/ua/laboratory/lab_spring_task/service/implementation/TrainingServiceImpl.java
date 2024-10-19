@@ -2,16 +2,14 @@ package ua.laboratory.lab_spring_task.service.implementation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.laboratory.lab_spring_task.dao.TrainingRepository;
 import ua.laboratory.lab_spring_task.dao.TrainingTypeRepository;
-import ua.laboratory.lab_spring_task.dao.UserRepository;
 import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.Trainer;
+import ua.laboratory.lab_spring_task.model.Training;
 import ua.laboratory.lab_spring_task.model.TrainingType;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
-import ua.laboratory.lab_spring_task.model.Training;
 import ua.laboratory.lab_spring_task.service.TrainingService;
 import ua.laboratory.lab_spring_task.util.Utilities;
 import ua.laboratory.lab_spring_task.util.exception.InvalidDataException;

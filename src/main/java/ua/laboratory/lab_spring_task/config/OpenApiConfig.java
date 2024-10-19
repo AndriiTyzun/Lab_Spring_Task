@@ -15,6 +15,6 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Training Management API")
                         .version("1.0")
-                        .description("API для управління тренуваннями, тренерами та учасниками"));
+                        .description("API that processes incoming requests"));
     }
 }

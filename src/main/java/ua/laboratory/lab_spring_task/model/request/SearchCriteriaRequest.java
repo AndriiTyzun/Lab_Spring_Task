@@ -19,4 +19,14 @@ public class SearchCriteriaRequest {
     private String partnerName;
     private TrainingType type;
 
+    @Override
+    public String toString() {
+        return "SearchCriteriaRequest{" +
+                "username='" + username + '\'' +
+                ", fromDate=" + fromDate +
+                ", toDate=" + toDate +
+                ", partnerName='" + partnerName + '\'' +
+                ", type=" + type +
+                '}';
+    }
 }

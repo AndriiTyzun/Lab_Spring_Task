@@ -6,20 +6,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.laboratory.lab_spring_task.dao.TraineeRepository;
 import ua.laboratory.lab_spring_task.dao.UserRepository;
-import ua.laboratory.lab_spring_task.model.User;
-import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.Trainer;
+import ua.laboratory.lab_spring_task.model.User;
+import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.util.Utilities;
-import ua.laboratory.lab_spring_task.util.exception.EntityNotFoundException;
 import ua.laboratory.lab_spring_task.util.exception.InvalidDataException;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class TraineeServiceImpl implements TraineeService {

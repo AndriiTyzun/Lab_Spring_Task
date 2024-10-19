@@ -22,10 +22,13 @@ public class TrainerProfileResponse {
 
     @Override
     public String toString() {
-        return "username = " + username + ", " +
-                "firstName = " + firstName + ", " +
-                "lastName = " + lastName + ", " +
-                "active = " + isActive + ", " +
-                "training type = " + trainingType;
+        return "TrainerProfileResponse{" +
+                "username='" + username + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", isActive=" + isActive +
+                ", trainingType=" + trainingType +
+                ", trainees=" + trainees +
+                '}';
     }
 }

@@ -13,4 +13,14 @@ public class TraineeRegistrationRequest {
     private String lastName;
     private LocalDate dateOfBirth;
     private String address;
+
+    @Override
+    public String toString() {
+        return "TraineeRegistrationRequest{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", address='" + address + '\'' +
+                '}';
+    }
 }

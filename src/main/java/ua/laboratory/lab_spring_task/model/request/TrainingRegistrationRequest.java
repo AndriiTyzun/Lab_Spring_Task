@@ -19,4 +19,16 @@ public class TrainingRegistrationRequest {
     private LocalDate trainingDate;
     private Long trainingDuration;
     private TrainingType trainingType;
+
+    @Override
+    public String toString() {
+        return "TrainingRegistrationRequest{" +
+                "traineeUsername='" + traineeUsername + '\'' +
+                ", trainerUsername='" + trainerUsername + '\'' +
+                ", trainingName='" + trainingName + '\'' +
+                ", trainingDate=" + trainingDate +
+                ", trainingDuration=" + trainingDuration +
+                ", trainingType=" + trainingType +
+                '}';
+    }
 }

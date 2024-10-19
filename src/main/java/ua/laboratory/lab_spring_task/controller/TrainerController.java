@@ -7,7 +7,6 @@ import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.Trainer;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.model.request.TrainerRegistrationRequest;
-import ua.laboratory.lab_spring_task.model.request.UpdateTraineeProfileRequest;
 import ua.laboratory.lab_spring_task.model.request.UpdateTrainerProfileRequest;
 import ua.laboratory.lab_spring_task.model.response.TraineeProfileResponse;
 import ua.laboratory.lab_spring_task.model.response.TrainerProfileResponse;

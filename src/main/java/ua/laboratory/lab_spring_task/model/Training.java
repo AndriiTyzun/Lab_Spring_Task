@@ -43,4 +43,17 @@ public class Training {
         this.trainee = trainee;
         this.trainer = trainer;
     }
+
+    @Override
+    public String toString() {
+        return "Training{" +
+                "id=" + id +
+                ", trainingName='" + trainingName + '\'' +
+                ", trainingDate=" + trainingDate +
+                ", trainingDuration=" + trainingDuration +
+                ", trainingType=" + trainingType +
+                ", trainee=" + trainee +
+                ", trainer=" + trainer +
+                '}';
+    }
 }

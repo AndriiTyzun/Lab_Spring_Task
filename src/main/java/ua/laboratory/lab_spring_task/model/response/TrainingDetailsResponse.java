@@ -21,10 +21,12 @@ public class TrainingDetailsResponse {
 
     @Override
     public String toString() {
-        return "name = " + name + ", " +
-                "date = " + date + ", " +
-                "trainingType = " + trainingType + ", " +
-                "duration = " + duration + ", " +
-                "trainerName = " + trainerName;
+        return "TrainingDetailsResponse{" +
+                "name='" + name + '\'' +
+                ", date=" + date +
+                ", trainingType=" + trainingType +
+                ", duration=" + duration +
+                ", trainerName='" + trainerName + '\'' +
+                '}';
     }
 }

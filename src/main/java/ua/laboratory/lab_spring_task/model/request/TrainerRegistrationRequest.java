@@ -14,4 +14,13 @@ public class TrainerRegistrationRequest {
     private String firstName;
     private String lastName;
     private TrainingType trainingType;
+
+    @Override
+    public String toString() {
+        return "TrainerRegistrationRequest{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", trainingType=" + trainingType +
+                '}';
+    }
 }
