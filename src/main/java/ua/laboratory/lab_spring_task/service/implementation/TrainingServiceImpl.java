@@ -39,9 +39,7 @@ public class TrainingServiceImpl implements TrainingService {
         logger.info("Creating training");
 
         TrainingType type = trainingTypeRepository.getByTrainingTypeName(
-                trainingType.getTrainingTypeName()).orElse(null);
-        if(type == null)
-            trainingTypeRepository.save(trainingType);
+                trainingType.getTrainingTypeName()).orElseThrow();
 
         Training training = new Training(trainingName, trainingDate, trainingDuration, trainingType, trainee, trainer);
 
@@ -52,7 +50,9 @@ public class TrainingServiceImpl implements TrainingService {
     public Training updateTraining(Training training) {
         if(training == null)
             throw new InvalidDataException("Training cannot be null");
-        trainingTypeRepository.save(training.getTrainingType());
+        trainingTypeRepository.getByTrainingTypeName(
+                training.getTrainingType().getTrainingTypeName()).orElseThrow();
+
         return trainingRepository.save(training);
     }
 

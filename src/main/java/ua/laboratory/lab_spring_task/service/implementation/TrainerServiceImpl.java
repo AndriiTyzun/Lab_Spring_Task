@@ -41,9 +41,9 @@ public class TrainerServiceImpl implements TrainerService {
         logger.info("Creating trainee");
 
         TrainingType type = trainingTypeRepository.getByTrainingTypeName(
-                trainingType.getTrainingTypeName()).orElseThrow(null);
-        if(type == null)
-            trainingTypeRepository.save(trainingType);
+                trainingType.getTrainingTypeName()).orElseThrow();
+//        if(type == null)
+//            trainingTypeRepository.save(trainingType);
 
         User user = new User(firstName, lastName);
         Utilities.setUserUsername(user);
@@ -63,7 +63,10 @@ public class TrainerServiceImpl implements TrainerService {
             throw new InvalidDataException("Username and password are required");
         if(trainer == null)
             throw new InvalidDataException("Trainee cannot be null");
-        trainingTypeRepository.save(trainer.getSpecialization());
+
+        trainingTypeRepository.getByTrainingTypeName(
+                trainer.getSpecialization().getTrainingTypeName()).orElseThrow();
+
         userRepository.save(trainer.getUser());
         return trainerRepository.save(trainer);
     }
