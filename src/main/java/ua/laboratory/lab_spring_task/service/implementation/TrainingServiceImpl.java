@@ -52,7 +52,7 @@ public class TrainingServiceImpl implements TrainingService {
     public Training updateTraining(Training training) {
         if(training == null)
             throw new InvalidDataException("Training cannot be null");
-
+        trainingTypeRepository.save(training.getTrainingType());
         return trainingRepository.save(training);
     }
 
