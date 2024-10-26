@@ -1,13 +1,13 @@
-package ua.laboratory.lab_spring_task.util.exception_handler;
+package ua.laboratory.lab_spring_task.util.exception_handlers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import ua.laboratory.lab_spring_task.util.exception.EntityAlreadyPresentException;
-import ua.laboratory.lab_spring_task.util.exception.EntityNotFoundException;
-import ua.laboratory.lab_spring_task.util.exception.InvalidDataException;
+import ua.laboratory.lab_spring_task.util.exceptions.EntityAlreadyPresentException;
+import ua.laboratory.lab_spring_task.util.exceptions.EntityNotFoundException;
+import ua.laboratory.lab_spring_task.util.exceptions.InvalidDataException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

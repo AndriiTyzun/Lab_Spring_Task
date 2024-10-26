@@ -1,4 +1,4 @@
-package ua.laboratory.lab_spring_task.util.exception;
+package ua.laboratory.lab_spring_task.util.exceptions;
 
 public class InvalidDataException extends RuntimeException {
     public InvalidDataException(String message) {

@@ -12,7 +12,7 @@ import ua.laboratory.lab_spring_task.model.User;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.util.Utilities;
-import ua.laboratory.lab_spring_task.util.exception.InvalidDataException;
+import ua.laboratory.lab_spring_task.util.exceptions.InvalidDataException;
 
 import java.time.LocalDate;
 import java.util.HashSet;

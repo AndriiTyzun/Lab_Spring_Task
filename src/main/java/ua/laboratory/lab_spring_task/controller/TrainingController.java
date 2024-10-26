@@ -13,12 +13,19 @@ import ua.laboratory.lab_spring_task.model.response.TrainingDetailsResponse;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.service.TrainerService;
 import ua.laboratory.lab_spring_task.service.implementation.TrainingServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/api/trainings")
+@Tag(name = "Trainings", description = "Manage training sessions between trainees and trainers")
 public class TrainingController {
     @Autowired
     private TraineeService traineeService;
@@ -29,6 +36,19 @@ public class TrainingController {
 
 
     @PostMapping("/create")
+    @Operation(
+            summary = "Create a new training session",
+            description = "Creates a training session by assigning a trainer to a trainee.",
+            requestBody = @RequestBody(
+                    description = "Training registration details",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = TrainingRegistrationRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Training created successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input data")
+            }
+    )
     public ResponseEntity<Void> createTraining(@RequestHeader String username,
                                                @RequestHeader String password,
                                                @RequestBody TrainingRegistrationRequest request) {
@@ -42,7 +62,21 @@ public class TrainingController {
 
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/trainee_trainings")
+    @Operation(
+            summary = "Get trainings for a trainee",
+            description = "Fetches the list of trainings based on search criteria for a specific trainee.",
+            requestBody = @RequestBody(
+                    description = "Search criteria for fetching trainee trainings",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = SearchCriteriaRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Trainings retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
     public ResponseEntity<List<TrainingDetailsResponse>> getTraineeTrainings(@RequestHeader String username,
                                                                         @RequestHeader String password,
                                                                         @RequestBody SearchCriteriaRequest request) {
@@ -57,6 +91,19 @@ public class TrainingController {
     }
 
     @GetMapping("/trainer_trainings")
+    @Operation(
+            summary = "Get trainings for a trainer",
+            description = "Fetches the list of trainings based on search criteria for a specific trainer.",
+            requestBody = @RequestBody(
+                    description = "Search criteria for fetching trainer trainings",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = SearchCriteriaRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Trainings retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
     public ResponseEntity<List<TrainingDetailsResponse>> getTrainerTrainings(@RequestHeader String username,
                                                                              @RequestHeader String password,
                                                                              @RequestBody SearchCriteriaRequest request) {
@@ -71,6 +118,14 @@ public class TrainingController {
     }
 
     @GetMapping("/training_types")
+    @Operation(
+            summary = "Get all available training types",
+            description = "Fetches the list of all training types available in the system.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Training types retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
     public ResponseEntity<Set<TrainingType>> getTrainingTypes(@RequestHeader String username,
                                                               @RequestHeader String password){
         Credentials credentials = new Credentials(username, password);
