@@ -50,8 +50,8 @@ public class TrainingServiceImpl implements TrainingService {
     public Training updateTraining(Training training) {
         if(training == null)
             throw new InvalidDataException("Training cannot be null");
-        trainingTypeRepository.getByTrainingTypeName(
-                training.getTrainingType().getTrainingTypeName()).orElseThrow();
+        training.setTrainingType(trainingTypeRepository.getByTrainingTypeName(
+                training.getTrainingType().getTrainingTypeName()).orElseThrow());
 
         return trainingRepository.save(training);
     }

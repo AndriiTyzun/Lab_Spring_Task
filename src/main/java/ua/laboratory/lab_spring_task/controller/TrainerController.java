@@ -16,7 +16,6 @@ import ua.laboratory.lab_spring_task.util.metrics.RegistrationMetric;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -38,7 +37,7 @@ public class TrainerController {
     @Operation(
             summary = "Create a new Trainer",
             description = "Registers a new trainer and returns login credentials.",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Trainer registration details",
                     required = true,
                     content = @Content(schema = @Schema(implementation = TrainerRegistrationRequest.class))
@@ -148,7 +147,7 @@ public class TrainerController {
     @Operation(
             summary = "Update Trainer Profile",
             description = "Updates the profile of the authenticated trainer.",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Updated profile details",
                     required = true,
                     content = @Content(schema = @Schema(implementation = UpdateTrainerProfileRequest.class))
@@ -191,7 +190,7 @@ public class TrainerController {
     @Operation(
             summary = "Update Assigned Trainees",
             description = "Updates the list of trainees assigned to the trainer.",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "List of trainee usernames to be assigned",
                     required = true,
                     content = @Content(schema = @Schema(implementation = List.class))

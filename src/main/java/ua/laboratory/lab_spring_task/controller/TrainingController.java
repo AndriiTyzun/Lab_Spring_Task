@@ -16,7 +16,6 @@ import ua.laboratory.lab_spring_task.service.implementation.TrainingServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -39,7 +38,7 @@ public class TrainingController {
     @Operation(
             summary = "Create a new training session",
             description = "Creates a training session by assigning a trainer to a trainee.",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Training registration details",
                     required = true,
                     content = @Content(schema = @Schema(implementation = TrainingRegistrationRequest.class))
@@ -67,7 +66,7 @@ public class TrainingController {
     @Operation(
             summary = "Get trainings for a trainee",
             description = "Fetches the list of trainings based on search criteria for a specific trainee.",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Search criteria for fetching trainee trainings",
                     required = true,
                     content = @Content(schema = @Schema(implementation = SearchCriteriaRequest.class))
@@ -94,7 +93,7 @@ public class TrainingController {
     @Operation(
             summary = "Get trainings for a trainer",
             description = "Fetches the list of trainings based on search criteria for a specific trainer.",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Search criteria for fetching trainer trainings",
                     required = true,
                     content = @Content(schema = @Schema(implementation = SearchCriteriaRequest.class))

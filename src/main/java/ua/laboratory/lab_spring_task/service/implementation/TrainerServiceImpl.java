@@ -64,8 +64,8 @@ public class TrainerServiceImpl implements TrainerService {
         if(trainer == null)
             throw new InvalidDataException("Trainee cannot be null");
 
-        trainingTypeRepository.getByTrainingTypeName(
-                trainer.getSpecialization().getTrainingTypeName()).orElseThrow();
+        trainer.setSpecialization(trainingTypeRepository.getByTrainingTypeName(
+                trainer.getSpecialization().getTrainingTypeName()).orElseThrow());
 
         userRepository.save(trainer.getUser());
         return trainerRepository.save(trainer);

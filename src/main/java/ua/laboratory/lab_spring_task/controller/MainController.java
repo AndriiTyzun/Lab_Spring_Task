@@ -3,7 +3,6 @@ package ua.laboratory.lab_spring_task.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +52,7 @@ public class MainController {
     @Operation(
             summary = "Change Trainee Password",
             description = "Allows a trainee to change their password.",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description  = "ChangePasswordRequest object containing username, old password, and new password.",
                     required = true,
                     content = @Content(schema = @Schema(implementation = ChangePasswordRequest.class))
@@ -80,7 +79,7 @@ public class MainController {
     @Operation(
             summary = "Change Trainer Password",
             description = "Allows a trainer to change their password.",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "ChangePasswordRequest object containing username, old password, and new password.",
                     required = true,
                     content = @Content(schema = @Schema(implementation = ChangePasswordRequest.class))

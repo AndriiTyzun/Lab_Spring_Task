@@ -25,7 +25,7 @@ public class ApiHealthIndicator implements HealthIndicator {
 
     private int checkApiHealth() throws IOException {
         HttpURLConnection connection =
-                (HttpURLConnection) new URL("http://localhost:8080/api/login?username=paul.doe&password=mkc8r8NFak").openConnection();
+                (HttpURLConnection) new URL("http://localhost:8080/api/health/check").openConnection();
         connection.setRequestMethod("GET");
         return connection.getResponseCode();
     }
