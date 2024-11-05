@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,6 +22,7 @@ import ua.laboratory.lab_spring_task.model.request.UpdateTrainerProfileRequest;
 import ua.laboratory.lab_spring_task.model.response.TrainerProfileResponse;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.service.TrainerService;
+import ua.laboratory.lab_spring_task.util.JwtUtil;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -49,6 +51,15 @@ public class TrainerControllerTests {
     @MockBean
     private TrainerService trainerService;
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static String jwtToken;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @BeforeEach
+    public void setUpEach() {
+        jwtToken = jwtUtil.generateToken("john.doe");
+    }
 
     @BeforeAll
     public static void setUp() {
@@ -76,21 +87,19 @@ public class TrainerControllerTests {
 
     @Test
     public void testActivateTrainer() throws Exception {
-        doNothing().when(trainerService).activateTrainer(anyString(), any());
+        doNothing().when(trainerService).activateTrainer(anyString());
 
         mockMvc.perform(patch("/api/trainers/activate")
-                        .header("username", "trainer1")
-                        .header("password", "password123"))
+                        .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void testDeactivateTrainer() throws Exception {
-        doNothing().when(trainerService).deactivateTrainer(anyString(), any());
+        doNothing().when(trainerService).deactivateTrainer(anyString());
 
         mockMvc.perform(patch("/api/trainers/deactivate")
-                        .header("username", "trainer1")
-                        .header("password", "password123"))
+                        .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk());
     }
 
@@ -101,12 +110,11 @@ public class TrainerControllerTests {
                 new User("","","trainer1","password123",true),
                 new HashSet<>()));
 
-        when(trainerService.getUnassignedTrainersByTraineeUsername(anyString(), any()))
+        when(trainerService.getUnassignedTrainersByTraineeUsername(anyString()))
                 .thenReturn(trainers);
 
         mockMvc.perform(get("/api/trainers/trainers")
-                        .header("username", "user1")
-                        .header("password", "password123")
+                        .header("Authorization", "Bearer " + jwtToken)
                         .content("\"searchUsername\""))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].username").value("trainer1"));
@@ -114,13 +122,12 @@ public class TrainerControllerTests {
 
     @Test
     public void testGetTrainerProfile() throws Exception {
-        when(trainerService.getTrainerByUsername(anyString(), any())).thenReturn(new Trainer(1L,new TrainingType(),
+        when(trainerService.getTrainerByUsername(anyString())).thenReturn(new Trainer(1L,new TrainingType(),
                 new User("","","trainer1","password123",true),
                 new HashSet<>()));
 
         mockMvc.perform(get("/api/trainers/profile")
-                        .header("username", "trainer1")
-                        .header("password", "password123"))
+                        .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("trainer1"));
     }
@@ -133,12 +140,11 @@ public class TrainerControllerTests {
                 new User("","","trainer1","password123",true),
                 new HashSet<>());
 
-        when(trainerService.getTrainerByUsername(anyString(), any())).thenReturn(trainer);
-        when(trainerService.updateTrainer(any(), any())).thenReturn(trainer);
+        when(trainerService.getTrainerByUsername(anyString())).thenReturn(trainer);
+        when(trainerService.updateTrainer(any())).thenReturn(trainer);
 
         mockMvc.perform(put("/api/trainers/profile")
-                        .header("username", "trainer1")
-                        .header("password", "password123")
+                        .header("Authorization", "Bearer " + jwtToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk());
@@ -149,13 +155,13 @@ public class TrainerControllerTests {
         List<String> traineeUsernames = List.of("trainee1", "trainee2");
         Set<Trainee> trainees = new HashSet<>();
 
-        when(trainerService.getAllTrainees(anyString(), any())).thenReturn(trainees);
-        when(trainerService.getTrainerByUsername(anyString(), any())).thenReturn(
+        when(trainerService.getAllTrainees(anyString())).thenReturn(trainees);
+        when(trainerService.getTrainerByUsername(anyString())).thenReturn(
                 new Trainer(1L,new TrainingType(),
                         new User("","","trainer1","password123",true),
                         new HashSet<>())
         );
-        when(traineeService.getTraineeByUsername(anyString(), any())).thenReturn(
+        when(traineeService.getTraineeByUsername(anyString())).thenReturn(
                 new Trainee(1L,LocalDate.now(), "Address 1",
                         new User("","","john123","password123",true),
                         new HashSet<>()
@@ -163,8 +169,7 @@ public class TrainerControllerTests {
 
 
         mockMvc.perform(put("/api/trainers/trainees")
-                        .header("username", "trainer1")
-                        .header("password", "password123")
+                        .header("Authorization", "Bearer " + jwtToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(traineeUsernames)))
                 .andExpect(status().isOk());

@@ -85,14 +85,14 @@ public class TrainingServiceTests {
 
     @Test
     public void testGetTraining() {
-        Training retrievedTraining = trainingService.getTraining(testTraining.getId(), validCredentials);
+        Training retrievedTraining = trainingService.getTraining(testTraining.getId());
         assertNotNull(retrievedTraining);
         assertEquals(testTraining.getId(), retrievedTraining.getId());
     }
 
     @Test
     public void testGetAllTrainings() {
-        List<Training> trainings = trainingService.getAllTrainings(validCredentials);
+        List<Training> trainings = trainingService.getAllTrainings();
         assertFalse(trainings.isEmpty());
     }
 
@@ -103,8 +103,7 @@ public class TrainingServiceTests {
                 null,
                 null,
                 null,
-                null,
-                validCredentials
+                null
         );
 
         assertFalse(trainings.isEmpty());
@@ -118,8 +117,7 @@ public class TrainingServiceTests {
                 null,
                 null,
                 null,
-                null,
-                validCredentials
+                null
         );
 
         assertFalse(trainings.isEmpty());

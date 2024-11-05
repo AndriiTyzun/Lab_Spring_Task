@@ -10,14 +10,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChangePasswordRequest {
-    private String username;
     private String oldPassword;
     private String newPassword;
 
     @Override
     public String toString() {
         return "ChangePasswordRequest{" +
-                "username='" + username + '\'' +
                 ", oldPassword='" + oldPassword + '\'' +
                 ", newPassword='" + newPassword + '\'' +
                 '}';

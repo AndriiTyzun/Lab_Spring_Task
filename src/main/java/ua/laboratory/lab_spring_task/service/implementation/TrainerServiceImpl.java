@@ -42,8 +42,6 @@ public class TrainerServiceImpl implements TrainerService {
 
         TrainingType type = trainingTypeRepository.getByTrainingTypeName(
                 trainingType.getTrainingTypeName()).orElseThrow();
-//        if(type == null)
-//            trainingTypeRepository.save(trainingType);
 
         User user = new User(firstName, lastName);
         Utilities.setUserUsername(user);
@@ -57,10 +55,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer updateTrainer(Trainer trainer, Credentials credentials) {
-        if(credentials.getUsername() == null || credentials.getPassword() == null ||
-                credentials.getUsername().isEmpty() || credentials.getPassword().isEmpty())
-            throw new InvalidDataException("Username and password are required");
+    public Trainer updateTrainer(Trainer trainer) {
         if(trainer == null)
             throw new InvalidDataException("Trainee cannot be null");
 
@@ -81,9 +76,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer getTrainerById(Long id, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public Trainer getTrainerById(Long id) {
         if(id == null)
             throw new InvalidDataException("Id cannot be null");
 
@@ -92,9 +85,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer getTrainerByUsername(String username, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public Trainer getTrainerByUsername(String username) {
         if(username == null)
             throw new InvalidDataException("Username cannot be null");
 
@@ -103,18 +94,13 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public List<Trainer> getAllTrainers(Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
-
+    public List<Trainer> getAllTrainers() {
         logger.info("Fetching all trainers");
         return trainerRepository.getAllByOrderByIdDesc();
     }
 
     @Override
-    public void updateTrainees(Long id, Set<Trainee> trainees, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public void updateTrainees(Long id, Set<Trainee> trainees) {
         if(id == null)
             throw new InvalidDataException("Id cannot be null");
         if(trainees == null || trainees.isEmpty())
@@ -126,12 +112,9 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer changePassword(String username, String newPassword, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public Trainer changePassword(String username, String newPassword) {
         if(username == null || newPassword == null || username.isEmpty() || newPassword.isEmpty())
             throw new InvalidDataException("Username and password are required");
-
 
         Trainer trainer = trainerRepository.getByUserUsername(username).orElseThrow(
                 IllegalArgumentException::new
@@ -141,9 +124,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public void activateTrainer(Long id, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public void activateTrainer(Long id) {
         if(id == null)
             throw new InvalidDataException("Id cannot be null");
 
@@ -153,9 +134,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public void activateTrainer(String username, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public void activateTrainer(String username) {
         if(username == null)
             throw new InvalidDataException("Username cannot be null");
 
@@ -165,9 +144,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public void deactivateTrainer(Long id, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public void deactivateTrainer(Long id) {
         if(id == null)
             throw new InvalidDataException("Id cannot be null");
 
@@ -177,9 +154,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public void deactivateTrainer(String username, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public void deactivateTrainer(String username) {
         if(username == null)
             throw new InvalidDataException("Username cannot be null");
 
@@ -189,18 +164,13 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Set<Trainer> getUnassignedTrainersByTraineeUsername(String traineeUsername, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
-
+    public Set<Trainer> getUnassignedTrainersByTraineeUsername(String traineeUsername) {
         logger.info("Fetching all trainers not assigned to trainee");
         return new HashSet<>(trainerRepository.getUnassignedTrainersByUserUsername(traineeUsername));
     }
 
     @Override
-    public Set<Trainee> getAllTrainees(String username, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public Set<Trainee> getAllTrainees(String username) {
         if(username.isEmpty())
             throw new InvalidDataException("Username cannot be empty");
 

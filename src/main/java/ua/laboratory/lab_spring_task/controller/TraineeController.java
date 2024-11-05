@@ -2,9 +2,11 @@ package ua.laboratory.lab_spring_task.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.Trainer;
+import ua.laboratory.lab_spring_task.model.User;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.model.request.TraineeRegistrationRequest;
 import ua.laboratory.lab_spring_task.model.request.UpdateTraineeProfileRequest;
@@ -69,9 +71,8 @@ public class TraineeController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<TraineeProfileResponse> getTraineeProfile(@RequestHeader String username,
-                                                                    @RequestHeader String password) {
-        Trainee trainee = traineeService.getTraineeByUsername(username, new Credentials(username, password));
+    public ResponseEntity<TraineeProfileResponse> getTraineeProfile(@AuthenticationPrincipal User user) {
+        Trainee trainee = traineeService.getTraineeByUsername(user.getUsername());
 
         List<TrainerProfileResponse> trainers = trainee.getTrainers().stream()
                 .map(trainer -> new TrainerProfileResponse(trainer.getUser().getUsername(),
@@ -107,14 +108,12 @@ public class TraineeController {
             }
     )
     public ResponseEntity<TraineeProfileResponse> updateTraineeProfile(
-            @RequestHeader String username,
-            @RequestHeader String password,
+            @AuthenticationPrincipal User user,
             @RequestBody UpdateTraineeProfileRequest updateRequest) {
 
-        Credentials credentials = new Credentials(username, password);
-        Trainee trainee = traineeService.getTraineeByUsername(username, credentials);
+        Trainee trainee = traineeService.getTraineeByUsername(user.getUsername());
         trainee.updateByRequest(updateRequest);
-        Trainee updatedTrainee = traineeService.updateTrainee(trainee, credentials);
+        Trainee updatedTrainee = traineeService.updateTrainee(trainee);
 
         List<TrainerProfileResponse> trainers = updatedTrainee.getTrainers().stream()
                 .map(trainer -> new TrainerProfileResponse(trainer.getUser().getUsername(),
@@ -144,9 +143,8 @@ public class TraineeController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<Void> deleteTraineeProfile(@RequestHeader String username,
-                                                     @RequestHeader String password) {
-        traineeService.deleteTrainee(username, new Credentials(username, password));
+    public ResponseEntity<Void> deleteTraineeProfile(@AuthenticationPrincipal User user) {
+        traineeService.deleteTrainee(user.getUsername());
         return ResponseEntity.ok().build();
     }
 
@@ -159,9 +157,8 @@ public class TraineeController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<Void> activateTrainee(@RequestHeader String username,
-                                                     @RequestHeader String password) {
-        traineeService.activateTrainee(username, new Credentials(username, password));
+    public ResponseEntity<Void> activateTrainee(@AuthenticationPrincipal User user) {
+        traineeService.activateTrainee(user.getUsername());
         return ResponseEntity.ok().build();
     }
 
@@ -174,9 +171,8 @@ public class TraineeController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<Void> deactivateTrainee(@RequestHeader String username,
-                                                @RequestHeader String password) {
-        traineeService.deactivateTrainee(username, new Credentials(username, password));
+    public ResponseEntity<Void> deactivateTrainee(@AuthenticationPrincipal User user) {
+        traineeService.deactivateTrainee(user.getUsername());
         return ResponseEntity.ok().build();
     }
 
@@ -194,18 +190,17 @@ public class TraineeController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<Set<Trainer>> updateTrainers(@RequestHeader String username,
-                                                        @RequestHeader String password,
+    public ResponseEntity<Set<Trainer>> updateTrainers(@AuthenticationPrincipal User user,
                                                         @RequestBody List<String> trainers){
-        Credentials credentials = new Credentials(username, password);
+
         Set<Trainer> trainerList = new HashSet<>();
         for (String trainer : trainers)
-            trainerList.add(trainerService.getTrainerByUsername(trainer,credentials));
+            trainerList.add(trainerService.getTrainerByUsername(trainer));
 
-        traineeService.updateTrainers(traineeService.getTraineeByUsername(username, credentials).getId(),
-                trainerList, credentials);
+        traineeService.updateTrainers(traineeService.getTraineeByUsername(user.getUsername()).getId(),
+                trainerList);
 
-        trainerList = traineeService.getAllTrainers(username, credentials);
+        trainerList = traineeService.getAllTrainers(user.getUsername());
         return ResponseEntity.ok(trainerList);
     }
 }

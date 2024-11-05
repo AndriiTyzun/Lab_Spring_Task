@@ -10,17 +10,17 @@ import java.util.Set;
 
 public interface TrainerService {
     Trainer createTrainer(String firstName, String lastName, TrainingType trainingType);
-    Trainer updateTrainer(Trainer trainer, Credentials credentials);
+    Trainer updateTrainer(Trainer trainer);
     Boolean checkCredentials(Credentials credentials);
-    Trainer getTrainerById(Long id, Credentials credentials);
-    Trainer getTrainerByUsername(String username, Credentials credentials);
-    List<Trainer> getAllTrainers(Credentials credentials);
-    Trainer changePassword(String username, String newPassword, Credentials credentials);
-    void updateTrainees(Long id, Set<Trainee> trainees, Credentials credentials);
-    void activateTrainer(Long id, Credentials credentials);
-    void activateTrainer(String username, Credentials credentials);
-    void deactivateTrainer(Long id, Credentials credentials);
-    void deactivateTrainer(String username, Credentials credentials);
-    Set<Trainer> getUnassignedTrainersByTraineeUsername(String traineeUsername, Credentials credentials);
-    Set<Trainee> getAllTrainees(String username, Credentials credentials);
+    Trainer getTrainerById(Long id);
+    Trainer getTrainerByUsername(String username);
+    List<Trainer> getAllTrainers();
+    Trainer changePassword(String username, String newPassword);
+    void updateTrainees(Long id, Set<Trainee> trainees);
+    void activateTrainer(Long id);
+    void activateTrainer(String username);
+    void deactivateTrainer(Long id);
+    void deactivateTrainer(String username);
+    Set<Trainer> getUnassignedTrainersByTraineeUsername(String traineeUsername);
+    Set<Trainee> getAllTrainees(String username);
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,6 +20,7 @@ import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.service.TrainerService;
 import ua.laboratory.lab_spring_task.service.TrainingService;
 import ua.laboratory.lab_spring_task.service.implementation.TrainingServiceImpl;
+import ua.laboratory.lab_spring_task.util.JwtUtil;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,6 +48,15 @@ public class TrainingControllerTests {
     private TrainingServiceImpl trainingService;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static String jwtToken;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @BeforeEach
+    public void setUpEach() {
+        jwtToken = jwtUtil.generateToken("john.doe");
+    }
 
     @BeforeAll
     public static void setUp() {
@@ -60,20 +71,19 @@ public class TrainingControllerTests {
                 2L, new TrainingType()
         );
 
-        when(traineeService.getTraineeByUsername(anyString(), any())).thenReturn(
+        when(traineeService.getTraineeByUsername(anyString())).thenReturn(
                 new Trainee(1L, LocalDate.now(), "Address 1",
                         new User("","","john123","password123",true),
                         new HashSet<>())
         );
-        when(trainerService.getTrainerByUsername(anyString(), any())).thenReturn(
+        when(trainerService.getTrainerByUsername(anyString())).thenReturn(
                 new Trainer(1L,new TrainingType(),
                         new User("","","trainer1","password123",true),
                         new HashSet<>())
         );
 
         mockMvc.perform(post("/api/trainings/create")
-                        .header("username", "admin")
-                        .header("password", "password123")
+                        .header("Authorization", "Bearer " + jwtToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
@@ -89,12 +99,11 @@ public class TrainingControllerTests {
                 new TrainingDetailsResponse("Training1", LocalDate.now(), new TrainingType(), 2L, "trainer1")
         );
 
-        when(trainingService.getTraineeTrainingsByCriteria(anyString(), any(), any(), any(), any(), any()))
+        when(trainingService.getTraineeTrainingsByCriteria(anyString(), any(), any(), any(), any()))
                 .thenReturn(new ArrayList<>());
 
         mockMvc.perform(get("/api/trainings/trainee_trainings")
-                        .header("username", "trainee1")
-                        .header("password", "password123")
+                        .header("Authorization", "Bearer " + jwtToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(criteria)))
                 .andExpect(status().isOk());
@@ -111,12 +120,11 @@ public class TrainingControllerTests {
                         2L, "trainer1")
         );
 
-        when(trainingService.getTrainerTrainingsByCriteria(anyString(), any(), any(), any(), any(), any()))
+        when(trainingService.getTrainerTrainingsByCriteria(anyString(), any(), any(), any(), any()))
                 .thenReturn(new ArrayList<>());
 
         mockMvc.perform(get("/api/trainings/trainer_trainings")
-                        .header("username", "trainer1")
-                        .header("password", "password123")
+                        .header("Authorization", "Bearer " + jwtToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(criteria)))
                 .andExpect(status().isOk());
@@ -128,13 +136,12 @@ public class TrainingControllerTests {
                 new TrainingType("Yoga"), new TrainingType("Cardio")
         );
 
-        when(trainingService.getAllTrainingTypes(any())).thenReturn(trainingTypes);
+        when(trainingService.getAllTrainingTypes()).thenReturn(trainingTypes);
 
         mockMvc.perform(get("/api/trainings/training_types")
-                        .header("username", "admin")
-                        .header("password", "password123"))
+                        .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].trainingTypeName").value("Cardio"))
-                .andExpect(jsonPath("$[1].trainingTypeName").value("Yoga"));
+                .andExpect(jsonPath("$[1].trainingTypeName").value("Cardio"))
+                .andExpect(jsonPath("$[0].trainingTypeName").value("Yoga"));
     }
 }

@@ -48,11 +48,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public Trainee updateTrainee(Trainee trainee, Credentials credentials) {
-        if(credentials.getUsername() == null || credentials.getPassword() == null ||
-                credentials.getUsername().isEmpty() || credentials.getPassword().isEmpty()) {
-            throw new InvalidDataException("Username and password are required");
-        }
+    public Trainee updateTrainee(Trainee trainee) {
         if(trainee == null)
             throw new InvalidDataException("Trainee cannot be null");
 
@@ -71,9 +67,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public Trainee getTraineeById(Long id, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public Trainee getTraineeById(Long id) {
         if(id == null)
             throw new InvalidDataException("Id cannot be null");
 
@@ -82,9 +76,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public Trainee getTraineeByUsername(String username, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public Trainee getTraineeByUsername(String username) {
         if(username == null)
             throw new InvalidDataException("Username cannot be null");
 
@@ -93,9 +85,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public Trainee changePassword(String username, String newPassword, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public Trainee changePassword(String username, String newPassword) {
         if(username == null || newPassword == null || username.isEmpty() || newPassword.isEmpty())
             throw new InvalidDataException("Username and password are required");
 
@@ -105,9 +95,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public void activateTrainee(Long id, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public void activateTrainee(Long id) {
         if(id == null)
             throw new InvalidDataException("Id cannot be null");
 
@@ -117,9 +105,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public void activateTrainee(String username, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public void activateTrainee(String username) {
         if(username == null)
             throw new InvalidDataException("Username cannot be null");
 
@@ -129,9 +115,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public void deactivateTrainee(Long id, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public void deactivateTrainee(Long id) {
         if(id == null)
             throw new InvalidDataException("Id cannot be null");
 
@@ -141,9 +125,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public void deactivateTrainee(String username, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public void deactivateTrainee(String username) {
         if(username == null)
             throw new InvalidDataException("Username cannot be null");
 
@@ -153,9 +135,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public void updateTrainers(Long id, Set<Trainer> trainers, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public void updateTrainers(Long id, Set<Trainer> trainers) {
         if(id == null)
             throw new InvalidDataException("Id cannot be null");
         if(trainers == null || trainers.isEmpty())
@@ -180,9 +160,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
-    public void deleteTrainee(Long id, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public void deleteTrainee(Long id) {
         if(id == null)
             throw new InvalidDataException("Id cannot be null");
 
@@ -192,9 +170,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
-    public void deleteTrainee(String username, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public void deleteTrainee(String username) {
         if(username.isEmpty())
             throw new InvalidDataException("Username cannot be empty");
 
@@ -203,9 +179,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public Set<Trainer> getAllTrainers(String username, Credentials credentials) {
-        if(!checkCredentials(credentials))
-            throw new InvalidDataException("Username and password are required");
+    public Set<Trainer> getAllTrainers(String username) {
         if(username.isEmpty())
             throw new InvalidDataException("Username cannot be empty");
 

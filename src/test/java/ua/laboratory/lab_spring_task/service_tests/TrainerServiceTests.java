@@ -75,7 +75,7 @@ public class TrainerServiceTests {
     @Test
     public void testUpdateTrainer() {
         testTrainer.getUser().setLastName("UpdatedLastName");
-        Trainer updatedTrainer = trainerService.updateTrainer(testTrainer, validCredentials);
+        Trainer updatedTrainer = trainerService.updateTrainer(testTrainer);
 
         assertNotNull(updatedTrainer);
         assertEquals("UpdatedLastName", updatedTrainer.getUser().getLastName());
@@ -96,28 +96,28 @@ public class TrainerServiceTests {
 
     @Test
     public void testGetTrainerById() {
-        Trainer trainer = trainerService.getTrainerById(testTrainer.getId(), validCredentials);
+        Trainer trainer = trainerService.getTrainerById(testTrainer.getId());
         assertNotNull(trainer);
         assertEquals(testTrainer.getId(), trainer.getId());
     }
 
     @Test
     public void testGetTrainerByUsername() {
-        Trainer trainer = trainerService.getTrainerByUsername(testTrainer.getUser().getUsername(), validCredentials);
+        Trainer trainer = trainerService.getTrainerByUsername(testTrainer.getUser().getUsername());
         assertNotNull(trainer);
         assertEquals(testTrainer.getUser().getUsername(), trainer.getUser().getUsername());
     }
 
     @Test
     public void testGetAllTrainers() {
-        List<Trainer> trainers = trainerService.getAllTrainers(validCredentials);
+        List<Trainer> trainers = trainerService.getAllTrainers();
         assertNotNull(trainers);
         assertFalse(trainers.isEmpty());
     }
 
     @Test
     public void testChangePassword() {
-        trainerService.changePassword(testTrainer.getUser().getUsername(), "newPassword", validCredentials);
+        trainerService.changePassword(testTrainer.getUser().getUsername(), "newPassword");
 
         Credentials updatedCredentials = new Credentials(testTrainer.getUser().getUsername(), "newPassword");
         Boolean isUpdated = trainerService.checkCredentials(updatedCredentials);
@@ -127,24 +127,24 @@ public class TrainerServiceTests {
 
     @Test
     public void testActivateTrainer() {
-        trainerService.activateTrainer(testTrainer.getId(), validCredentials);
+        trainerService.activateTrainer(testTrainer.getId());
 
-        Trainer activatedTrainer = trainerService.getTrainerById(testTrainer.getId(), validCredentials);
+        Trainer activatedTrainer = trainerService.getTrainerById(testTrainer.getId());
         assertTrue(activatedTrainer.getUser().isActive());
     }
 
     @Test
     public void testDeactivateTrainer() {
-        trainerService.deactivateTrainer(testTrainer.getId(), validCredentials);
+        trainerService.deactivateTrainer(testTrainer.getId());
 
-        Trainer deactivatedTrainer = trainerService.getTrainerById(testTrainer.getId(), validCredentials);
+        Trainer deactivatedTrainer = trainerService.getTrainerById(testTrainer.getId());
         assertFalse(deactivatedTrainer.getUser().isActive());
     }
 
     @Test
     public void testGetUnassignedTrainersByTraineeUsername() {
         Set<Trainer> unassignedTrainers = trainerService.getUnassignedTrainersByTraineeUsername(
-                testTrainee.getUser().getUsername(), validCredentials);
+                testTrainee.getUser().getUsername());
 
         assertNotNull(unassignedTrainers);
         assertFalse(unassignedTrainers.isEmpty());

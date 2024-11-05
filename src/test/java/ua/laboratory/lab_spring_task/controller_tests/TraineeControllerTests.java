@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,6 +21,7 @@ import ua.laboratory.lab_spring_task.model.request.UpdateTraineeProfileRequest;
 import ua.laboratory.lab_spring_task.model.response.TraineeProfileResponse;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.service.TrainerService;
+import ua.laboratory.lab_spring_task.util.JwtUtil;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -40,6 +42,15 @@ public class TraineeControllerTests {
     @MockBean
     private TrainerService trainerService;
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static String jwtToken;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @BeforeEach
+    public void setUpEach() {
+        jwtToken = jwtUtil.generateToken("john.doe");
+    }
 
     @BeforeAll
     public static void setUp() {
@@ -58,6 +69,7 @@ public class TraineeControllerTests {
         );
 
         mockMvc.perform(post("/api/trainees/create")
+                        .header("Authorization", "Bearer " + jwtToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -67,15 +79,14 @@ public class TraineeControllerTests {
 
     @Test
     public void testGetTraineeProfile() throws Exception {
-        when(traineeService.getTraineeByUsername(any(), any())).thenReturn(
+        when(traineeService.getTraineeByUsername(any())).thenReturn(
                 new Trainee(1L,LocalDate.now(), "Address 1",
                         new User("","","john123","password123",true),
                         new HashSet<>())
         );
 
         mockMvc.perform(get("/api/trainees/profile")
-                        .header("username", "john123")
-                        .header("password", "password123"))
+                        .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("john123"));
     }
@@ -87,12 +98,11 @@ public class TraineeControllerTests {
                 new User("","","john123","password123",true),
                 new HashSet<>());
 
-        when(traineeService.getTraineeByUsername(anyString(), any())).thenReturn(trainee);
-        when(traineeService.updateTrainee(any(), any())).thenReturn(trainee);
+        when(traineeService.getTraineeByUsername(anyString())).thenReturn(trainee);
+        when(traineeService.updateTrainee(any())).thenReturn(trainee);
 
         mockMvc.perform(put("/api/trainees/profile")
-                        .header("username", "john123")
-                        .header("password", "password123")
+                        .header("Authorization", "Bearer " + jwtToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk());
@@ -100,31 +110,28 @@ public class TraineeControllerTests {
 
     @Test
     public void testDeleteTraineeProfile() throws Exception {
-        doNothing().when(traineeService).deleteTrainee(anyString(), any());
+        doNothing().when(traineeService).deleteTrainee(anyString());
 
         mockMvc.perform(delete("/api/trainees/")
-                        .header("username", "john123")
-                        .header("password", "password123"))
+                        .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void testActivateTrainee() throws Exception {
-        doNothing().when(traineeService).activateTrainee(anyString(), any());
+        doNothing().when(traineeService).activateTrainee(anyString());
 
         mockMvc.perform(patch("/api/trainees/activate")
-                        .header("username", "john123")
-                        .header("password", "password123"))
+                        .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void testDeactivateTrainee() throws Exception {
-        doNothing().when(traineeService).deactivateTrainee(anyString(), any());
+        doNothing().when(traineeService).deactivateTrainee(anyString());
 
         mockMvc.perform(patch("/api/trainees/deactivate")
-                        .header("username", "john123")
-                        .header("password", "password123"))
+                        .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk());
     }
 
@@ -133,21 +140,20 @@ public class TraineeControllerTests {
         List<String> trainerUsernames = List.of("trainer1", "trainer2");
         Set<Trainer> trainerSet = new HashSet<>();
 
-        when(trainerService.getTrainerByUsername(anyString(), any())).thenReturn(
+        when(trainerService.getTrainerByUsername(anyString())).thenReturn(
                 new Trainer(1L,new TrainingType(),
                         new User("","","john123","password123",true),
                         new HashSet<>())
         );
-        when(traineeService.getAllTrainers(anyString(), any())).thenReturn(trainerSet);
-        when(traineeService.getTraineeByUsername(anyString(), any())).thenReturn(
+        when(traineeService.getAllTrainers(anyString())).thenReturn(trainerSet);
+        when(traineeService.getTraineeByUsername(anyString())).thenReturn(
                 new Trainee(1L,LocalDate.now(), "Address 1",
                         new User("","","john123","password123",true),
                         new HashSet<>()
         ));
 
         mockMvc.perform(put("/api/trainees/trainers")
-                        .header("username", "john123")
-                        .header("password", "password123")
+                        .header("Authorization", "Bearer " + jwtToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(trainerUsernames)))
                 .andExpect(status().isOk());

@@ -6,13 +6,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ua.laboratory.lab_spring_task.model.User;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.model.request.ChangePasswordRequest;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.service.TrainerService;
+import ua.laboratory.lab_spring_task.util.JwtUtil;
 import ua.laboratory.lab_spring_task.util.metrics.LogInMetric;
 
 
@@ -26,6 +30,8 @@ public class MainController {
     private TrainerService trainerService;
     @Autowired
     private LogInMetric logInMetric;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @GetMapping("/login")
     @Operation(
@@ -42,7 +48,14 @@ public class MainController {
         Boolean isValid = traineeService.checkCredentials(credentials);
         if (isValid) {
             logInMetric.increment();
-            return ResponseEntity.ok("Login successful");
+
+            String token = jwtUtil.generateToken(username);
+            return ResponseEntity.ok().header(
+                    HttpHeaders.AUTHORIZATION,
+                    token
+            ).body(
+                    "Login successful"
+            );
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
@@ -62,17 +75,9 @@ public class MainController {
                     @ApiResponse(responseCode = "401", description = "Invalid old credentials")
             }
     )
-    public ResponseEntity<String> changeTraineePassword(@RequestBody ChangePasswordRequest request) {
-        Credentials oldCredentials = new Credentials(request.getUsername(), request.getOldPassword());
-
-        Boolean isValid = traineeService.checkCredentials(oldCredentials);
-
-        if (isValid) {
-            traineeService.changePassword(request.getUsername(), request.getNewPassword(), oldCredentials);
-            return ResponseEntity.ok("Password changed successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid old credentials");
-        }
+    public ResponseEntity<String> changeTraineePassword(@AuthenticationPrincipal User user, @RequestBody ChangePasswordRequest request) {
+        traineeService.changePassword(user.getUsername(), request.getNewPassword());
+        return ResponseEntity.ok("Password changed successfully");
     }
 
     @PutMapping("/change-trainer-password")
@@ -89,17 +94,9 @@ public class MainController {
                     @ApiResponse(responseCode = "401", description = "Invalid old credentials")
             }
     )
-    public ResponseEntity<String> changeTrainerPassword(@RequestBody ChangePasswordRequest request) {
-        Credentials oldCredentials = new Credentials(request.getUsername(), request.getOldPassword());
-
-        Boolean isValid = trainerService.checkCredentials(oldCredentials);
-
-        if (isValid) {
-            trainerService.changePassword(request.getUsername(), request.getNewPassword(), oldCredentials);
-            return ResponseEntity.ok("Password changed successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid old credentials");
-        }
+    public ResponseEntity<String> changeTrainerPassword(@AuthenticationPrincipal User user, @RequestBody ChangePasswordRequest request) {
+        trainerService.changePassword(user.getUsername(), request.getNewPassword());
+        return ResponseEntity.ok("Password changed successfully");
     }
 
 }

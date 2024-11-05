@@ -57,9 +57,7 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
-    public Training getTraining(Long id, Credentials credentials) {
-        if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
-            throw new InvalidDataException("Username and password are required");
+    public Training getTraining(Long id) {
         if(id == null)
             throw new InvalidDataException("Id cannot be null");
 
@@ -68,26 +66,19 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
-    public List<Training> getAllTrainings(Credentials credentials) {
-        if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
-            throw new InvalidDataException("Username and password are required");
+    public List<Training> getAllTrainings() {
         logger.info("Fetching all trainings");
 
         return trainingRepository.getAllByOrderByIdDesc();
     }
 
     @Override
-    public Set<TrainingType> getAllTrainingTypes(Credentials credentials) {
-        if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
-            throw new InvalidDataException("Username and password are required");
-
+    public Set<TrainingType> getAllTrainingTypes() {
         return trainingTypeRepository.getAllByOrderByIdDesc();
     }
 
     @Override
-    public List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String trainerName, String trainingType, Credentials credentials) {
-        if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
-            throw new InvalidDataException("Username and password are required");
+    public List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String trainerName, String trainingType) {
         if(username == null)
             throw new InvalidDataException("Username is required");
 
@@ -95,9 +86,7 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
-    public List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String traineeName, String trainingType, Credentials credentials) {
-        if(!Utilities.checkCredentials(credentials.getUsername(),credentials.getPassword()))
-            throw new InvalidDataException("Username and password are required");
+    public List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate, String traineeName, String trainingType) {
         if(username == null)
             throw new InvalidDataException("Username is required");
 

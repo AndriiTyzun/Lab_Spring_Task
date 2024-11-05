@@ -14,11 +14,11 @@ public  interface TrainingService {
     Training createTraining(String trainingName, LocalDate trainingDate, Long trainingDuration,
                             TrainingType trainingType, Trainee trainee, Trainer trainer);
     Training updateTraining(Training training);
-    Training getTraining(Long id, Credentials credentials);
-    List<Training> getAllTrainings(Credentials credentials);
-    Set<TrainingType> getAllTrainingTypes(Credentials credentials);
+    Training getTraining(Long id);
+    List<Training> getAllTrainings();
+    Set<TrainingType> getAllTrainingTypes();
     List<Training> getTraineeTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate,
-                                                 String trainerName,String trainingType, Credentials credentials);
+                                                 String trainerName,String trainingType);
     List<Training> getTrainerTrainingsByCriteria(String username, LocalDate fromDate, LocalDate toDate,
-                                                 String traineeName,String trainingType, Credentials credentials);
+                                                 String traineeName,String trainingType);
 }

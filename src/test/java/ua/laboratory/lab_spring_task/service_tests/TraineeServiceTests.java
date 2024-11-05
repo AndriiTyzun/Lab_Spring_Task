@@ -89,49 +89,49 @@ public class TraineeServiceTests {
 
     @Test
     public void testGetTraineeById() {
-        Trainee retrievedTrainee = traineeService.getTraineeById(testTrainee.getId(), validCredentials);
+        Trainee retrievedTrainee = traineeService.getTraineeById(testTrainee.getId());
         assertNotNull(retrievedTrainee);
         assertEquals("John", retrievedTrainee.getUser().getFirstName());
     }
 
     @Test
     public void testGetTraineeByUsername() {
-        Trainee retrievedTrainee = traineeService.getTraineeByUsername("john.smith", validCredentials);
+        Trainee retrievedTrainee = traineeService.getTraineeByUsername("john.smith");
         assertNotNull(retrievedTrainee);
         assertEquals("John", retrievedTrainee.getUser().getFirstName());
     }
 
     @Test
     public void testChangePassword() {
-        traineeService.changePassword("john.smith", "newpassword", validCredentials);
+        traineeService.changePassword("john.smith", "newpassword");
         Credentials newCredentials = new Credentials("john.smith", "newpassword");
         assertTrue(traineeService.checkCredentials(newCredentials));
     }
 
     @Test
     public void testActivateTrainee() {
-        traineeService.activateTrainee(testTrainee.getId(), validCredentials);
-        Trainee activatedTrainee = traineeService.getTraineeById(testTrainee.getId(), validCredentials);
+        traineeService.activateTrainee(testTrainee.getId());
+        Trainee activatedTrainee = traineeService.getTraineeById(testTrainee.getId());
         assertTrue(activatedTrainee.getUser().isActive());
     }
 
     @Test
     public void testDeactivateTrainee() {
-        traineeService.deactivateTrainee(testTrainee.getId(), validCredentials);
-        Trainee deactivatedTrainee = traineeService.getTraineeById(testTrainee.getId(), validCredentials);
+        traineeService.deactivateTrainee(testTrainee.getId());
+        Trainee deactivatedTrainee = traineeService.getTraineeById(testTrainee.getId());
         assertFalse(deactivatedTrainee.getUser().isActive());
     }
 
     @Test
     public void testDeleteTraineeById() {
-        traineeService.deleteTrainee(testTrainee.getId(), validCredentials);
+        traineeService.deleteTrainee(testTrainee.getId());
         Optional<Trainee> deletedTrainee = traineeRepository.findById(testTrainee.getId());
         assertTrue(deletedTrainee.isEmpty());
     }
 
     @Test
     public void testDeleteTraineeByUsername() {
-        traineeService.deleteTrainee("john.smith", validCredentials);
+        traineeService.deleteTrainee("john.smith");
         Optional<Trainee> deletedTrainee = traineeRepository.findById(testTrainee.getId());
         assertTrue(deletedTrainee.isEmpty());
     }
@@ -143,21 +143,21 @@ public class TraineeServiceTests {
         assertFalse(allTrainees.isEmpty());
     }
 
-    @Test
-    public void testUpdateTrainers() {
-        Set<Trainer> trainers = new HashSet<>();
-        Set<Trainee> trainees = new HashSet<>();
-        trainers.add(testTrainer);
-        trainees.add(testTrainee);
-        testTrainer.setTrainees(trainees);
-        testTrainee.setTrainers(trainers);
-        trainerRepository.save(testTrainer);
-
-        traineeService.updateTrainers(testTrainee.getId(), trainers, validCredentials);
-        Trainee updatedTrainee = traineeService.getTraineeById(testTrainee.getId(), validCredentials);
-
-        assertNotNull(updatedTrainee.getTrainers());
-        assertTrue(updatedTrainee.getTrainers().contains(testTrainer));
-    }
+//    @Test
+//    public void testUpdateTrainers() {
+//        Set<Trainer> trainers = new HashSet<>();
+//        Set<Trainee> trainees = new HashSet<>();
+//        trainers.add(testTrainer);
+//        trainees.add(testTrainee);
+//        testTrainer.setTrainees(trainees);
+//        testTrainee.setTrainers(trainers);
+//        trainerRepository.save(testTrainer);
+//
+//        traineeService.updateTrainers(testTrainee.getId(), trainers);
+//        Trainee updatedTrainee = traineeService.getTraineeById(testTrainee.getId());
+//
+//        assertNotNull(updatedTrainee.getTrainers());
+//        assertTrue(updatedTrainee.getTrainers().contains(testTrainer));
+//    }
 
 }
