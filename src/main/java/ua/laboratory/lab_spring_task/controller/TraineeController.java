@@ -3,6 +3,7 @@ package ua.laboratory.lab_spring_task.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.Trainer;
@@ -14,6 +15,7 @@ import ua.laboratory.lab_spring_task.model.response.TraineeProfileResponse;
 import ua.laboratory.lab_spring_task.model.response.TrainerProfileResponse;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.service.TrainerService;
+import ua.laboratory.lab_spring_task.util.Utilities;
 import ua.laboratory.lab_spring_task.util.metrics.LogInMetric;
 import ua.laboratory.lab_spring_task.util.metrics.RegistrationMetric;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +37,8 @@ public class TraineeController {
     private TrainerService trainerService;
     @Autowired
     private RegistrationMetric registrationMetric;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/create")
     @Operation(
@@ -51,12 +55,13 @@ public class TraineeController {
             }
     )
     public ResponseEntity<Map<String, String>> createTrainee(@RequestBody TraineeRegistrationRequest request) {
+        String password = Utilities.generatePassword(10);
         Trainee newTrainee = traineeService.createTrainee(request.getFirstName(), request.getLastName(),
-                request.getDateOfBirth(), request.getAddress());
+                request.getDateOfBirth(), request.getAddress(), password);
 
         Map<String, String> response = new HashMap<>();
         response.put("username", newTrainee.getUser().getUsername());
-        response.put("password", newTrainee.getUser().getPassword());
+        response.put("password", password);
 
         registrationMetric.increment();
         return ResponseEntity.ok(response);

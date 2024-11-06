@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface TrainerService {
-    Trainer createTrainer(String firstName, String lastName, TrainingType trainingType);
+    Trainer createTrainer(String firstName, String lastName, TrainingType trainingType, String password);
     Trainer updateTrainer(Trainer trainer);
     Boolean checkCredentials(Credentials credentials);
     Trainer getTrainerById(Long id);

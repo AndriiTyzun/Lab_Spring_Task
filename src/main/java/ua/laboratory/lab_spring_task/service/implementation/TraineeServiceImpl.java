@@ -2,6 +2,8 @@ package ua.laboratory.lab_spring_task.service.implementation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.laboratory.lab_spring_task.dao.TraineeRepository;
@@ -23,6 +25,8 @@ public class TraineeServiceImpl implements TraineeService {
     private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImpl.class);
     private final TraineeRepository traineeRepository;
     private final UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public TraineeServiceImpl(TraineeRepository traineeRepository, UserRepository userRepository) {
         this.traineeRepository = traineeRepository;
@@ -31,14 +35,14 @@ public class TraineeServiceImpl implements TraineeService {
 
 
     @Override
-    public Trainee createTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address) {
+    public Trainee createTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address, String password) {
         if(firstName == null || lastName == null)
             throw new InvalidDataException("Trainee cannot be null");
 
         logger.info("Creating trainee");
         User user = new User(firstName, lastName);
         Utilities.setUserUsername(user);
-        user.setPassword(Utilities.generatePassword(10));
+        user.setPassword(passwordEncoder.encode(password));
         user.setActive(true);
 
         Trainee trainee = new Trainee(dateOfBirth, address);
@@ -51,7 +55,7 @@ public class TraineeServiceImpl implements TraineeService {
     public Trainee updateTrainee(Trainee trainee) {
         if(trainee == null)
             throw new InvalidDataException("Trainee cannot be null");
-
+        trainee.getUser().setPassword(passwordEncoder.encode(trainee.getUser().getPassword()));
         userRepository.save(trainee.getUser());
         return traineeRepository.save(trainee);
     }
@@ -90,7 +94,7 @@ public class TraineeServiceImpl implements TraineeService {
             throw new InvalidDataException("Username and password are required");
 
         Trainee trainee = traineeRepository.getByUserUsername(username).orElseThrow();
-        trainee.getUser().setPassword(newPassword);
+        trainee.getUser().setPassword(passwordEncoder.encode(newPassword));
         return traineeRepository.save(trainee);
     }
 

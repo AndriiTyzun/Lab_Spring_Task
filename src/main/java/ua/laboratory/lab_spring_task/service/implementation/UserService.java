@@ -10,13 +10,18 @@ import ua.laboratory.lab_spring_task.dao.UserRepository;
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
+    private final LoginAttemptService loginAttemptService;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
+        this.loginAttemptService = loginAttemptService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        if (loginAttemptService.isBlocked(username)) {
+            throw new RuntimeException("Blocked due to too many failed login attempts");
+        }
         return userRepository.getByUsername(username).orElseThrow();
     }
 }

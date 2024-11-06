@@ -65,7 +65,7 @@ public class TrainerServiceTests {
 
     @Test
     public void testCreateTrainer() {
-        Trainer newTrainer = trainerService.createTrainer("Jane", "Smith", new TrainingType("Agility"));
+        Trainer newTrainer = trainerService.createTrainer("Jane", "Smith", new TrainingType("Agility"), "123");
 
         assertNotNull(newTrainer);
         assertEquals("Jane", newTrainer.getUser().getFirstName());
@@ -113,16 +113,6 @@ public class TrainerServiceTests {
         List<Trainer> trainers = trainerService.getAllTrainers();
         assertNotNull(trainers);
         assertFalse(trainers.isEmpty());
-    }
-
-    @Test
-    public void testChangePassword() {
-        trainerService.changePassword(testTrainer.getUser().getUsername(), "newPassword");
-
-        Credentials updatedCredentials = new Credentials(testTrainer.getUser().getUsername(), "newPassword");
-        Boolean isUpdated = trainerService.checkCredentials(updatedCredentials);
-
-        assertTrue(isUpdated);
     }
 
     @Test

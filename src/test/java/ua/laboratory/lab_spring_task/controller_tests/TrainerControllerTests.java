@@ -71,7 +71,7 @@ public class TrainerControllerTests {
     public void testCreateTrainer() throws Exception {
         TrainerRegistrationRequest request = new TrainerRegistrationRequest("John", "Doe", new TrainingType());
 
-        when(trainerService.createTrainer(any(), any(), any())).thenReturn(
+        when(trainerService.createTrainer(any(), any(), any(), any())).thenReturn(
                 new Trainer(1L,new TrainingType(),
                         new User("","","trainer1","password123",true),
                         new HashSet<>())

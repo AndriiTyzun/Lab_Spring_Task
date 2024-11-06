@@ -14,6 +14,7 @@ import ua.laboratory.lab_spring_task.model.response.TraineeProfileResponse;
 import ua.laboratory.lab_spring_task.model.response.TrainerProfileResponse;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.service.TrainerService;
+import ua.laboratory.lab_spring_task.util.Utilities;
 import ua.laboratory.lab_spring_task.util.metrics.RegistrationMetric;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -50,12 +51,13 @@ public class TrainerController {
             }
     )
     public ResponseEntity<Map<String, String>> createTrainer(@RequestBody TrainerRegistrationRequest request) {
+        String password = Utilities.generatePassword(10);
         Trainer newTrainer = trainerService.createTrainer(request.getFirstName(), request.getLastName(),
-                request.getTrainingType());
+                request.getTrainingType(), password);
 
         Map<String, String> response = new HashMap<>();
         response.put("username", newTrainer.getUser().getUsername());
-        response.put("password", newTrainer.getUser().getPassword());
+        response.put("password", password);
 
         registrationMetric.increment();
         return ResponseEntity.ok(response);

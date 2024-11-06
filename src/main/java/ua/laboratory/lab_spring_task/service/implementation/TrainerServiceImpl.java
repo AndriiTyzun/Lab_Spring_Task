@@ -2,6 +2,8 @@ package ua.laboratory.lab_spring_task.service.implementation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.laboratory.lab_spring_task.dao.TrainerRepository;
 import ua.laboratory.lab_spring_task.dao.TrainingTypeRepository;
@@ -25,6 +27,8 @@ public class TrainerServiceImpl implements TrainerService {
     private final TrainerRepository trainerRepository;
     private final TrainingTypeRepository trainingTypeRepository;
     private final UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public TrainerServiceImpl(TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, UserRepository userRepository) {
         this.trainerRepository = trainerRepository;
@@ -33,7 +37,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer createTrainer(String firstName, String lastName, TrainingType trainingType) {
+    public Trainer createTrainer(String firstName, String lastName, TrainingType trainingType, String password) {
         if(firstName == null || lastName == null || trainingType == null)
             throw new InvalidDataException("Trainer cannot be null");
 
@@ -45,7 +49,7 @@ public class TrainerServiceImpl implements TrainerService {
 
         User user = new User(firstName, lastName);
         Utilities.setUserUsername(user);
-        user.setPassword(Utilities.generatePassword(10));
+        user.setPassword(passwordEncoder.encode(password));
         user.setActive(true);
 
         Trainer trainer = new Trainer(type);
@@ -61,7 +65,7 @@ public class TrainerServiceImpl implements TrainerService {
 
         trainer.setSpecialization(trainingTypeRepository.getByTrainingTypeName(
                 trainer.getSpecialization().getTrainingTypeName()).orElseThrow());
-
+        trainer.getUser().setPassword(passwordEncoder.encode(trainer.getUser().getPassword()));
         userRepository.save(trainer.getUser());
         return trainerRepository.save(trainer);
     }
@@ -119,7 +123,7 @@ public class TrainerServiceImpl implements TrainerService {
         Trainer trainer = trainerRepository.getByUserUsername(username).orElseThrow(
                 IllegalArgumentException::new
         );
-        trainer.getUser().setPassword(newPassword);
+        trainer.getUser().setPassword(passwordEncoder.encode(newPassword));
         return trainerRepository.save(trainer);
     }
 

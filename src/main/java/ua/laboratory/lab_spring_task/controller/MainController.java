@@ -9,13 +9,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ua.laboratory.lab_spring_task.model.User;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.model.request.ChangePasswordRequest;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.service.TrainerService;
+import ua.laboratory.lab_spring_task.service.implementation.LoginAttemptService;
+import ua.laboratory.lab_spring_task.service.implementation.LogoutService;
 import ua.laboratory.lab_spring_task.util.JwtUtil;
 import ua.laboratory.lab_spring_task.util.metrics.LogInMetric;
 
@@ -32,6 +39,12 @@ public class MainController {
     private LogInMetric logInMetric;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private LoginAttemptService loginAttemptService;
+    @Autowired
+    private LogoutService logoutService;
 
     @GetMapping("/login")
     @Operation(
@@ -43,23 +56,44 @@ public class MainController {
             }
     )
     public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
-        Credentials credentials = new Credentials(username, password);
+        try {
+            Authentication authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(
+                            username,
+                            password
+                    ));
+            String token = jwtUtil.generateToken(authentication.getName());
 
-        Boolean isValid = traineeService.checkCredentials(credentials);
-        if (isValid) {
             logInMetric.increment();
-
-            String token = jwtUtil.generateToken(username);
+            loginAttemptService.resetAttempts(username);
             return ResponseEntity.ok().header(
                     HttpHeaders.AUTHORIZATION,
                     token
             ).body(
                     "Login successful"
             );
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+
+    @GetMapping("/logout")
+    @Operation(
+            summary = "User Logout",
+            description = "Log out the user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Logout successful"),
+                    @ApiResponse(responseCode = "401", description = "You aree not logged in")
+            }
+    )
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        logoutService.blacklistToken(token);
+        return ResponseEntity.ok("Successfully logged out");
+    }
+
+
 
     @PutMapping("/change-trainee-password")
     @Operation(

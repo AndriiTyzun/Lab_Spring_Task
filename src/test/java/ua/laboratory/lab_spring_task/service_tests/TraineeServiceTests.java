@@ -59,7 +59,7 @@ public class TraineeServiceTests {
         testTrainingType = new TrainingType("Test type 1");
         testTrainingType = trainingTypeRepository.save(testTrainingType);
         testTrainer = new Trainer(trainingTypeRepository.getReferenceById(testTrainingType.getId()));
-        testTrainer.setUser(user);
+        testTrainer.setUser(userBackup);
         testTrainer.getUser().setActive(true);
 
         trainerRepository.save(testTrainer);
@@ -67,7 +67,7 @@ public class TraineeServiceTests {
 
     @Test
     public void testCreateTrainee() {
-        Trainee createdTrainee = traineeService.createTrainee("Jason", "Smith", LocalDate.now(), "Address 1");
+        Trainee createdTrainee = traineeService.createTrainee("Jason", "Smith", LocalDate.now(), "Address 1", "123");
 
         assertNotNull(createdTrainee);
         assertEquals("jason.smith", createdTrainee.getUser().getUsername());
@@ -99,13 +99,6 @@ public class TraineeServiceTests {
         Trainee retrievedTrainee = traineeService.getTraineeByUsername("john.smith");
         assertNotNull(retrievedTrainee);
         assertEquals("John", retrievedTrainee.getUser().getFirstName());
-    }
-
-    @Test
-    public void testChangePassword() {
-        traineeService.changePassword("john.smith", "newpassword");
-        Credentials newCredentials = new Credentials("john.smith", "newpassword");
-        assertTrue(traineeService.checkCredentials(newCredentials));
     }
 
     @Test

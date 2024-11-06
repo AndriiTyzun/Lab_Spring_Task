@@ -1,8 +1,6 @@
 package ua.laboratory.lab_spring_task.util;
 
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,5 +50,14 @@ public class JwtUtil {
         return jwtParser
                 .parseClaimsJws(token)
                 .getBody().getSubject();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            jwtParser.parse(token);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface TraineeService {
-    Trainee createTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address);
+    Trainee createTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address, String password);
     Trainee updateTrainee(Trainee trainee);
     Boolean checkCredentials(Credentials credentials);
     Trainee getTraineeById(Long id);

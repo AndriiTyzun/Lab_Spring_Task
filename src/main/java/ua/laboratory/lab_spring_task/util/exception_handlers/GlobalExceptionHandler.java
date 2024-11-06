@@ -1,7 +1,9 @@
 package ua.laboratory.lab_spring_task.util.exception_handlers;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -15,51 +17,45 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidData(EntityNotFoundException ex, WebRequest request) {
+
+    private ResponseEntity<Map<String, Object>> buildResponseEntity(HttpStatus status, String error, String message, WebRequest request) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Entity not found");
-        body.put("message", ex.getMessage());
+        body.put("status", status.value());
+        body.put("error", error);
+        body.put("message", message);
         body.put("path", request.getDescription(false));
+        return ResponseEntity.status(status)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(body);
+    }
 
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleEntityNotFound(EntityNotFoundException ex, WebRequest request) {
+        return buildResponseEntity(HttpStatus.NOT_FOUND, "Entity not found", ex.getMessage(), request);
     }
 
     @ExceptionHandler(EntityAlreadyPresentException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidData(EntityAlreadyPresentException ex, WebRequest request) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Entity already exists");
-        body.put("message", ex.getMessage());
-        body.put("path", request.getDescription(false));
-
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Map<String, Object>> handleEntityAlreadyPresent(EntityAlreadyPresentException ex, WebRequest request) {
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, "Entity already exists", ex.getMessage(), request);
     }
 
     @ExceptionHandler(InvalidDataException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidData(InvalidDataException ex, WebRequest request) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Invalid Data");
-        body.put("message", ex.getMessage());
-        body.put("path", request.getDescription(false));
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, "Invalid Data", ex.getMessage(), request);
+    }
 
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, String>> handleAccessDeniedException(AccessDeniedException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Access Denied");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGlobalException(Exception ex, WebRequest request) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        body.put("error", "Internal Server Error");
-        body.put("message", ex.getMessage());
-        body.put("path", request.getDescription(false));
-
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage(), request);
     }
 }

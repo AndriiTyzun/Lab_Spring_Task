@@ -62,7 +62,7 @@ public class TraineeControllerTests {
     public void testCreateTrainee() throws Exception {
         TraineeRegistrationRequest request = new TraineeRegistrationRequest("John", "Doe", LocalDate.now(), "Address");
 
-        when(traineeService.createTrainee(any(), any(), any(), any())).thenReturn(
+        when(traineeService.createTrainee(any(), any(), any(), any(), any())).thenReturn(
                 new Trainee(1L,LocalDate.now(), "Address 1",
                         new User("","","john123","password123",true),
                         new HashSet<>())
