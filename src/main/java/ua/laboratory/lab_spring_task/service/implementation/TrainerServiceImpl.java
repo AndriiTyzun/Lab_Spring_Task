@@ -13,6 +13,8 @@ import ua.laboratory.lab_spring_task.model.Trainer;
 import ua.laboratory.lab_spring_task.model.TrainingType;
 import ua.laboratory.lab_spring_task.model.User;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
+import ua.laboratory.lab_spring_task.model.response.TraineeProfileResponse;
+import ua.laboratory.lab_spring_task.model.response.TrainerProfileResponse;
 import ua.laboratory.lab_spring_task.service.TrainerService;
 import ua.laboratory.lab_spring_task.util.Utilities;
 import ua.laboratory.lab_spring_task.util.exceptions.InvalidDataException;
@@ -20,6 +22,7 @@ import ua.laboratory.lab_spring_task.util.exceptions.InvalidDataException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class TrainerServiceImpl implements TrainerService {
@@ -30,14 +33,17 @@ public class TrainerServiceImpl implements TrainerService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public TrainerServiceImpl(TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, UserRepository userRepository) {
+    public TrainerServiceImpl(TrainerRepository trainerRepository,
+                              TrainingTypeRepository trainingTypeRepository,
+                              UserRepository userRepository) {
         this.trainerRepository = trainerRepository;
         this.trainingTypeRepository = trainingTypeRepository;
         this.userRepository = userRepository;
     }
 
     @Override
-    public Trainer createTrainer(String firstName, String lastName, TrainingType trainingType, String password) {
+    public TrainerProfileResponse createTrainer(String firstName, String lastName,
+                                                TrainingType trainingType, String password) {
         if(firstName == null || lastName == null || trainingType == null)
             throw new InvalidDataException("Trainer cannot be null");
 
@@ -55,11 +61,11 @@ public class TrainerServiceImpl implements TrainerService {
         Trainer trainer = new Trainer(type);
         trainer.setUser(user);
 
-        return trainerRepository.save(trainer);
+        return new TrainerProfileResponse(trainerRepository.save(trainer));
     }
 
     @Override
-    public Trainer updateTrainer(Trainer trainer) {
+    public TrainerProfileResponse updateTrainer(Trainer trainer) {
         if(trainer == null)
             throw new InvalidDataException("Trainee cannot be null");
 
@@ -67,7 +73,7 @@ public class TrainerServiceImpl implements TrainerService {
                 trainer.getSpecialization().getTrainingTypeName()).orElseThrow());
         trainer.getUser().setPassword(passwordEncoder.encode(trainer.getUser().getPassword()));
         userRepository.save(trainer.getUser());
-        return trainerRepository.save(trainer);
+        return new TrainerProfileResponse(trainerRepository.save(trainer));
     }
 
     @Override
@@ -89,18 +95,20 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer getTrainerByUsername(String username) {
+    public TrainerProfileResponse getTrainerByUsername(String username) {
         if(username == null)
             throw new InvalidDataException("Username cannot be null");
 
         logger.info("Fetching trainer with username: {}", username);
-        return trainerRepository.getByUserUsername(username).orElseThrow();
+        return new TrainerProfileResponse(trainerRepository.getByUserUsername(username)
+                .orElseThrow());
     }
 
     @Override
-    public List<Trainer> getAllTrainers() {
+    public Set<TrainerProfileResponse> getAllTrainers() {
         logger.info("Fetching all trainers");
-        return trainerRepository.getAllByOrderByIdDesc();
+        return trainerRepository.getAllByOrderByIdDesc()
+                .stream().map(TrainerProfileResponse::new).collect(Collectors.toSet());
     }
 
     @Override
@@ -116,7 +124,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer changePassword(String username, String newPassword) {
+    public TrainerProfileResponse changePassword(String username, String newPassword) {
         if(username == null || newPassword == null || username.isEmpty() || newPassword.isEmpty())
             throw new InvalidDataException("Username and password are required");
 
@@ -124,7 +132,7 @@ public class TrainerServiceImpl implements TrainerService {
                 IllegalArgumentException::new
         );
         trainer.getUser().setPassword(passwordEncoder.encode(newPassword));
-        return trainerRepository.save(trainer);
+        return new TrainerProfileResponse(trainerRepository.save(trainer));
     }
 
     @Override
@@ -168,16 +176,18 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Set<Trainer> getUnassignedTrainersByTraineeUsername(String traineeUsername) {
+    public Set<TrainerProfileResponse> getUnassignedTrainersByTraineeUsername(String traineeUsername) {
         logger.info("Fetching all trainers not assigned to trainee");
-        return new HashSet<>(trainerRepository.getUnassignedTrainersByUserUsername(traineeUsername));
+        return trainerRepository.getUnassignedTrainersByUserUsername(traineeUsername)
+                .stream().map(TrainerProfileResponse::new).collect(Collectors.toSet());
     }
 
     @Override
-    public Set<Trainee> getAllTrainees(String username) {
+    public Set<TraineeProfileResponse> getAllTrainees(String username) {
         if(username.isEmpty())
             throw new InvalidDataException("Username cannot be empty");
 
-        return trainerRepository.getAllTraineesByTraineeUsername(username);
+        return trainerRepository.getAllTraineesByTraineeUsername(username)
+                .stream().map(TraineeProfileResponse::new).collect(Collectors.toSet());
     }
 }

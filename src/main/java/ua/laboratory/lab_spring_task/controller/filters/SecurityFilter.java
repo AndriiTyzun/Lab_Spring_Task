@@ -9,13 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ua.laboratory.lab_spring_task.dao.UserRepository;
 import ua.laboratory.lab_spring_task.model.User;
-import ua.laboratory.lab_spring_task.model.dto.Credentials;
 import ua.laboratory.lab_spring_task.model.dto.UserCredentials;
 import ua.laboratory.lab_spring_task.service.implementation.LoginAttemptService;
 import ua.laboratory.lab_spring_task.service.implementation.LogoutService;
@@ -26,14 +24,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class JwtFilter extends OncePerRequestFilter {
+public class SecurityFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final ObjectMapper mapper;
     private final LoginAttemptService loginAttemptService;
     private final LogoutService logoutService;
 
-    public JwtFilter(JwtUtil jwtUtil, UserRepository userRepository, ObjectMapper mapper, LoginAttemptService loginAttemptService, LogoutService logoutService) {
+    public SecurityFilter(JwtUtil jwtUtil, UserRepository userRepository, ObjectMapper mapper, LoginAttemptService loginAttemptService, LogoutService logoutService) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
         this.mapper = mapper;
@@ -44,49 +42,18 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         Map<String, Object> errorDetails = new HashMap<>();
-        try {
-            String accessToken = jwtUtil.resolveToken(request);
-
-            if (accessToken == null || !jwtUtil.validateToken(accessToken)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            if (logoutService.isTokenBlacklisted(accessToken)) {
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                errorDetails.put("message", "Token has been blacklisted. Please log in again.");
+        if ("/api/login".equals(request.getRequestURI())) {
+            String username = request.getParameter("username");
+            if (username != null && loginAttemptService.isBlocked(username)) {
+                errorDetails.put("message", "User account is locked due to too many failed login attempts. Please try again later.");
+                response.setStatus(HttpStatus.FORBIDDEN.value());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 mapper.writeValue(response.getWriter(), errorDetails);
                 return;
             }
-
-            String username = jwtUtil.getEmail(accessToken);
-
-            User user = userRepository.getByUsername(username).orElse(null);
-            UserCredentials userCredentials = new UserCredentials(user.getUsername(), user.getPassword());
-
-            if (userCredentials.getUsername() != null) {
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userCredentials,
-                                null,
-                                userCredentials.getAuthorities()
-                        );
-
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-
-        } catch (Exception e) {
-            errorDetails.put("message", "Authentication Error");
-            errorDetails.put("details", e.getMessage());
-            response.setStatus(HttpStatus.FORBIDDEN.value());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            mapper.writeValue(response.getWriter(), errorDetails);
-            return;
         }
 
         filterChain.doFilter(request, response);
     }
+
 }

@@ -1,13 +1,17 @@
 package ua.laboratory.lab_spring_task.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.Trainer;
-import ua.laboratory.lab_spring_task.model.User;
-import ua.laboratory.lab_spring_task.model.dto.Credentials;
+import ua.laboratory.lab_spring_task.model.dto.UserCredentials;
 import ua.laboratory.lab_spring_task.model.request.TrainerRegistrationRequest;
 import ua.laboratory.lab_spring_task.model.request.UpdateTrainerProfileRequest;
 import ua.laboratory.lab_spring_task.model.response.TraineeProfileResponse;
@@ -16,11 +20,6 @@ import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.service.TrainerService;
 import ua.laboratory.lab_spring_task.util.Utilities;
 import ua.laboratory.lab_spring_task.util.metrics.RegistrationMetric;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,11 +51,11 @@ public class TrainerController {
     )
     public ResponseEntity<Map<String, String>> createTrainer(@RequestBody TrainerRegistrationRequest request) {
         String password = Utilities.generatePassword(10);
-        Trainer newTrainer = trainerService.createTrainer(request.getFirstName(), request.getLastName(),
+        TrainerProfileResponse newTrainer = trainerService.createTrainer(request.getFirstName(), request.getLastName(),
                 request.getTrainingType(), password);
 
         Map<String, String> response = new HashMap<>();
-        response.put("username", newTrainer.getUser().getUsername());
+        response.put("username", newTrainer.getUsername());
         response.put("password", password);
 
         registrationMetric.increment();
@@ -72,7 +71,7 @@ public class TrainerController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<Void> activateTrainer(@AuthenticationPrincipal User user) {
+    public ResponseEntity<Void> activateTrainer(@AuthenticationPrincipal UserCredentials user) {
         trainerService.activateTrainer(user.getUsername());
         return ResponseEntity.ok().build();
     }
@@ -86,7 +85,7 @@ public class TrainerController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<Void> deactivateTrainer(@AuthenticationPrincipal User user) {
+    public ResponseEntity<Void> deactivateTrainer(@AuthenticationPrincipal UserCredentials user) {
         trainerService.deactivateTrainer(user.getUsername());
         return ResponseEntity.ok().build();
     }
@@ -100,15 +99,10 @@ public class TrainerController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<Set<TrainerProfileResponse>> getAvailableTrainers(@AuthenticationPrincipal User user,
+    public ResponseEntity<Set<TrainerProfileResponse>> getAvailableTrainers(@AuthenticationPrincipal UserCredentials user,
                                                               @RequestBody String searchUsername){
-        Set<TrainerProfileResponse> response = trainerService.getUnassignedTrainersByTraineeUsername(
-                searchUsername).stream()
-                .filter(trainer -> trainer.getUser().isActive())
-                .map(trainer -> new TrainerProfileResponse(trainer.getUser().getUsername(),
-                        trainer.getUser().getFirstName(), trainer.getUser().getLastName(),
-                        true,trainer.getSpecialization(),null))
-                .collect(Collectors.toSet());;
+        Set<TrainerProfileResponse> response = trainerService
+                .getUnassignedTrainersByTraineeUsername(searchUsername);
         return ResponseEntity.ok(response);
     }
 
@@ -121,26 +115,9 @@ public class TrainerController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<TrainerProfileResponse> getTrainerProfile(@AuthenticationPrincipal User user) {
-        Trainer trainer = trainerService.getTrainerByUsername(user.getUsername());
-
-        List<TraineeProfileResponse> trainers = trainer.getTrainees().stream()
-                .map(trainee -> new TraineeProfileResponse(trainee.getUser().getUsername(),
-                        trainee.getUser().getFirstName(), trainee.getUser().getLastName(),
-                        trainee.getUser().isActive(), trainee.getDateOfBirth(),
-                        trainee.getAddress(), null))
-                .collect(Collectors.toList());
-
-        TrainerProfileResponse response = new TrainerProfileResponse(
-                trainer.getUser().getUsername(),
-                trainer.getUser().getFirstName(),
-                trainer.getUser().getLastName(),
-                trainer.getUser().isActive(),
-                trainer.getSpecialization(),
-                trainers
-        );
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<TrainerProfileResponse> getTrainerProfile(@AuthenticationPrincipal UserCredentials user) {
+        TrainerProfileResponse trainer = trainerService.getTrainerByUsername(user.getUsername());
+        return ResponseEntity.ok(trainer);
     }
 
     @PutMapping("/profile")
@@ -158,30 +135,15 @@ public class TrainerController {
             }
     )
     public ResponseEntity<TrainerProfileResponse> updateTrainerProfile(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal UserCredentials user,
             @RequestBody UpdateTrainerProfileRequest updateRequest) {
 
-        Trainer trainer = trainerService.getTrainerByUsername(user.getUsername());
-        trainer.updateByRequest(updateRequest);
-        Trainer updatedTrainer = trainerService.updateTrainer(trainer);
+        TrainerProfileResponse trainer = trainerService.getTrainerByUsername(user.getUsername());
+        Trainer updatedtrainer = trainerService.getTrainerById(trainer.getTrainerId());
+        updatedtrainer.updateByRequest(updateRequest);
+        trainer = trainerService.updateTrainer(updatedtrainer);
 
-        List<TraineeProfileResponse> trainees = updatedTrainer.getTrainees().stream()
-                .map(trainee -> new TraineeProfileResponse(trainee.getUser().getUsername(),
-                        trainee.getUser().getFirstName(), trainee.getUser().getLastName(),
-                        trainee.getUser().isActive(),trainee.getDateOfBirth(),trainee.getAddress(),
-                        null))
-                .toList();
-
-        TrainerProfileResponse response = new TrainerProfileResponse(
-                updatedTrainer.getUser().getUsername(),
-                updatedTrainer.getUser().getFirstName(),
-                updatedTrainer.getUser().getLastName(),
-                updatedTrainer.getUser().isActive(),
-                updatedTrainer.getSpecialization(),
-                trainees
-        );
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(trainer);
     }
 
     @PutMapping("/trainees")
@@ -198,16 +160,16 @@ public class TrainerController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<Set<Trainee>> updateTrainees(@AuthenticationPrincipal User user,
-                                                       @RequestBody List<String> trainers){
+    public ResponseEntity<Set<TraineeProfileResponse>> updateTrainees(@AuthenticationPrincipal UserCredentials user,
+                                                       @RequestBody List<String> trainees){
         Set<Trainee> traineeList = new HashSet<>();
-        for (String trainer : trainers)
-            traineeList.add(traineeService.getTraineeByUsername(trainer));
+        for (String trainer : trainees){
+            TraineeProfileResponse trainee = traineeService.getTraineeByUsername(trainer);
+            traineeList.add(traineeService.getTraineeById(trainee.getTraineeId()));
+        }
+        trainerService.updateTrainees(traineeService.getTraineeByUsername(
+                user.getUsername()).getTraineeId(), traineeList);
 
-        trainerService.updateTrainees(traineeService.getTraineeByUsername(user.getUsername()).getId(),
-                traineeList);
-
-        traineeList = trainerService.getAllTrainees(user.getUsername());
-        return ResponseEntity.ok(traineeList);
+        return ResponseEntity.ok(trainerService.getAllTrainees(user.getUsername()));
     }
 }

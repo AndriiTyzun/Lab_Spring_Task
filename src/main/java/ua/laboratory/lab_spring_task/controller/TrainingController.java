@@ -9,6 +9,7 @@ import ua.laboratory.lab_spring_task.model.Trainer;
 import ua.laboratory.lab_spring_task.model.TrainingType;
 import ua.laboratory.lab_spring_task.model.User;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
+import ua.laboratory.lab_spring_task.model.dto.UserCredentials;
 import ua.laboratory.lab_spring_task.model.request.SearchCriteriaRequest;
 import ua.laboratory.lab_spring_task.model.request.TrainingRegistrationRequest;
 import ua.laboratory.lab_spring_task.model.response.TrainingDetailsResponse;
@@ -50,11 +51,11 @@ public class TrainingController {
                     @ApiResponse(responseCode = "400", description = "Invalid input data")
             }
     )
-    public ResponseEntity<Void> createTraining(@AuthenticationPrincipal User user,
+    public ResponseEntity<Void> createTraining(@AuthenticationPrincipal UserCredentials user,
                                                @RequestBody TrainingRegistrationRequest request) {
 
-        Trainee trainee = traineeService.getTraineeByUsername(request.getTraineeUsername());
-        Trainer trainer = trainerService.getTrainerByUsername(request.getTrainerUsername());
+        Trainee trainee = traineeService.getTraineeById(request.getTraineeId());
+        Trainer trainer = trainerService.getTrainerById(request.getTrainerId());
 
         trainingService.createTraining(request.getTrainingName(), request.getTrainingDate(),
                 request.getTrainingDuration(), request.getTrainingType(), trainee, trainer);
@@ -76,14 +77,13 @@ public class TrainingController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<List<TrainingDetailsResponse>> getTraineeTrainings(@AuthenticationPrincipal User user,
+    public ResponseEntity<Set<TrainingDetailsResponse>> getTraineeTrainings(@AuthenticationPrincipal UserCredentials user,
                                                                         @RequestBody SearchCriteriaRequest request) {
-        List<TrainingDetailsResponse> trainingDetailsResponse = trainingService.getTraineeTrainingsByCriteria(request.getUsername(),
-                request.getFromDate(),request.getToDate(),request.getPartnerName(),
-                        request.getType() == null ? null : request.getType().getTrainingTypeName())
-                .stream().map(training -> new TrainingDetailsResponse(training.getTrainingName(), training.getTrainingDate(),
-                        training.getTrainingType(), training.getTrainingDuration(), training.getTrainer().getUser().getUsername()))
-                .toList();
+        Set<TrainingDetailsResponse> trainingDetailsResponse = trainingService
+                .getTraineeTrainingsByCriteria(request.getUsername(),
+                        request.getFromDate(),request.getToDate(),request.getPartnerName(),
+                        request.getType() == null ? null : request.getType().getTrainingTypeName()
+                );
         return ResponseEntity.ok(trainingDetailsResponse);
     }
 
@@ -101,14 +101,12 @@ public class TrainingController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<List<TrainingDetailsResponse>> getTrainerTrainings(@AuthenticationPrincipal User user,
+    public ResponseEntity<Set<TrainingDetailsResponse>> getTrainerTrainings(@AuthenticationPrincipal UserCredentials user,
                                                                              @RequestBody SearchCriteriaRequest request) {
-        List<TrainingDetailsResponse> trainingDetailsResponse = trainingService.getTrainerTrainingsByCriteria(request.getUsername(),
+        Set<TrainingDetailsResponse> trainingDetailsResponse = trainingService.getTrainerTrainingsByCriteria(request.getUsername(),
                         request.getFromDate(),request.getToDate(),request.getPartnerName(),
                         request.getType() == null ? null : request.getType().getTrainingTypeName()
-                ).stream().map(training -> new TrainingDetailsResponse(training.getTrainingName(), training.getTrainingDate(),
-                        training.getTrainingType(), training.getTrainingDuration(), training.getTrainer().getUser().getUsername()))
-                .toList();
+                );
         return ResponseEntity.ok(trainingDetailsResponse);
     }
 
@@ -121,7 +119,7 @@ public class TrainingController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    public ResponseEntity<Set<TrainingType>> getTrainingTypes(@AuthenticationPrincipal User user){
+    public ResponseEntity<Set<TrainingType>> getTrainingTypes(@AuthenticationPrincipal UserCredentials user){
         Set<TrainingType> trainingTypes = trainingService.getAllTrainingTypes();
         return ResponseEntity.ok(trainingTypes);
     }

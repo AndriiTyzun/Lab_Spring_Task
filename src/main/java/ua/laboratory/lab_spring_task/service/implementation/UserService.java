@@ -6,6 +6,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ua.laboratory.lab_spring_task.dao.UserRepository;
+import ua.laboratory.lab_spring_task.model.User;
+import ua.laboratory.lab_spring_task.model.dto.UserCredentials;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -22,6 +24,7 @@ public class UserService implements UserDetailsService {
         if (loginAttemptService.isBlocked(username)) {
             throw new RuntimeException("Blocked due to too many failed login attempts");
         }
-        return userRepository.getByUsername(username).orElseThrow();
+        User user = userRepository.getByUsername(username).orElseThrow();
+        return new UserCredentials(user.getUsername(), user.getPassword());
     }
 }

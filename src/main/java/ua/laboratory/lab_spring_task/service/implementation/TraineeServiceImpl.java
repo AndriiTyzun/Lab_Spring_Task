@@ -12,6 +12,8 @@ import ua.laboratory.lab_spring_task.model.Trainee;
 import ua.laboratory.lab_spring_task.model.Trainer;
 import ua.laboratory.lab_spring_task.model.User;
 import ua.laboratory.lab_spring_task.model.dto.Credentials;
+import ua.laboratory.lab_spring_task.model.response.TraineeProfileResponse;
+import ua.laboratory.lab_spring_task.model.response.TrainerProfileResponse;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.util.Utilities;
 import ua.laboratory.lab_spring_task.util.exceptions.InvalidDataException;
@@ -19,6 +21,7 @@ import ua.laboratory.lab_spring_task.util.exceptions.InvalidDataException;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class TraineeServiceImpl implements TraineeService {
@@ -28,14 +31,17 @@ public class TraineeServiceImpl implements TraineeService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public TraineeServiceImpl(TraineeRepository traineeRepository, UserRepository userRepository) {
+    public TraineeServiceImpl(TraineeRepository traineeRepository,
+                              UserRepository userRepository) {
         this.traineeRepository = traineeRepository;
         this.userRepository = userRepository;
     }
 
 
     @Override
-    public Trainee createTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address, String password) {
+    public TraineeProfileResponse createTrainee(String firstName, String lastName,
+                                                LocalDate dateOfBirth, String address,
+                                                String password) {
         if(firstName == null || lastName == null)
             throw new InvalidDataException("Trainee cannot be null");
 
@@ -48,16 +54,16 @@ public class TraineeServiceImpl implements TraineeService {
         Trainee trainee = new Trainee(dateOfBirth, address);
         trainee.setUser(user);
 
-        return traineeRepository.save(trainee);
+        return new TraineeProfileResponse(traineeRepository.save(trainee));
     }
 
     @Override
-    public Trainee updateTrainee(Trainee trainee) {
+    public TraineeProfileResponse updateTrainee(Trainee trainee) {
         if(trainee == null)
             throw new InvalidDataException("Trainee cannot be null");
         trainee.getUser().setPassword(passwordEncoder.encode(trainee.getUser().getPassword()));
         userRepository.save(trainee.getUser());
-        return traineeRepository.save(trainee);
+        return new TraineeProfileResponse(traineeRepository.save(trainee));
     }
 
     @Override
@@ -67,7 +73,8 @@ public class TraineeServiceImpl implements TraineeService {
             throw new InvalidDataException("Username and password are required");
         }
 
-        return Utilities.checkCredentials(credentials.getUsername(), credentials.getPassword());
+        return Utilities.checkCredentials(credentials.getUsername(),
+                credentials.getPassword());
     }
 
     @Override
@@ -80,22 +87,23 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public Trainee getTraineeByUsername(String username) {
+    public TraineeProfileResponse getTraineeByUsername(String username) {
         if(username == null)
             throw new InvalidDataException("Username cannot be null");
 
         logger.info("Fetching trainee with username: {}", username);
-        return traineeRepository.getByUserUsername(username).orElseThrow();
+        return new TraineeProfileResponse(traineeRepository
+                .getByUserUsername(username).orElseThrow());
     }
 
     @Override
-    public Trainee changePassword(String username, String newPassword) {
+    public TraineeProfileResponse changePassword(String username, String newPassword) {
         if(username == null || newPassword == null || username.isEmpty() || newPassword.isEmpty())
             throw new InvalidDataException("Username and password are required");
 
         Trainee trainee = traineeRepository.getByUserUsername(username).orElseThrow();
         trainee.getUser().setPassword(passwordEncoder.encode(newPassword));
-        return traineeRepository.save(trainee);
+        return new TraineeProfileResponse(traineeRepository.save(trainee));
     }
 
     @Override
@@ -154,12 +162,13 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public Set<Trainee> getAllTrainees(Credentials credentials) {
+    public Set<TraineeProfileResponse> getAllTrainees(Credentials credentials) {
         if(!checkCredentials(credentials))
             throw new InvalidDataException("Username and password are required");
 
         logger.info("Fetching all trainees");
-        return new HashSet<>(traineeRepository.getAllByOrderByIdDesc());
+        return traineeRepository.getAllByOrderByIdDesc().stream()
+                .map(TraineeProfileResponse::new).collect(Collectors.toSet());
     }
 
     @Override
@@ -183,11 +192,12 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public Set<Trainer> getAllTrainers(String username) {
+    public Set<TrainerProfileResponse> getAllTrainers(String username) {
         if(username.isEmpty())
             throw new InvalidDataException("Username cannot be empty");
 
-        return traineeRepository.getAllTrainersByTraineeUsername(username);
+        return traineeRepository.getAllTrainersByTraineeUsername(username)
+                .stream().map(TrainerProfileResponse::new).collect(Collectors.toSet());
     }
 }
 

@@ -13,8 +13,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TrainingRegistrationRequest {
-    private String traineeUsername;
-    private String trainerUsername;
+    private Long traineeId;
+    private Long trainerId;
     private String trainingName;
     private LocalDate trainingDate;
     private Long trainingDuration;
@@ -23,8 +23,8 @@ public class TrainingRegistrationRequest {
     @Override
     public String toString() {
         return "TrainingRegistrationRequest{" +
-                "traineeUsername='" + traineeUsername + '\'' +
-                ", trainerUsername='" + trainerUsername + '\'' +
+                "traineeUsername='" + traineeId + '\'' +
+                ", trainerUsername='" + trainerId + '\'' +
                 ", trainingName='" + trainingName + '\'' +
                 ", trainingDate=" + trainingDate +
                 ", trainingDuration=" + trainingDuration +

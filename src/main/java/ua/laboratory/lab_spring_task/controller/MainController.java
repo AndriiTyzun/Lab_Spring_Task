@@ -14,10 +14,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import ua.laboratory.lab_spring_task.model.User;
-import ua.laboratory.lab_spring_task.model.dto.Credentials;
+import ua.laboratory.lab_spring_task.model.dto.UserCredentials;
 import ua.laboratory.lab_spring_task.model.request.ChangePasswordRequest;
 import ua.laboratory.lab_spring_task.service.TraineeService;
 import ua.laboratory.lab_spring_task.service.TrainerService;
@@ -109,7 +107,7 @@ public class MainController {
                     @ApiResponse(responseCode = "401", description = "Invalid old credentials")
             }
     )
-    public ResponseEntity<String> changeTraineePassword(@AuthenticationPrincipal User user, @RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<String> changeTraineePassword(@AuthenticationPrincipal UserCredentials user, @RequestBody ChangePasswordRequest request) {
         traineeService.changePassword(user.getUsername(), request.getNewPassword());
         return ResponseEntity.ok("Password changed successfully");
     }
@@ -128,7 +126,7 @@ public class MainController {
                     @ApiResponse(responseCode = "401", description = "Invalid old credentials")
             }
     )
-    public ResponseEntity<String> changeTrainerPassword(@AuthenticationPrincipal User user, @RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<String> changeTrainerPassword(@AuthenticationPrincipal UserCredentials user, @RequestBody ChangePasswordRequest request) {
         trainerService.changePassword(user.getUsername(), request.getNewPassword());
         return ResponseEntity.ok("Password changed successfully");
     }

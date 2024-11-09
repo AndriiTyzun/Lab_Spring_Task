@@ -14,16 +14,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ua.laboratory.lab_spring_task.controller.filters.JwtFilter;
+import ua.laboratory.lab_spring_task.controller.filters.SecurityFilter;
 import ua.laboratory.lab_spring_task.service.implementation.UserService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     private final JwtFilter jwtFilter;
+    private final SecurityFilter securityFilter;
     private final UserService userDetailsService;
 
-    public SecurityConfig(JwtFilter jwtFilter, UserService userDetailsService) {
+    public SecurityConfig(JwtFilter jwtFilter, SecurityFilter securityFilter, UserService userDetailsService) {
         this.jwtFilter = jwtFilter;
+        this.securityFilter = securityFilter;
         this.userDetailsService = userDetailsService;
     }
 
@@ -48,6 +51,7 @@ public class SecurityConfig {
 
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(authenticationManager(http,passwordEncoder()));
         return http.build();
     }
